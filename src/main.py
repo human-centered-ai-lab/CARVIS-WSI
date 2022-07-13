@@ -2,27 +2,29 @@
 
 ''' 
 main.py
-extracts layer/part of whole slide image as jpg and renders heatmaps of eye tracking data
+draws heatmap of eye tracking on jpeg extraction of whole slide image
 '''
 
 # ToDo:
 #
+# - openslide does bad things when calling read_region, 
 # (- add more string testing for image section parameters?)
 #
 
+import os
 import sys
 import csv
 from os.path import exists
 from ImageSection import ImageSection
 from EyeData import EyeData
 from HeatMapUtils import HeatMapUtils
+from PIL import Image
 from openslide import open_slide
 from openslide import OpenSlide, OpenSlideError
 from openslide.deepzoom import DeepZoomGenerator
 
 ROI_CHANGE_SIGNAL = "%7b%22"
 wsiLevel = 0
-heatMapUtils = HeatMapUtils()
 
 # options/settings via terminal args
 # extract images, and save with heatmaps overlay and viewpath
@@ -234,21 +236,30 @@ def verifyInput():
     if (len(sys.argv) != 4):
         terminate()
 
-    if not exists(sys.argv[1]) or not exists(sys.argv[2]):
+    if not exists(sys.argv[1]):
         print("File not found!")
+        terminate()
+    
+    if not os.path.exists(sys.argv[2]):
+        print("given data directory does not exist!")
+        print("Note that the directory parameter must be relative to your current path.")
         terminate()
     
     wsiLevel = sys.argv[3]
 
 # prints usage and exits
 def terminate():
-    print("usage: main.py <CSV FILE> <SVS FILE> <EXTRACTION LAYER>")
+    print("usage: main.py <CSV FILE> <SVS DIRECTORY> <EXTRACTION LAYER>")
     exit()
 
 # reads the svs file and extracs the needed
 def readSVS(file):
+    if not exists(file):
+        print(f'The needed wsi file {file} does not exist!')
+        terminate()
+
     wsiSlide = open_slide(file)
-    print(file)
+    print(f'reqested Image filename: {file}')
     print(f'slide level count: {wsiSlide.level_count} level dimensions: {wsiSlide.level_dimensions}')
     return wsiSlide
 
@@ -256,11 +267,27 @@ if __name__ == "__main__":
     verifyInput()
 
     csvData = readCSV(sys.argv[1])
-    wsiSlide = readSVS(sys.argv[2])
+
+    wsiFileName = csvData[1]._fileName
+    print(f'real filename: {wsiFileName}')
+    wsiSlide = readSVS(sys.argv[2] + wsiFileName)
 
     dims = wsiSlide.level_dimensions
-    (gridX, gridY) = heatMapUtils.calculateGrid(dims[wsiLevel][0], dims[wsiLevel][1])
-    print(f'gridxy: {gridX, gridY}')
+    heatMapUtils = HeatMapUtils(dims[wsiLevel][0], dims[wsiLevel][1])
+
+    img = heatMapUtils.extractLayer(wsiSlide, 3)
+    img.show()
+
+    #print(f'{heatMapUtils._pixelPerCellX}, {heatMapUtils._pixelPerCellY}')
+    print(f'pixels per cell [x, y]: {heatMapUtils._pixelPerCellX}, {heatMapUtils._pixelPerCellY}')
+
+    # a fine grid needs to be layed over the image. when an eyeData point will
+    # hit one grid cell, it's counter will be increased. then the grid will get
+    # colorised according to it cell's hit rate and displayed over the original
+    # wsi image layer.
+    #
+    # all eyeData points need to be calculated back to the original image pixels at level 0.
+    # data for this is in each corresponding ImageSection. 
 
     print("done!")
     input()
