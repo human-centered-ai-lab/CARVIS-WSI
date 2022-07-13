@@ -1,5 +1,9 @@
 # ImageSection.py
-# dataframe for ImageSections
+
+''' dataframe for ImageSections '''
+
+from copy import copy
+
 
 class ImageSection():
     def __init__(self,
@@ -26,5 +30,17 @@ class ImageSection():
         self._topRigth = topRight
         self._bottomLeft = bottomLeft
         self._bottomRight = bottomRight
-        self._timestamps = []
-        self._eyeTracking = []
+        self._timestamps = [ ]
+        self._eyeTracking = [ ]
+    
+    # appends timestamps to empty _timestamps list
+    # for inheritance reasons
+    def addTimestamps(self, timestamps):
+        # deep copy
+        self._timestamps = timestamps.copy()
+        
+
+    # appends eye tracking data to empty _eyeTracking list
+    # for inheritance reasons
+    def addEyeTracking(self, eyeData):
+        self._eyeTracking = eyeData.copy()

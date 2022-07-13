@@ -1,5 +1,6 @@
 # EyeData.py
-# every EyeData gets an ImageSections assigned
+
+''' every EyeData gets an ImageSections assigned '''
 
 class EyeData():
     def __init__(self,
