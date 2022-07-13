@@ -1,2 +1,3 @@
 OpenSlide
 OpenSlide Python (Python Interface for OpenSlide)
+Pillow

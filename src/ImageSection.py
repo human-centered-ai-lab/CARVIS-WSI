@@ -4,7 +4,6 @@
 
 from copy import copy
 
-
 class ImageSection():
     def __init__(self,
     file,
