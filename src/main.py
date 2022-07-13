@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 
-# main.py
+''' 
+main.py
+extracts layer/part of whole slide image as jpg and renders heatmaps of eye tracking data
+'''
 
 # ToDo:
 #
-# - why are there on all entries the same amount of timestamps (list length) and eye tracking points? (1122)
 # (- add more string testing for image section parameters?)
 #
 
@@ -13,14 +15,20 @@ import csv
 from os.path import exists
 from ImageSection import ImageSection
 from EyeData import EyeData
+from HeatMapUtils import HeatMapUtils
+from openslide import open_slide
+from openslide import OpenSlide, OpenSlideError
+from openslide.deepzoom import DeepZoomGenerator
 
 ROI_CHANGE_SIGNAL = "%7b%22"
+wsiLevel = 0
+heatMapUtils = HeatMapUtils()
 
 # options/settings via terminal args
 # extract images, and save with heatmaps overlay and viewpath
 # datapoints: eye tracking data is viewport specific
 
-# usage: main.py <CSV File> <SVS FILE>
+# usage: main.py <CSV File> <SVS FILE> <EXTRACTION LAYER>
 
 # extracts the eye tracking data for all image sections
 # returns: list of imageSections
@@ -87,8 +95,8 @@ def readCSV(file):
                 # when there is a new roi change signal save all currently
                 # collected data to existing image section and create a new one
                 if (roiChangeColumn == ROI_CHANGE_SIGNAL):
-                    ImageSectionList[-1]._timestamps = imageSectionTimestamps
-                    ImageSectionList[-1]._eyeTracking = eyeDataList
+                    ImageSectionList[-1].addTimestamps(imageSectionTimestamps)
+                    ImageSectionList[-1].addEyeTracking(eyeDataList)
 
                     # after adding collected eye tracking data to corresponding image section
                     # clear the list so the next image section gets only its eye data
@@ -213,25 +221,47 @@ def readCSV(file):
                       ))
 
         # also don't forget to save all pending eye tracking data
-        print(f'eye list length: {len(eyeDataList)}')
+        ImageSectionList[-1].addTimestamps(imageSectionTimestamps)
+        ImageSectionList[-1].addEyeTracking(eyeDataList)
 
-        
-        # this is just for testing if inserting worked
-        #for smth in ImageSectionList:
-        #     print(f'Filename: {smth._fileName}, timestamps (how many): {len(smth._timestamps)} \nNumber of Eye tracking points: {len(smth._eyeTracking)}\n')
+        imageSectionTimestamps.clear()
+        eyeDataList.clear()
+
+        return ImageSectionList
 
 # checks if the user choosen input makes sense
 def verifyInput():
-    if (len(sys.argv) != 3):
-        print("usage: main.py <CSV FILE> <SVS FILE>")
-        exit()
+    if (len(sys.argv) != 4):
+        terminate()
 
     if not exists(sys.argv[1]) or not exists(sys.argv[2]):
         print("File not found!")
-        print("usage: main.py <CSV FILE> <SVS FILE>")
-        exit()
+        terminate()
+    
+    wsiLevel = sys.argv[3]
+
+# prints usage and exits
+def terminate():
+    print("usage: main.py <CSV FILE> <SVS FILE> <EXTRACTION LAYER>")
+    exit()
+
+# reads the svs file and extracs the needed
+def readSVS(file):
+    wsiSlide = open_slide(file)
+    print(file)
+    print(f'slide level count: {wsiSlide.level_count} level dimensions: {wsiSlide.level_dimensions}')
+    return wsiSlide
 
 if __name__ == "__main__":
     verifyInput()
 
-    readCSV(sys.argv[1])
+    csvData = readCSV(sys.argv[1])
+    wsiSlide = readSVS(sys.argv[2])
+
+    dims = wsiSlide.level_dimensions
+    (gridX, gridY) = heatMapUtils.calculateGrid(dims[wsiLevel][0], dims[wsiLevel][1])
+    print(f'gridxy: {gridX, gridY}')
+
+    print("done!")
+    input()
+    
