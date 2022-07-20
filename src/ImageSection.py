@@ -13,10 +13,14 @@ class ImageSection():
     width,
     height,
     roi,
-    topLeft,
-    topRight,
-    bottomLeft,
-    bottomRight):
+    topLeftX,
+    topLeftY,
+    topRightX,
+    topRightY,
+    bottomLeftX,
+    bottomLeftY,
+    bottomRightX,
+    bottomRightY):
 
         self._fileName = file
         self._centerX = centerX
@@ -25,10 +29,14 @@ class ImageSection():
         self._width = width
         self._height = height
         self._viewRoi = roi
-        self._topLeft = topLeft
-        self._topRigth = topRight
-        self._bottomLeft = bottomLeft
-        self._bottomRight = bottomRight
+        self._topLeftX = topLeftX
+        self._topLeftY = topLeftY
+        self._topRightX = topRightX
+        self._topRightY = topRightY
+        self._bottomLeftX = bottomLeftX
+        self._bottomLeftY = bottomLeftY
+        self._bottomRightX = bottomRightX
+        self._bottomRightY = bottomRightY
         self._timestamps = [ ]
         self._eyeTracking = [ ]
     
@@ -42,4 +50,4 @@ class ImageSection():
     # appends eye tracking data to empty _eyeTracking list
     # for inheritance reasons
     def addEyeTracking(self, eyeData):
-        self._eyeTracking = eyeData.copy()
+        self._eyeTracking = eyeData.copy(),
