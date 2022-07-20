@@ -7,8 +7,12 @@ draws heatmap of eye tracking on jpeg extraction of whole slide image
 
 # ToDo:
 #
-# - openslide does bad things when calling read_region, 
-# (- add more string testing for image section parameters?)
+# - heatmap gets drawn on specified layer of wsi image!
+# - get rid of empty image parts on level extraction
+# - specify heatmap resolution in arguments. this will be the resolution in which
+#   the layer extractions will return a thumbnail and the grid size will be matched
+# - get_thumbnail and read_region are running forever/failing at lower levels
+# - framewidth and frameheight: slide bereich auf bildschirm!
 #
 
 import os
@@ -18,7 +22,6 @@ from os.path import exists
 from ImageSection import ImageSection
 from EyeData import EyeData
 from HeatMapUtils import HeatMapUtils
-from PIL import Image
 from openslide import open_slide
 from openslide import OpenSlide, OpenSlideError
 from openslide.deepzoom import DeepZoomGenerator
@@ -37,7 +40,7 @@ wsiLevel = 0
 def extractImageSections():
     pass
 
-# reds csv and returns a dictionary with headlines as keys
+# reds csv and returns a nested list
 def readCSV(file):
     ImageSectionList = []
     eyeDataList = []
@@ -65,6 +68,10 @@ def readCSV(file):
                 if not ImageSectionList:
                     ImageSectionList.append(ImageSection(
                       "None",
+                      0,
+                      0,
+                      0,
+                      0,
                       0,
                       0,
                       0,
@@ -173,40 +180,72 @@ def readCSV(file):
 
                     roi = roiChangeSubstring[roiStart : roiEnd]
 
-                    # top left - there may be a second parameter leftover
+                    # top left x
                     topLeftStart = roiChangeSubstring.find("TopLeft")
                     topLeftStart += 26
                     topLeftEnd = roiChangeSubstring.find("TopRight")
                     topLeftSubstring = roiChangeSubstring[topLeftStart : topLeftEnd]
                     topLeftEnd = topLeftSubstring.find("%2c%22")
 
-                    topLeft = topLeftSubstring[: topLeftEnd]
+                    topLeftX = topLeftSubstring[: topLeftEnd]
 
-                    # top right - there may be a second parameter leftover
+                    # top left y
+                    topLeftYStart = topLeftSubstring.find("Y")
+                    topLeftYStart += 7
+                    topLeftYEnd = topLeftSubstring.find("TopRight")
+                    topLeftYEnd -= 8
+
+                    topLeftY = topLeftSubstring[topLeftYStart : topLeftYEnd]
+
+                    # top right y
                     topRightStart = roiChangeSubstring.find("TopRight")
                     topRightStart += 27
                     topRightEnd = roiChangeSubstring.find("BottomLeft")
                     topRightSubstring = roiChangeSubstring[topRightStart : topRightEnd]
                     topRightEnd = topRightSubstring.find("%2c%22")
 
-                    topRight = topRightSubstring[: topRightEnd]
+                    topRightX = topRightSubstring[: topRightEnd]
 
-                    # bottom left - there may be a second parameter leftover
+                    # top right y
+                    topRightYStart = topRightSubstring.find("Y")
+                    topRightYStart += 7
+                    topRightYEnd = topRightSubstring.find("BottomLeft")
+                    topRightYEnd -= 8
+
+                    topRightY = topRightSubstring[topRightYStart : topRightYEnd]
+
+                    # bottom left x
                     bottomLeftStart = roiChangeSubstring.find("BottomLeft")
                     bottomLeftStart += 29
                     bottomLeftEnd = roiChangeSubstring.find("BottomRight")
                     bottomLeftSubstring = roiChangeSubstring[bottomLeftStart : bottomLeftEnd]
                     bottomLeftEnd = bottomLeftSubstring.find("%2c%22")
 
-                    bottomLeft = bottomLeftSubstring[: bottomLeftEnd]
+                    bottomLeftX = bottomLeftSubstring[: bottomLeftEnd]
 
-                    # bottom right - there may be a second parameter leftover
+                    # bottom left y
+                    bottomLeftYStart = bottomLeftSubstring.find("Y")
+                    bottomLeftYStart += 7
+                    bottomLeftYEnd = bottomLeftSubstring.find("BottomRight")
+                    bottomLeftYEnd -= 8
+
+                    bottomLeftY = bottomLeftSubstring[bottomLeftYStart : bottomLeftYEnd]
+
+                    # bottom right x
                     bottomRightStart = roiChangeSubstring.find("BottomRight")
                     bottomRightStart += 30
                     bottomRightSubstring = roiChangeSubstring[bottomRightStart :]
                     bottomtRightEnd = bottomRightSubstring.find("%2c%22")
 
-                    bottomRight = bottomRightSubstring[: bottomtRightEnd]
+                    bottomRightX = bottomRightSubstring[: bottomtRightEnd]
+
+                    # bottom right y
+                    bottomRightYStart = bottomRightSubstring.find("Y")
+                    bottomRightYStart += 7
+                    bottomRightYEnd = bottomRightSubstring.find("%7d%7d%7d%7d")
+
+                    bottomRightY = bottomRightSubstring[bottomRightYStart : bottomRightYEnd]
+
 
                     ImageSectionList.append(ImageSection(
                       fileName,
@@ -216,10 +255,14 @@ def readCSV(file):
                       width,
                       height,
                       roi,
-                      topLeft,
-                      topRight,
-                      bottomLeft,
-                      bottomRight
+                      topLeftX,
+                      topLeftY,
+                      topRightX,
+                      topRightY,
+                      bottomLeftX,
+                      bottomLeftY,
+                      bottomRightX,
+                      bottomRightY
                       ))
 
         # also don't forget to save all pending eye tracking data
@@ -241,11 +284,12 @@ def verifyInput():
         terminate()
     
     if not os.path.exists(sys.argv[2]):
-        print("given data directory does not exist!")
+        print("Given data directory does not exist!")
         print("Note that the directory parameter must be relative to your current path.")
         terminate()
     
-    wsiLevel = sys.argv[3]
+    global wsiLevel
+    wsiLevel = int(sys.argv[3])
 
 # prints usage and exits
 def terminate():
@@ -255,12 +299,10 @@ def terminate():
 # reads the svs file and extracs the needed
 def readSVS(file):
     if not exists(file):
-        print(f'The needed wsi file {file} does not exist!')
+        print(f'The needed WSI file: {file} does not exist!')
         terminate()
 
     wsiSlide = open_slide(file)
-    print(f'reqested Image filename: {file}')
-    print(f'slide level count: {wsiSlide.level_count} level dimensions: {wsiSlide.level_dimensions}')
     return wsiSlide
 
 if __name__ == "__main__":
@@ -273,21 +315,18 @@ if __name__ == "__main__":
     wsiSlide = readSVS(sys.argv[2] + wsiFileName)
 
     dims = wsiSlide.level_dimensions
+    print(f'wsi level: {wsiLevel}')
+    print(f'image level {wsiLevel} dimensions: {dims[wsiLevel][0]}, {dims[wsiLevel][1]}\nlevel 0 dimensions: {wsiSlide.dimensions}')
     heatMapUtils = HeatMapUtils(dims[wsiLevel][0], dims[wsiLevel][1])
 
-    img = heatMapUtils.extractLayer(wsiSlide, 3)
-    img.show()
+    baseImage = heatMapUtils.extractLayer(wsiSlide, wsiLevel)
+    if (baseImage is None):
+        exit()
 
-    #print(f'{heatMapUtils._pixelPerCellX}, {heatMapUtils._pixelPerCellY}')
-    print(f'pixels per cell [x, y]: {heatMapUtils._pixelPerCellX}, {heatMapUtils._pixelPerCellY}')
+    imageWithSections = heatMapUtils.drawRoiOnImage(baseImage, csvData)
+    imageWithSections.show()
 
-    # a fine grid needs to be layed over the image. when an eyeData point will
-    # hit one grid cell, it's counter will be increased. then the grid will get
-    # colorised according to it cell's hit rate and displayed over the original
-    # wsi image layer.
-    #
-    # all eyeData points need to be calculated back to the original image pixels at level 0.
-    # data for this is in each corresponding ImageSection. 
+    # going further from here...
 
     print("done!")
     input()
