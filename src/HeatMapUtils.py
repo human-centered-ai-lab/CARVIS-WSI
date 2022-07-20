@@ -39,7 +39,7 @@ class HeatMapUtils():
             topLeftX = int(float(imageSection._topLeftX))
             topLeftY = int(float(imageSection._topLeftY))
             bottomRightX = int(float(imageSection._bottomRightX))
-            bottomRightY = int(float(imageSection._bottomRightY))s
+            bottomRightY = int(float(imageSection._bottomRightY))
 
             #print(f'{topLeftX} {topLeftY} {bottomRightX} {bottomRightY}')
 
