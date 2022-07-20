@@ -4,6 +4,10 @@
 
 class EyeData():
     def __init__(self,
+      gazeLeftX,
+      gazeLeftY,
+      gazeRightX,
+      gazeRightY,
       pupilLeft,
       pupilRight,
       timeSignal,
@@ -14,6 +18,10 @@ class EyeData():
       cameraRightX,
       cameraRightY):
 
+        self._gazeLeftX = gazeLeftX
+        self._gazeLeftY = gazeLeftY
+        self._gazeRightX = gazeRightX
+        self._gazeRightY = gazeRightY
         self._pupilLeft = pupilLeft
         self._pupilRight = pupilRight
         self.distanceLeft = distanceLeft
