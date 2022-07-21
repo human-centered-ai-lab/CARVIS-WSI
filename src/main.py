@@ -13,6 +13,8 @@ draws heatmap of eye tracking on jpeg extraction of whole slide image
 #   the layer extractions will return a thumbnail and the grid size will be matched
 # - get_thumbnail and read_region are running forever/failing at lower levels
 # - framewidth and frameheight: slide bereich auf bildschirm!
+# - build input system to take an option for either direct svs filename or to try to
+#   parese the svs filename from the csv file
 #
 
 import os
@@ -27,13 +29,14 @@ from openslide import OpenSlide, OpenSlideError
 from openslide.deepzoom import DeepZoomGenerator
 
 ROI_CHANGE_SIGNAL = "%7b%22"
+wsiFileName = ""
 wsiLevel = 0
 
 # options/settings via terminal args
 # extract images, and save with heatmaps overlay and viewpath
 # datapoints: eye tracking data is viewport specific
 
-# usage: main.py <CSV File> <SVS FILE> <EXTRACTION LAYER>
+# usage: main.py <CSV File> <SVS DIRECTORY OR FILE> <EXTRACTION LAYER>
 
 # extracts the eye tracking data for all image sections
 # returns: list of imageSections
@@ -88,7 +91,16 @@ def readCSV(file):
                 # in eyeDataList and insert it to the existing and currently active image 
                 # section (last one in ImageSectionList)
                 if (roiChangeColumn != ROI_CHANGE_SIGNAL):
+                    # 13 ET_GazeLeftx
+                    # 14 ET_GazeLefty
+                    # 15 right x
+                    # 16 right y
+
                     eyeDataList.append(EyeData(
+                      row[13],
+                      row[14],
+                      row[15],
+                      row[16],
                       row[17],
                       row[18],
                       row[19],
@@ -279,52 +291,70 @@ def verifyInput():
     if (len(sys.argv) != 4):
         terminate()
 
-    if not exists(sys.argv[1]):
-        print("File not found!")
+    if (not exists(sys.argv[1])):
+        print("CSV File not found!")
         terminate()
     
-    if not os.path.exists(sys.argv[2]):
-        print("Given data directory does not exist!")
+    if not os.path.exists(sys.argv[2] and not os.path.isfile(sys.argv[2])):
+        print("Given data directory does not exist or is no directory!")
         print("Note that the directory parameter must be relative to your current path.")
         terminate()
-    
-    global wsiLevel
-    wsiLevel = int(sys.argv[3])
 
 # prints usage and exits
 def terminate():
-    print("usage: main.py <CSV FILE> <SVS DIRECTORY> <EXTRACTION LAYER>")
+    print("usage: main.py <CSV FILE> <SVS DIRECTORY OR FILE> <EXTRACTION LAYER>")
     exit()
 
 # reads the svs file and extracs the needed
 def readSVS(file):
     if not exists(file):
-        print(f'The needed WSI file: {file} does not exist!')
+        print(f'Requested WSI file: {file} does not exist!')
         terminate()
 
     wsiSlide = open_slide(file)
     return wsiSlide
 
+# chooses svs file by checking input and csv file data
+# returns svs filename including path or none in case of failure
+def chooseInputFile(csvString):
+    # need to add data/ when the svs filename comes from the csv file
+    wsiFileName = "data/" + csvString
+
+    if (os.path.isfile(sys.argv[2])):
+        return readSVS(sys.argv[2])
+    
+    elif (os.path.isdir(sys.argv[2]) and wsiFileName == ""):
+        return None
+    
+    else:
+        return readSVS(wsiFileName)
+
 if __name__ == "__main__":
     verifyInput()
 
     csvData = readCSV(sys.argv[1])
+    wsiFileName = chooseInputFile(csvData[1]._fileName)
 
-    wsiFileName = csvData[1]._fileName
-    print(f'real filename: {wsiFileName}')
-    wsiSlide = readSVS(sys.argv[2] + wsiFileName)
+    if (wsiFileName is None):
+        print("No Filename found inside CSV file. Please specify file.")
+        terminate()
+
+    wsiSlide = readSVS(wsiFileName)    
 
     dims = wsiSlide.level_dimensions
-    print(f'wsi level: {wsiLevel}')
-    print(f'image level {wsiLevel} dimensions: {dims[wsiLevel][0]}, {dims[wsiLevel][1]}\nlevel 0 dimensions: {wsiSlide.dimensions}')
     heatMapUtils = HeatMapUtils(dims[wsiLevel][0], dims[wsiLevel][1])
 
     baseImage = heatMapUtils.extractLayer(wsiSlide, wsiLevel)
     if (baseImage is None):
         exit()
+    #baseImage.show()
 
     imageWithSections = heatMapUtils.drawRoiOnImage(baseImage, csvData)
-    imageWithSections.show()
+    #imageWithSections.show()
+
+    imageWithPoints = heatMapUtils.calculateActivityValues(baseImage, csvData)
+    imageWithPoints = heatMapUtils.drawX(imageWithPoints)
+    imageWithPoints.show()
 
     # going further from here...
 
