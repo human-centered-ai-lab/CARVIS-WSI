@@ -40,7 +40,9 @@
             "program": "src/main.py",
             "args": [
                 "-c",
-                "data/008_P013.csv"
+                "data/008_P013.csv",
+                "-r",
+                "16433,13864"
             ],
             "console": "externalTerminal"
         }
