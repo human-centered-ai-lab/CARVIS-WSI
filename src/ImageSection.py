@@ -50,4 +50,4 @@ class ImageSection():
     # appends eye tracking data to empty _eyeTracking list
     # for inheritance reasons
     def addEyeTracking(self, eyeData):
-        self._eyeTracking = eyeData.copy(),
+        self._eyeTracking = eyeData.copy()
