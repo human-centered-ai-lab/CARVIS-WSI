@@ -287,7 +287,7 @@ def readCSV(file):
 
 # checks if the user choosen input makes sense
 def verifyInput(arguments):
-    if (len(sys.argv) != 7):
+    if (len(sys.argv) < 3):
         terminate()
 
     if (not os.path.isfile(arguments.c)):
@@ -295,9 +295,10 @@ def verifyInput(arguments):
         print(arguments.c)
         terminate()
 
-    if (not os.path.isfile(arguments.s)):
-        print("SVS file not found!")
-        terminate()
+    if (not arguments.s is None):
+        if (not os.path.isfile(arguments.s)):
+            print("SVS file not found!")
+            terminate()
 
 # prints usage and exits
 def terminate():
@@ -314,8 +315,8 @@ def initArgumentParser():
     global parser
     parser = argparse.ArgumentParser(description="Extract a jpg of given resolution out of a wsi and draw a heatmap out of given csv file data.")
     parser.add_argument("-c", type=str, help="Csv file path (relative to current path)")
-    parser.add_argument("-s", type=str, help="Svs file path (relative to current path)")
     parser.add_argument("-r", help="Tuple of resolution [x,y]. You will need to make sure to use the correct aspect ratio.")
+    parser.add_argument("-s", nargs='?', type=str, help="[OPTIONAL] Svs file path (relative to current path)")
     parser.add_argument("-l", action='store_true', help="[OPTIONAL] Output the layer resolutions of given svs file.")
     #parser.add_argument("-d", type=str, help="If the csv file contains the svs filename you can input the relative directory path to the svs file. (Only used if -s is not used)")
     #parser.add_argument("-l", type=int, help="The given layer's resolution gets exported. (Only used if no -r is not used)")
@@ -336,6 +337,27 @@ def debugCSV(csvData):
     for imageSection in csvData:
         print(f'fileName: {imageSection._fileName}')
 
+# loads all files found inside the csv files into dictionary.
+# also sort csvData (ImageSections) by fileNames
+# returns a dictionary as nested dictionary
+# personWsiData[ImageName] = {ImageSection, ImageSection, ...}
+def loadSVSFiles(csvData):
+    personWsiData = { }
+    for imageSection in csvData:
+        imageName = imageSection._fileName
+        
+        if (imageName == 'None'):
+            continue
+
+        if (imageName in personWsiData):        
+            newData = personWsiData[imageName]
+            newData.append(imageSection)
+            personWsiData.update({imageName: newData})
+        else:
+            personWsiData[imageName] = [imageSection]
+    
+    return personWsiData.copy()
+
 if __name__ == "__main__":
     initArgumentParser()
     arguments = parser.parse_args()
@@ -344,32 +366,37 @@ if __name__ == "__main__":
     # read data from csv. 
     # then choose which input (csv filename and specifyed direcotry or specifyed file) to use.
     csvData = readCSV(arguments.c)
-    wsiFileName = arguments.s
-
+    
+    '''wsiFileName = arguments.s
     if (wsiFileName is None):
         print("No Filename found inside CSV file. Please specify file.")
-        terminate()
+        terminate()'''
 
-    wsiSlide = readSVS(wsiFileName)
+    personWsiData = loadSVSFiles(csvData)
 
-    if (arguments.l):
-        print(f'Layer resolutions: {wsiSlide.level_dimensions}')
-        exit()
+    for smth in personWsiData:
+        print(personWsiData[smth])
 
-    resolutionX, resolutionY = getResolutionFromArgs(arguments)
-    heatMapUtils = HeatMapUtils(resolutionX, resolutionY)
+    #wsiSlide = readSVS(wsiFileName)
 
-    baseImage = heatMapUtils.extractJPG(wsiSlide)
-    if (baseImage is None):
-        exit()
+    #if (arguments.l):
+    #    print(f'Layer resolutions: {wsiSlide.level_dimensions}')
+    #    exit()
+
+    #resolutionX, resolutionY = getResolutionFromArgs(arguments)
+    #heatMapUtils = HeatMapUtils(resolutionX, resolutionY)
+
+    #baseImage = heatMapUtils.extractJPG(wsiSlide)
+    #if (baseImage is None):
+    #    exit()
     #baseImage.show()
 
-    imageWithSections = heatMapUtils.drawRoiOnImage(baseImage, csvData)
+    #imageWithSections = heatMapUtils.drawRoiOnImage(baseImage, csvData)
     #imageWithSections.show()
 
-    imageWithPoints = heatMapUtils.calculateActivityValues(baseImage, csvData)
-    imageWithPoints = heatMapUtils.drawLegend(imageWithPoints)
-    imageWithPoints.show()
+    #imageWithPoints = heatMapUtils.calculateActivityValues(baseImage, csvData)
+    #imageWithPoints = heatMapUtils.drawLegend(imageWithPoints)
+    #imageWithPoints.show()
 
     # going further from here...
 
