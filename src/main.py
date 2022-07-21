@@ -351,34 +351,54 @@ def debugCSV(csvData):
 # personWsiData[ImageName] = {ImageSection, ImageSection, ...}
 def loadSVSFiles(csvData):
     personWsiData = { }
+    imageSectionList = [ ]
     for imageSection in csvData:
         imageName = imageSection._fileName
         
         if (imageName == 'None'):
             continue
 
+        # just add to existing image
         if (imageName in personWsiData):
             #newData = personWsiData[imageName]
             #newData.append(imageSection)
             #personWsiData.update({imageName: newData})
-            if (personWsiData[imageName] is None):
-                continue
+            #if (personWsiData[imageName] is None):
+                # append to last image
+            imageSectionList.append(imageSection)
+
+            personWsiData[imageName].appendImageSections(imageSectionList)
+
+            #    continue
             
-            personWsiData[imageName] = personWsiData[imageName].appendImageSection(imageSection)
+            #personWsiData[imageName] = personWsiData[imageName].appendImageSection(imageSection)
+
+        # new image for frames
         else:
+            imageSectionList.clear()
             #personWsiData[imageName] = [imageSection]
             wsiImage = readSVS(imageName)
             if (wsiImage is None):
+                # bad
                 continue
+            
 
             personWsiData[imageName] = PersonWsiData(wsiImage)
-            
-            if (personWsiData[imageName] is None):
-                continue
+            imageSectionList.append(imageSection)
 
-            personWsiData[imageName].appendImageSection(imageSection)
+            
+            #if (personWsiData[imageName] is None):
+            #    continue
+
+            # ToDo! created instances are all None!
+            # same problem as with image section member listst
+            #personWsiData[imageName].appendImageSection(imageSection)
     
-    return personWsiData.copy()
+    lastKey = list(personWsiData.keys())[-1]
+    personWsiData[lastKey].appendImageSections(imageSectionList)
+    imageSectionList.clear()
+
+    return personWsiData
 
 if __name__ == "__main__":
     initArgumentParser()
@@ -398,6 +418,13 @@ if __name__ == "__main__":
 
     for smth in personWsiData:
         print(smth)
+
+    resolutionX, resolutionY = getResolutionFromArgs(arguments)
+    heatMapUtils = HeatMapUtils(resolutionX, resolutionY)
+    for wsi in personWsiData:
+        baseImage = heatMapUtils.extractJPG(personWsiData[wsi]._wsi)
+        baseImage.show()
+
 
     #wsiSlide = readSVS(wsiFileName)
 
