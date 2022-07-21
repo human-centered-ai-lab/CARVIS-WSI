@@ -34,12 +34,6 @@ wsiFileName = ""
 wsiLevel = 0
 parser = None
 
-# options/settings via terminal args
-# extract images, and save with heatmaps overlay and viewpath
-# datapoints: eye tracking data is viewport specific
-
-# usage: main.py <CSV File> <SVS DIRECTORY OR FILE> <EXTRACTION LAYER>
-
 # extracts the eye tracking data for all image sections
 # returns: list of imageSections
 def extractImageSections():
@@ -289,45 +283,28 @@ def readCSV(file):
         return ImageSectionList
 
 # checks if the user choosen input makes sense
-def verifyInput():
-    if (len(sys.argv) != 4):
+def verifyInput(arguments):
+    if (len(sys.argv) != 7):
         terminate()
 
-    if (not exists(sys.argv[1])):
-        print("CSV File not found!")
+    if (not os.path.isfile(arguments.c)):
+        print("CSV file not found!")
+        print(arguments.c)
         terminate()
-    
-    if not os.path.exists(sys.argv[2] and not os.path.isfile(sys.argv[2])):
-        print("Given data directory does not exist or is no directory!")
-        print("Note that the directory parameter must be relative to your current path.")
+
+    if (not os.path.isfile(arguments.s)):
+        print("SVS file not found!")
         terminate()
 
 # prints usage and exits
 def terminate():
-    print("usage: main.py <CSV FILE> <SVS DIRECTORY OR FILE> <EXTRACTION LAYER>")
-    exit()
+    parser.print_help()
+    parser.exit()
 
 # reads the svs file and extracs the needed
 def readSVS(file):
     wsiSlide = open_slide(file)
     return wsiSlide
-
-# chooses svs file by checking input and csv file data
-# when a file is specifyed use this. if a directory is specifyed check
-# if a file is saved inside csv file and use this if it exists
-# returns svs filename including path or none in case of failure
-def chooseInputFile(csvString):
-    # need to add data/ when the svs filename comes from the csv file
-    wsiFileName = "data/" + csvString
-
-    if (os.path.isfile(sys.argv[2])):
-        return sys.argv[2]
-    
-    elif (os.path.isdir(sys.argv[2]) and wsiFileName == ""):
-        return None
-    
-    else:
-        return wsiFileName
 
 # initialises argument parser
 def initArgumentParser():
@@ -336,21 +313,29 @@ def initArgumentParser():
     parser.add_argument("-c", type=str, help="Csv file path (relative to current path)")
     parser.add_argument("-s", type=str, help="Svs file path (relative to current path)")
     parser.add_argument("-r", help="Tuple of resolution [x,y]")
-    parser.add_argument("-d", type=str, help="If the csv file contains the svs filename you can input the relative directory path to the svs file. (Only used if -s is not used)")
-    parser.add_argument("-l", type=int, help="The given layer's resolution gets exported. (Only used if no -r is not used)")
+    #parser.add_argument("-d", type=str, help="If the csv file contains the svs filename you can input the relative directory path to the svs file. (Only used if -s is not used)")
+    #parser.add_argument("-l", type=int, help="The given layer's resolution gets exported. (Only used if no -r is not used)")
+
+# gets relsolution from input argument
+# returns (x, y) integer
+def getResolutionFromArgs(arguments):
+    # get resolution from string
+    comma = arguments.r.find(",")
+    x = int(arguments.r[: comma])
+    comma += 1
+    y = int(arguments.r[comma :])
+
+    return (x, y)
 
 if __name__ == "__main__":
     initArgumentParser()
     arguments = parser.parse_args()
-
-
-
-    verifyInput()
+    verifyInput(arguments)
 
     # read data from csv. 
     # then choose which input (csv filename and specifyed direcotry or specifyed file) to use.
-    csvData = readCSV(sys.argv[1])
-    wsiFileName = chooseInputFile(csvData[1]._fileName)
+    csvData = readCSV(arguments.c)
+    wsiFileName = arguments.s
 
     if (wsiFileName is None):
         print("No Filename found inside CSV file. Please specify file.")
@@ -358,10 +343,10 @@ if __name__ == "__main__":
 
     wsiSlide = readSVS(wsiFileName)    
 
-    dims = wsiSlide.level_dimensions
-    heatMapUtils = HeatMapUtils(dims[wsiLevel][0], dims[wsiLevel][1])
+    resolutionX, resolutionY = getResolutionFromArgs(arguments)
+    heatMapUtils = HeatMapUtils(resolutionX, resolutionY)
 
-    baseImage = heatMapUtils.extractLayer(wsiSlide, wsiLevel)
+    baseImage = heatMapUtils.extractJPG(wsiSlide)
     if (baseImage is None):
         exit()
     #baseImage.show()

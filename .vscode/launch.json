@@ -10,9 +10,12 @@
             "request": "launch",
             "program": "src/main.py",
             "args": [
+                "-c",
                 "data/008_P013.csv",
+                "-s",
                 "data/MUGGRZ-PATH-SCAN-SS7533-1113757.svs",
-                "3"
+                "-r",
+                "1920,1080"
             ],
             "console": "externalTerminal"
         }
