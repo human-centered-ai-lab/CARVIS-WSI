@@ -32,6 +32,17 @@
                 "-l"
             ],
             "console": "externalTerminal"
+        },
+        {
+            "name": "Testrun person wsi data",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/008_P013.csv"
+            ],
+            "console": "externalTerminal"
         }
     ]
 }
