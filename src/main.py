@@ -7,14 +7,10 @@ draws heatmap of eye tracking on jpeg extraction of whole slide image
 
 # ToDo:
 #
-# - heatmap gets drawn on specified layer of wsi image!
-# - get rid of empty image parts on level extraction
+# - option for only exporting heatmap for one image(?)
+# - get rid of empty image parts on level extraction (?)
 # - specify heatmap resolution in arguments. this will be the resolution in which
-#   the layer extractions will return a thumbnail and the grid size will be matched
-# - get_thumbnail and read_region are running forever/failing at lower levels
-# - framewidth and frameheight: slide bereich auf bildschirm!
-# - build input system to take an option for either direct svs filename or to try to
-#   parese the svs filename from the csv file
+#   the layer extractions will return a thumbnail and the grid size will be matched(?)
 #
 
 import os
