@@ -7,12 +7,10 @@ draws heatmap of eye tracking on jpeg extraction of whole slide image
 
 # ToDo:
 #
-<<<<<<< HEAD
 # - option for only exporting heatmap for one image(?)
 # - get rid of empty image parts on level extraction (?)
 # - specify heatmap resolution in arguments. this will be the resolution in which
 #   the layer extractions will return a thumbnail and the grid size will be matched(?)
-=======
 # - accomondate for different wsi files in one person's csv file
 # - heatmap gets drawn on specified layer of wsi image!
 # - get rid of empty image parts on level extraction
@@ -20,7 +18,6 @@ draws heatmap of eye tracking on jpeg extraction of whole slide image
 #   the layer extractions will return a thumbnail and the grid size will be matched
 # - get_thumbnail and read_region are running forever/failing at lower levels
 # - framewidth and frameheight: slide bereich auf bildschirm!
->>>>>>> add csv debug method
 #
 
 import os
@@ -346,16 +343,8 @@ if __name__ == "__main__":
 
     # read data from csv. 
     # then choose which input (csv filename and specifyed direcotry or specifyed file) to use.
-<<<<<<< HEAD
     csvData = readCSV(arguments.c)
     wsiFileName = arguments.s
-=======
-    csvData = readCSV(sys.argv[1])
-
-    debugCSV(csvData)
-
-    wsiFileName = chooseInputFile(csvData[1]._fileName)
->>>>>>> add csv debug method
 
     if (wsiFileName is None):
         print("No Filename found inside CSV file. Please specify file.")
