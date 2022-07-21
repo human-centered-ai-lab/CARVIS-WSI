@@ -307,31 +307,31 @@ def terminate():
 
 # reads the svs file and extracs the needed
 def readSVS(file):
-    if not exists(file):
-        print(f'Requested WSI file: {file} does not exist!')
-        terminate()
-
     wsiSlide = open_slide(file)
     return wsiSlide
 
 # chooses svs file by checking input and csv file data
+# when a file is specifyed use this. if a directory is specifyed check
+# if a file is saved inside csv file and use this if it exists
 # returns svs filename including path or none in case of failure
 def chooseInputFile(csvString):
     # need to add data/ when the svs filename comes from the csv file
     wsiFileName = "data/" + csvString
 
     if (os.path.isfile(sys.argv[2])):
-        return readSVS(sys.argv[2])
+        return sys.argv[2]
     
     elif (os.path.isdir(sys.argv[2]) and wsiFileName == ""):
         return None
     
     else:
-        return readSVS(wsiFileName)
+        return wsiFileName
 
 if __name__ == "__main__":
     verifyInput()
 
+    # read data from csv. 
+    # then choose which input (csv filename and specifyed direcotry or specifyed file) to use.
     csvData = readCSV(sys.argv[1])
     wsiFileName = chooseInputFile(csvData[1]._fileName)
 
@@ -353,11 +353,11 @@ if __name__ == "__main__":
     #imageWithSections.show()
 
     imageWithPoints = heatMapUtils.calculateActivityValues(baseImage, csvData)
-    imageWithPoints = heatMapUtils.drawX(imageWithPoints)
+    imageWithPoints = heatMapUtils.drawLegend(imageWithPoints)
     imageWithPoints.show()
 
     # going further from here...
 
-    print("done!")
+    print("done.")
     input()
     
