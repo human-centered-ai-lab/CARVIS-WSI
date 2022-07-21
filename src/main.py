@@ -20,6 +20,7 @@ draws heatmap of eye tracking on jpeg extraction of whole slide image
 # - framewidth and frameheight: slide bereich auf bildschirm!
 #
 
+from curses import newpad
 import os
 import sys
 import csv
@@ -28,6 +29,7 @@ from os.path import exists
 from ImageSection import ImageSection
 from EyeData import EyeData
 from HeatMapUtils import HeatMapUtils
+from PersonWsiData import PersonWsiData
 from openslide import open_slide
 from openslide import OpenSlide, OpenSlideError
 from openslide.deepzoom import DeepZoomGenerator
@@ -307,6 +309,12 @@ def terminate():
 
 # reads the svs file and extracs the needed
 def readSVS(file):
+    file = "data/" + file
+
+    if (not os.path.isfile(file)):
+        print(f'could not find: {file}')
+        return
+    
     wsiSlide = open_slide(file)
     return wsiSlide
 
@@ -317,7 +325,7 @@ def initArgumentParser():
     parser.add_argument("-c", type=str, help="Csv file path (relative to current path)")
     parser.add_argument("-r", help="Tuple of resolution [x,y]. You will need to make sure to use the correct aspect ratio.")
     parser.add_argument("-s", nargs='?', type=str, help="[OPTIONAL] Svs file path (relative to current path)")
-    parser.add_argument("-l", action='store_true', help="[OPTIONAL] Output the layer resolutions of given svs file.")
+    #parser.add_argument("-l", action='store_true', help="[OPTIONAL] Output the layer resolutions of given svs file.")
     #parser.add_argument("-d", type=str, help="If the csv file contains the svs filename you can input the relative directory path to the svs file. (Only used if -s is not used)")
     #parser.add_argument("-l", type=int, help="The given layer's resolution gets exported. (Only used if no -r is not used)")
 
@@ -349,12 +357,26 @@ def loadSVSFiles(csvData):
         if (imageName == 'None'):
             continue
 
-        if (imageName in personWsiData):        
-            newData = personWsiData[imageName]
-            newData.append(imageSection)
-            personWsiData.update({imageName: newData})
+        if (imageName in personWsiData):
+            #newData = personWsiData[imageName]
+            #newData.append(imageSection)
+            #personWsiData.update({imageName: newData})
+            if (personWsiData[imageName] is None):
+                continue
+            
+            personWsiData[imageName] = personWsiData[imageName].appendImageSection(imageSection)
         else:
-            personWsiData[imageName] = [imageSection]
+            #personWsiData[imageName] = [imageSection]
+            wsiImage = readSVS(imageName)
+            if (wsiImage is None):
+                continue
+
+            personWsiData[imageName] = PersonWsiData(wsiImage)
+            
+            if (personWsiData[imageName] is None):
+                continue
+
+            personWsiData[imageName].appendImageSection(imageSection)
     
     return personWsiData.copy()
 
@@ -375,7 +397,7 @@ if __name__ == "__main__":
     personWsiData = loadSVSFiles(csvData)
 
     for smth in personWsiData:
-        print(personWsiData[smth])
+        print(smth)
 
     #wsiSlide = readSVS(wsiFileName)
 
@@ -386,7 +408,7 @@ if __name__ == "__main__":
     #resolutionX, resolutionY = getResolutionFromArgs(arguments)
     #heatMapUtils = HeatMapUtils(resolutionX, resolutionY)
 
-    #baseImage = heatMapUtils.extractJPG(wsiSlide)
+    #baseImage = heatMapUtils.extractJPG(personWsiData[])
     #if (baseImage is None):
     #    exit()
     #baseImage.show()
