@@ -11,7 +11,7 @@
             "program": "src/main.py",
             "args": [
                 "data/008_P013.csv",
-                "data/",
+                "data/MUGGRZ-PATH-SCAN-SS7533-1113757.svs",
                 "3"
             ],
             "console": "externalTerminal"
