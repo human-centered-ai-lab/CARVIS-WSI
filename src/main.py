@@ -312,7 +312,8 @@ def initArgumentParser():
     parser = argparse.ArgumentParser(description="Extract a jpg of given resolution out of a wsi and draw a heatmap out of given csv file data.")
     parser.add_argument("-c", type=str, help="Csv file path (relative to current path)")
     parser.add_argument("-s", type=str, help="Svs file path (relative to current path)")
-    parser.add_argument("-r", help="Tuple of resolution [x,y]")
+    parser.add_argument("-r", help="Tuple of resolution [x,y]. You will need to make sure to use the correct aspect ratio.")
+    parser.add_argument("-l", action='store_true', help="[OPTIONAL] Output the layer resolutions of given svs file.")
     #parser.add_argument("-d", type=str, help="If the csv file contains the svs filename you can input the relative directory path to the svs file. (Only used if -s is not used)")
     #parser.add_argument("-l", type=int, help="The given layer's resolution gets exported. (Only used if no -r is not used)")
 
@@ -341,7 +342,11 @@ if __name__ == "__main__":
         print("No Filename found inside CSV file. Please specify file.")
         terminate()
 
-    wsiSlide = readSVS(wsiFileName)    
+    wsiSlide = readSVS(wsiFileName)
+
+    if (arguments.l):
+        print(f'Layer resolutions: {wsiSlide.level_dimensions}')
+        exit()
 
     resolutionX, resolutionY = getResolutionFromArgs(arguments)
     heatMapUtils = HeatMapUtils(resolutionX, resolutionY)

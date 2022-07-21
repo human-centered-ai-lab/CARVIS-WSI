@@ -15,7 +15,21 @@
                 "-s",
                 "data/MUGGRZ-PATH-SCAN-SS7533-1113757.svs",
                 "-r",
-                "1920,1080"
+                "16433,13864"
+            ],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "Test Layer Resolution output",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/008_P013.csv",
+                "-s",
+                "data/MUGGRZ-PATH-SCAN-SS7533-1113757.svs",
+                "-l"
             ],
             "console": "externalTerminal"
         }

@@ -23,6 +23,8 @@ class HeatMapUtils():
         self.extractedSizeX = int(pixelCountX)
         self.extractedSizeY = int(pixelCountY)
 
+        print(self.extractedSizeX)
+
         xCells = self.extractedSizeX // self.CELL_SIZE_X
         yCells = self.extractedSizeY // self.CELL_SIZE_Y
 
