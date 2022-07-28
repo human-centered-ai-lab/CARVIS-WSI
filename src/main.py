@@ -348,12 +348,6 @@ if __name__ == "__main__":
     print("loading svs...")
     wsiFilesDict = loadSVSFiles(imageSectionsDict)
 
-    # do this for all images:
-    # get thumbnail of specifyed resolution
-    # calculate heat of heatmap
-    # draw heat onto heatmap
-    # save image...
-
     pixelCountX, pixelCountY = getResolutionFromArgs(arguments)
     heatmapUtils = HeatMapUtils(pixelCountX, pixelCountY)
     for fileName in wsiFilesDict:

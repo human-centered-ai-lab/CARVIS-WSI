@@ -97,30 +97,7 @@ class HeatMapUtils():
             bottomRightX = imageSection._bottomRightX / imageSection._downsampleFactor
             bottomRightY = imageSection._bottomRightY / imageSection._downsampleFactor
 
-            # test
-            #print(f'current roi has {len(imageSection._timestamps)} timestamps')
-            #print(f'index: {index}, normalized len: {len(normalizedList)}')
-            #print(f'normalized: {normalizedList[index]}')
-            # -> normalize timestamp data for roi intensity!
-            # test end
-
-            #sampleFactor = imageSection._downsampleFactor
             outlineing=(0, 0, 0, int(100 * normalizedList[index]))
-
-            '''if sampleFactor < 1:
-                outlineing = (204,255,51, 10)
-            elif sampleFactor < 4:
-                outlineing = (102,255,51, 10)
-            elif sampleFactor < 10:
-                outlineing = (51,255,102, 10)
-            elif sampleFactor < 20:
-                outlineing = (51,255,204, 10)
-            elif sampleFactor < 30:
-                outlineing = (51,204,255, 10)
-            elif sampleFactor < 40:
-                outlineing = (51,102,255, 10)
-            else:
-                outlineing = (102,51,255, 10)'''
 
             draw.rectangle((
                 topLeftX,
