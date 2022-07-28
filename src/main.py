@@ -45,6 +45,7 @@ def extractImageSections():
     pass
 
 # reds csv and returns a nested list
+# drops all EyeData until first filename is found as ImageSection
 def readCSV(file):
     ImageSectionList = []
     eyeDataList = []
@@ -88,11 +89,10 @@ def readCSV(file):
                       0
                     ))
 
-                # until there is a new signal for roi change, save all eye tracking values
-                # in eyeDataList and insert it to the existing and currently active image 
-                # section (last one in ImageSectionList)
+                # until there is a new signal for roi change, drop all data
                 if (roiChangeColumn != ROI_CHANGE_SIGNAL):
-                    # 13 ET_GazeLeftx
+                    continue
+                    '''# 13 ET_GazeLeftx
                     # 14 ET_GazeLefty
                     # 15 right x
                     # 16 right y
@@ -112,7 +112,7 @@ def readCSV(file):
                       row[24],
                       row[25]))
                     
-                    imageSectionTimestamps.append(row[1])
+                    imageSectionTimestamps.append(row[1])'''
 
                 # when there is a new roi change signal save all currently
                 # collected data to existing image section and create a new one
@@ -419,6 +419,7 @@ if __name__ == "__main__":
     for smth in personWsiData:
         print(smth)
 
+    # extract thumbnail of person's wsi images
     resolutionX, resolutionY = getResolutionFromArgs(arguments)
     heatMapUtils = HeatMapUtils(resolutionX, resolutionY)
     for wsi in personWsiData:
