@@ -63,7 +63,7 @@ def readCSV(file):
 
                 # initializing first image section
                 # this does not have image section parameters,
-                # so it only has "standard" values
+                # so it only has "None" values
                 # -> user has not changed roi since start of the session
                 if not ImageSectionList:
                     ImageSectionList.append(ImageSection(
@@ -86,6 +86,7 @@ def readCSV(file):
 
                 # until there is a new signal for roi change, drop all data
                 if (roiChangeColumn != ROI_CHANGE_SIGNAL):
+                    # ToDo: this should add data to the last image section!
                     continue
 
                 # when there is a new roi change signal save all currently
@@ -95,7 +96,7 @@ def readCSV(file):
                     ImageSectionList[-1].addEyeTracking(eyeDataList)
 
                     # after adding collected eye tracking data to corresponding image section
-                    # clear the list so the next image section gets only its eye data
+                    # clear the list for the next image section
                     imageSectionTimestamps.clear()
                     eyeDataList.clear()
 
@@ -233,7 +234,7 @@ def readCSV(file):
 
                     bottomRightY = bottomRightSubstring[bottomRightYStart : bottomRightYEnd]
 
-
+                    # now add the filled out image section to the image section list
                     ImageSectionList.append(ImageSection(
                       fileName,
                       centerX,
@@ -326,7 +327,11 @@ def loadSVSFiles(csvData):
     for imageSection in csvData:
         imageName = imageSection._fileName
         
+        # redo:
+        # first image sections needs to have a filename. save this as filename for the upcomming image sections
+        # until another filename comes up
         if (imageName == 'None'):
+            print("no file name for this image section")
             continue
 
         # just add to existing image
@@ -340,8 +345,7 @@ def loadSVSFiles(csvData):
             wsiImage = readSVS(imageName)
             if (wsiImage is None):
                 # bad
-                continue
-            
+                continue            
 
             personWsiData[imageName] = PersonWsiData(wsiImage)
             imageSectionList.append(imageSection)
@@ -360,7 +364,11 @@ if __name__ == "__main__":
     # read data from csv. 
     # then choose which input (csv filename and specifyed direcotry or specifyed file) to use.
     csvData = readCSV(arguments.c)
-    
+
+    #for imageSection in csvData:
+    #    for timestamps in imageSection._eyeTracking:
+    #        print(f'time: {timestamps}')
+
     '''wsiFileName = arguments.s
     if (wsiFileName is None):
         print("No Filename found inside CSV file. Please specify file.")
@@ -368,8 +376,8 @@ if __name__ == "__main__":
 
     personWsiData = loadSVSFiles(csvData)
 
-    for smth in personWsiData:
-        print(f'loaded: {smth}')
+    #for smth in personWsiData:
+    #    print(f'loaded: {smth}')
 
     # ToDo: make extraction multi threaded
     # extract thumbnail of person's wsi images
