@@ -39,11 +39,6 @@ wsiFileName = ""
 wsiLevel = 0
 parser = None
 
-# extracts the eye tracking data for all image sections
-# returns: list of imageSections
-def extractImageSections():
-    pass
-
 # reds csv and returns a nested list
 # drops all EyeData until first filename is found as ImageSection
 def readCSV(file):
@@ -92,27 +87,6 @@ def readCSV(file):
                 # until there is a new signal for roi change, drop all data
                 if (roiChangeColumn != ROI_CHANGE_SIGNAL):
                     continue
-                    '''# 13 ET_GazeLeftx
-                    # 14 ET_GazeLefty
-                    # 15 right x
-                    # 16 right y
-
-                    eyeDataList.append(EyeData(
-                      row[13],
-                      row[14],
-                      row[15],
-                      row[16],
-                      row[17],
-                      row[18],
-                      row[19],
-                      row[20],
-                      row[21],
-                      row[22],
-                      row[23],
-                      row[24],
-                      row[25]))
-                    
-                    imageSectionTimestamps.append(row[1])'''
 
                 # when there is a new roi change signal save all currently
                 # collected data to existing image section and create a new one
@@ -325,9 +299,6 @@ def initArgumentParser():
     parser.add_argument("-c", type=str, help="Csv file path (relative to current path)")
     parser.add_argument("-r", help="Tuple of resolution [x,y]. You will need to make sure to use the correct aspect ratio.")
     parser.add_argument("-s", nargs='?', type=str, help="[OPTIONAL] Svs file path (relative to current path)")
-    #parser.add_argument("-l", action='store_true', help="[OPTIONAL] Output the layer resolutions of given svs file.")
-    #parser.add_argument("-d", type=str, help="If the csv file contains the svs filename you can input the relative directory path to the svs file. (Only used if -s is not used)")
-    #parser.add_argument("-l", type=int, help="The given layer's resolution gets exported. (Only used if no -r is not used)")
 
 # gets relsolution from input argument
 # returns (x, y) integer
@@ -360,23 +331,12 @@ def loadSVSFiles(csvData):
 
         # just add to existing image
         if (imageName in personWsiData):
-            #newData = personWsiData[imageName]
-            #newData.append(imageSection)
-            #personWsiData.update({imageName: newData})
-            #if (personWsiData[imageName] is None):
-                # append to last image
             imageSectionList.append(imageSection)
-
             personWsiData[imageName].appendImageSections(imageSectionList)
-
-            #    continue
-            
-            #personWsiData[imageName] = personWsiData[imageName].appendImageSection(imageSection)
 
         # new image for frames
         else:
             imageSectionList.clear()
-            #personWsiData[imageName] = [imageSection]
             wsiImage = readSVS(imageName)
             if (wsiImage is None):
                 # bad
@@ -385,14 +345,6 @@ def loadSVSFiles(csvData):
 
             personWsiData[imageName] = PersonWsiData(wsiImage)
             imageSectionList.append(imageSection)
-
-            
-            #if (personWsiData[imageName] is None):
-            #    continue
-
-            # ToDo! created instances are all None!
-            # same problem as with image section member listst
-            #personWsiData[imageName].appendImageSection(imageSection)
     
     lastKey = list(personWsiData.keys())[-1]
     personWsiData[lastKey].appendImageSections(imageSectionList)
@@ -417,14 +369,15 @@ if __name__ == "__main__":
     personWsiData = loadSVSFiles(csvData)
 
     for smth in personWsiData:
-        print(smth)
+        print(f'loaded: {smth}')
 
+    # ToDo: make extraction multi threaded
     # extract thumbnail of person's wsi images
-    resolutionX, resolutionY = getResolutionFromArgs(arguments)
-    heatMapUtils = HeatMapUtils(resolutionX, resolutionY)
-    for wsi in personWsiData:
-        baseImage = heatMapUtils.extractJPG(personWsiData[wsi]._wsi)
-        baseImage.show()
+    #resolutionX, resolutionY = getResolutionFromArgs(arguments)
+    #heatMapUtils = HeatMapUtils(resolutionX, resolutionY)
+    #for wsi in personWsiData:
+    #    baseImage = heatMapUtils.extractJPG(personWsiData[wsi]._wsi)
+    #    baseImage.show()
 
 
     #wsiSlide = readSVS(wsiFileName)
@@ -432,23 +385,6 @@ if __name__ == "__main__":
     #if (arguments.l):
     #    print(f'Layer resolutions: {wsiSlide.level_dimensions}')
     #    exit()
-
-    #resolutionX, resolutionY = getResolutionFromArgs(arguments)
-    #heatMapUtils = HeatMapUtils(resolutionX, resolutionY)
-
-    #baseImage = heatMapUtils.extractJPG(personWsiData[])
-    #if (baseImage is None):
-    #    exit()
-    #baseImage.show()
-
-    #imageWithSections = heatMapUtils.drawRoiOnImage(baseImage, csvData)
-    #imageWithSections.show()
-
-    #imageWithPoints = heatMapUtils.calculateActivityValues(baseImage, csvData)
-    #imageWithPoints = heatMapUtils.drawLegend(imageWithPoints)
-    #imageWithPoints.show()
-
-    # going further from here...
 
     print("done.")
     input()
