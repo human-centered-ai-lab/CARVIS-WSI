@@ -354,9 +354,12 @@ if __name__ == "__main__":
         # get base image and draw roi on image
         print(f'rendering thumbnail for {fileName}...')
         baseImage = heatmapUtils.extractJPG(wsiFilesDict[fileName])
+        
         print("drawing roi...")
         roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
-        roiImage.show()
+        #roiImage.show()
+
+        print("calculating heat")
 
     # this option needs to specify the image
     #if (arguments.l):

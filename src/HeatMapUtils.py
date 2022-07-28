@@ -119,6 +119,11 @@ class HeatMapUtils():
     def extractJPG(self, slide):
         return slide.get_thumbnail((self.extractedSizeX, self.extractedSizeY))
 
+    # calculates heat of grid cells which stretch over an image
+    # maps eyeData onto the grid cells. each hit increades the heat of a cell
+    def calculateHeat(self, imageSections):
+        pass
+    
     # calculates the "heat" of a grid cell by increasing the cells counter by 1
     # every time the eyeData's gaze point hits a cell
     def calculateActivityValues(self, image, imageSections):
