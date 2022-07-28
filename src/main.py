@@ -6,10 +6,11 @@ draws heatmap of eye tracking on jpeg extraction of whole slide image
 '''
 
 # ToDo:
+#
 # - draw roi intensity for how long it has been on the screen
+# - should heatmap grid size be spacifyed by the user?
 #
 
-from curses import newpad
 import os
 import sys
 import csv
@@ -357,9 +358,11 @@ if __name__ == "__main__":
         
         print("drawing roi...")
         roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
-        #roiImage.show()
+        roiImage.show()
 
-        print("calculating heat")
+        print("calculating heatmap...")
+        heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
+        #heatmapImage.show()
 
     # this option needs to specify the image
     #if (arguments.l):

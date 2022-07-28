@@ -120,8 +120,11 @@ class HeatMapUtils():
         return slide.get_thumbnail((self.extractedSizeX, self.extractedSizeY))
 
     # calculates heat of grid cells which stretch over an image
-    # maps eyeData onto the grid cells. each hit increades the heat of a cell
-    def calculateHeat(self, imageSections):
+    # maps eyeData coordinates onto the grid cells. each hit increases the heat of a cell
+    # returns colored (but transparent) cells rendered onto a .jpg
+    def getHeatmap(self, image, imageSections):
+        # https://stackoverflow.com/questions/9816024/coordinates-to-grid-box-number
+        # https://stackoverflow.com/questions/20368413/draw-grid-lines-over-an-image-in-matplotlib
         pass
     
     # calculates the "heat" of a grid cell by increasing the cells counter by 1
