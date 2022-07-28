@@ -23,20 +23,20 @@ class ImageSection():
     bottomRightY):
 
         self._fileName = file
-        self._centerX = centerX
-        self._centerY = centerY
-        self._downsampleFactor = sampleFactor
-        self._width = width
-        self._height = height
+        self._centerX = float(centerX)
+        self._centerY = float(centerY)
+        self._downsampleFactor = float(sampleFactor)
+        self._width = float(width)
+        self._height = float(height)
         self._viewRoi = roi
-        self._topLeftX = topLeftX
-        self._topLeftY = topLeftY
-        self._topRightX = topRightX
-        self._topRightY = topRightY
-        self._bottomLeftX = bottomLeftX
-        self._bottomLeftY = bottomLeftY
-        self._bottomRightX = bottomRightX
-        self._bottomRightY = bottomRightY
+        self._topLeftX = float(topLeftX)
+        self._topLeftY = float(topLeftY)
+        self._topRightX = float(topRightX)
+        self._topRightY = float(topRightY)
+        self._bottomLeftX = float(bottomLeftX)
+        self._bottomLeftY = float(bottomLeftY)
+        self._bottomRightX = float(bottomRightX)
+        self._bottomRightY = float(bottomRightY)
         self._timestamps = [ ]
         self._eyeTracking = [ ]
     
@@ -44,8 +44,7 @@ class ImageSection():
     # for inheritance reasons
     def addTimestamps(self, timestamps):
         # deep copy
-        self._timestamps = timestamps.copy()
-        
+        self._timestamps = timestamps.copy()        
 
     # appends eye tracking data to empty _eyeTracking list
     # for inheritance reasons

@@ -26,6 +26,7 @@ class HeatMapUtils():
         xCells = self.extractedSizeX // self.CELL_SIZE_X
         yCells = self.extractedSizeY // self.CELL_SIZE_Y
 
+        # create 2D grid for mapping heat
         self._grid = [[self._grid for i in range(xCells)] for j in range(yCells)]
 
     # code is from Markus
@@ -56,7 +57,7 @@ class HeatMapUtils():
     # draws the path of eyes on the wsi extracted layer
     # returns wsi layer with path drawing on it
     def drawViewPath(self, image, viewPoints, color, lineThicknes):
-        # ToDo
+        # ToDo if needed
         pass
 
     # draws the Image Sections (ROI) on the extracted wsi layer
@@ -67,12 +68,12 @@ class HeatMapUtils():
 
         # do this for all image sections
         for imageSection in imageSections:
-            topLeftX = int(float(imageSection._topLeftX))
-            topLeftY = int(float(imageSection._topLeftY))
-            bottomRightX = int(float(imageSection._bottomRightX))
-            bottomRightY = int(float(imageSection._bottomRightY))
+            topLeftX = imageSection._topLeftX / imageSection._downsampleFactor
+            topLeftY = imageSection._topLeftY / imageSection._downsampleFactor
+            bottomRightX = imageSection._bottomRightX / imageSection._downsampleFactor
+            bottomRightY = imageSection._bottomRightY / imageSection._downsampleFactor
 
-            sampleFactor = int(float(imageSection._downsampleFactor))
+            sampleFactor = imageSection._downsampleFactor
             outlineing=(100,200,0, 10)
 
             if sampleFactor < 1:

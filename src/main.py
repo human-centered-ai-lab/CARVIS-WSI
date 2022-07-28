@@ -345,17 +345,24 @@ if __name__ == "__main__":
     # read csv and svs files
     print("loading csv...")
     imageSectionsDict = readCSV(arguments.c)
-    print("done.")
     print("loading svs...")
     wsiFilesDict = loadSVSFiles(imageSectionsDict)
-    print("done.")
 
-    # do this for all images
+    # do this for all images:
     # get thumbnail of specifyed resolution
     # calculate heat of heatmap
     # draw heat onto heatmap
     # save image...
 
+    pixelCountX, pixelCountY = getResolutionFromArgs(arguments)
+    heatmapUtils = HeatMapUtils(pixelCountX, pixelCountY)
+    for fileName in wsiFilesDict:
+        # get base image and draw roi on image
+        print(f'rendering thumbnail for {fileName}...')
+        baseImage = heatmapUtils.extractJPG(wsiFilesDict[fileName])
+        print("drawing roi...")
+        roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
+        roiImage.show()
 
     # this option needs to specify the image
     #if (arguments.l):
