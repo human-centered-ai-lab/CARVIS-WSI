@@ -6,18 +6,7 @@ draws heatmap of eye tracking on jpeg extraction of whole slide image
 '''
 
 # ToDo:
-#
-# - option for only exporting heatmap for one image(?)
-# - get rid of empty image parts on level extraction (?)
-# - specify heatmap resolution in arguments. this will be the resolution in which
-#   the layer extractions will return a thumbnail and the grid size will be matched(?)
-# - accomondate for different wsi files in one person's csv file
-# - heatmap gets drawn on specified layer of wsi image!
-# - get rid of empty image parts on level extraction
-# - specify heatmap resolution in arguments. this will be the resolution in which
-#   the layer extractions will return a thumbnail and the grid size will be matched
-# - get_thumbnail and read_region are running forever/failing at lower levels
-# - framewidth and frameheight: slide bereich auf bildschirm!
+# - get rid of None fileName
 #
 
 from curses import newpad
@@ -29,7 +18,6 @@ from os.path import exists
 from ImageSection import ImageSection
 from EyeData import EyeData
 from HeatMapUtils import HeatMapUtils
-from PersonWsiData import PersonWsiData
 from openslide import open_slide
 from openslide import OpenSlide, OpenSlideError
 from openslide.deepzoom import DeepZoomGenerator
@@ -336,79 +324,40 @@ def debugCSV(csvData):
     for imageSection in csvData:
         print(f'fileName: {imageSection._fileName}')
 
-# loads all files found inside the csv files into dictionary.
-# also sort csvData (ImageSections) by fileNames
-# returns a dictionary as nested dictionary
-# personWsiData[ImageName] = {ImageSection, ImageSection, ...}
-def loadSVSFiles(csvData):
-    personWsiData = { }
-    imageSectionList = [ ]
-    for imageSection in csvData:
-        imageName = imageSection._fileName
-        
-        # redo:
-        # first image sections needs to have a filename. save this as filename for the upcomming image sections
-        # until another filename comes up
-        if (imageName == 'None'):
-            print("no file name for this image section")
+# loads all svs files found inside the csv file into a dict
+# returns dict where filename is key and an wsi as the value
+def loadSVSFiles(imageSectionDict):
+    wsiFiles = { }
+    for fileName in imageSectionDict.keys():
+        if (fileName == "None"):
             continue
 
-        # just add to existing image
-        if (imageName in personWsiData):
-            imageSectionList.append(imageSection)
-            personWsiData[imageName].appendImageSections(imageSectionList)
+        wsiFiles[fileName] = readSVS(fileName)
+        print(f'got: {fileName}')
 
-        # new image for frames
-        else:
-            imageSectionList.clear()
-            wsiImage = readSVS(imageName)
-            if (wsiImage is None):
-                # bad
-                continue            
-
-            personWsiData[imageName] = PersonWsiData(wsiImage)
-            imageSectionList.append(imageSection)
-    
-    lastKey = list(personWsiData.keys())[-1]
-    personWsiData[lastKey].appendImageSections(imageSectionList)
-    imageSectionList.clear()
-
-    return personWsiData
+    return wsiFiles.copy()
 
 if __name__ == "__main__":
     initArgumentParser()
     arguments = parser.parse_args()
     verifyInput(arguments)
 
-    # read data from csv. 
-    # then choose which input (csv filename and specifyed direcotry or specifyed file) to use.
-    csvData = readCSV(arguments.c)
+    # read csv and svs files
+    print("loading csv...")
+    imageSectionsDict = readCSV(arguments.c)
+    print("done.")
+    print("loading svs...")
+    wsiFilesDict = loadSVSFiles(imageSectionsDict)
+    print("done.")
 
-    #for imageSection in csvData:
-    #    for timestamps in imageSection._eyeTracking:
-    #        print(f'time: {timestamps}')
-
-    '''wsiFileName = arguments.s
-    if (wsiFileName is None):
-        print("No Filename found inside CSV file. Please specify file.")
-        terminate()'''
-
-    #personWsiData = loadSVSFiles(csvData)
-
-    #for smth in personWsiData:
-    #    print(f'loaded: {smth}')
-
-    # ToDo: make extraction multi threaded
-    # extract thumbnail of person's wsi images
-    #resolutionX, resolutionY = getResolutionFromArgs(arguments)
-    #heatMapUtils = HeatMapUtils(resolutionX, resolutionY)
-    #for wsi in personWsiData:
-    #    baseImage = heatMapUtils.extractJPG(personWsiData[wsi]._wsi)
-    #    baseImage.show()
+    # do this for all images
+    # get thumbnail of specifyed resolution
+    # calculate heat of heatmap
+    # draw heat onto heatmap
+    # save image...
 
 
-    #wsiSlide = readSVS(wsiFileName)
-
+    # this option needs to specify the image
     #if (arguments.l):
     #    print(f'Layer resolutions: {wsiSlide.level_dimensions}')
     #    exit()
