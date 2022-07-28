@@ -39,18 +39,176 @@ wsiFileName = ""
 wsiLevel = 0
 parser = None
 
+# parses all EyeData parameters out of a roi string
+# returns image section with only the parsed parameters
+def getRoiParameters(row):
+    # first get all needed parameters from the roi change string
+    roiChangeString = row[11]
+    nameStart = roiChangeString.find("Filename")
+    
+    if(nameStart == -1):
+        print("Something has gone terribly wrong. ROI change string has no Filename!")
+        exit()
+    
+    nameStart += 17 # offset for Filename%22%3a%22
+    nameEnd = roiChangeString.find(".svs")
+    nameEnd += 4 # offset for .svs
+
+    fileName = roiChangeString[nameStart : nameEnd]
+
+    # center x
+    centerXStart = roiChangeString.find("CurrentCenterX")
+    centerXStart += 20
+    centerXEnd = roiChangeString.find("CurrentCenterY")
+    centerXEnd -= 6
+
+    centerX = roiChangeString[centerXStart : centerXEnd]
+
+    # center y
+    centerYStart = roiChangeString.find("CurrentCenterY")
+    centerYStart += 20
+    centerYEnd = roiChangeString.find("CurrentDownsampleFactor")
+    centerYEnd -= 6
+
+    centerY = roiChangeString[centerYStart : centerYEnd]
+
+    # sample factor
+    sampleFactorStart = roiChangeString.find("CurrentDownsampleFactor")
+    sampleFactorStart += 29
+    sampleFactorEnd = roiChangeString.find("Width")
+    sampleFactorEnd -= 6
+
+    sampleFactor = roiChangeString[sampleFactorStart : sampleFactorEnd]
+
+    # width
+    widthStart = roiChangeString.find("Width")
+    widthStart += 11
+    widthEnd = roiChangeString.find("Height")
+    widthEnd -= 6
+
+    width = roiChangeString[widthStart : widthEnd]
+
+    # height
+
+    # now a new tmp substring is needed since there are 
+    # some parameters more than once in this string and otherwise
+    # and find only returns the location of the first appearance
+    # of a searched substring
+    roiChangeSubstring = roiChangeString[widthEnd:]
+    heightStart = roiChangeSubstring.find("Height")
+    heightStart += 12
+    heightEnd = roiChangeSubstring.find("CurrentCenterY")
+    heightEnd -= 6
+
+    height = roiChangeSubstring[heightStart : heightEnd]
+
+    # roi
+    roiStart = roiChangeSubstring.find("ViewROI")
+    roiStart += 7
+    roiEnd = roiChangeSubstring.find("TopLeft")
+
+    roi = roiChangeSubstring[roiStart : roiEnd]
+
+    # top left x
+    topLeftStart = roiChangeSubstring.find("TopLeft")
+    topLeftStart += 26
+    topLeftEnd = roiChangeSubstring.find("TopRight")
+    topLeftSubstring = roiChangeSubstring[topLeftStart : topLeftEnd]
+    topLeftEnd = topLeftSubstring.find("%2c%22")
+
+    topLeftX = topLeftSubstring[: topLeftEnd]
+
+    # top left y
+    topLeftYStart = topLeftSubstring.find("Y")
+    topLeftYStart += 7
+    topLeftYEnd = topLeftSubstring.find("TopRight")
+    topLeftYEnd -= 8
+
+    topLeftY = topLeftSubstring[topLeftYStart : topLeftYEnd]
+
+    # top right y
+    topRightStart = roiChangeSubstring.find("TopRight")
+    topRightStart += 27
+    topRightEnd = roiChangeSubstring.find("BottomLeft")
+    topRightSubstring = roiChangeSubstring[topRightStart : topRightEnd]
+    topRightEnd = topRightSubstring.find("%2c%22")
+
+    topRightX = topRightSubstring[: topRightEnd]
+
+    # top right y
+    topRightYStart = topRightSubstring.find("Y")
+    topRightYStart += 7
+    topRightYEnd = topRightSubstring.find("BottomLeft")
+    topRightYEnd -= 8
+
+    topRightY = topRightSubstring[topRightYStart : topRightYEnd]
+
+    # bottom left x
+    bottomLeftStart = roiChangeSubstring.find("BottomLeft")
+    bottomLeftStart += 29
+    bottomLeftEnd = roiChangeSubstring.find("BottomRight")
+    bottomLeftSubstring = roiChangeSubstring[bottomLeftStart : bottomLeftEnd]
+    bottomLeftEnd = bottomLeftSubstring.find("%2c%22")
+
+    bottomLeftX = bottomLeftSubstring[: bottomLeftEnd]
+
+    # bottom left y
+    bottomLeftYStart = bottomLeftSubstring.find("Y")
+    bottomLeftYStart += 7
+    bottomLeftYEnd = bottomLeftSubstring.find("BottomRight")
+    bottomLeftYEnd -= 8
+
+    bottomLeftY = bottomLeftSubstring[bottomLeftYStart : bottomLeftYEnd]
+
+    # bottom right x
+    bottomRightStart = roiChangeSubstring.find("BottomRight")
+    bottomRightStart += 30
+    bottomRightSubstring = roiChangeSubstring[bottomRightStart :]
+    bottomtRightEnd = bottomRightSubstring.find("%2c%22")
+
+    bottomRightX = bottomRightSubstring[: bottomtRightEnd]
+
+    # bottom right y
+    bottomRightYStart = bottomRightSubstring.find("Y")
+    bottomRightYStart += 7
+    bottomRightYEnd = bottomRightSubstring.find("%7d%7d%7d%7d")
+
+    bottomRightY = bottomRightSubstring[bottomRightYStart : bottomRightYEnd]
+
+    return ImageSection(
+        fileName,
+        centerX,
+        centerY,
+        sampleFactor,
+        width,
+        height,
+        roi,
+        topLeftX,
+        topLeftY,
+        topRightX,
+        topRightY,
+        bottomLeftX,
+        bottomLeftY,
+        bottomRightX,
+        bottomRightY
+        )
+
+    return fileName, centerX, centerY, sampleFactor, width, height, roi, topLeftX, topLeftY, bottomLeftX, bottomLeftY, topRightX, topRightY, bottomRightX, bottomRightY
+
 # reds csv and returns a nested list
 # drops all EyeData until first filename is found as ImageSection
 def readCSV(file):
-    ImageSectionList = []
-    eyeDataList = []
+    ImageSectionsDict = { } # holds all image sections as list with filename as key
+    ImageSectionList = [ ]  # holds all image sections with eye data and timestamps per image section
+    imageSectionTimestamps = [ ] # holds all timestamps 
+    eyeDataList = [ ]   # all eye data
+    oldFileName = "None"
 
     with open(file, newline='') as csvfile:
         csvFile = csv.reader(csvfile, delimiter=',')
 
         # sort data by ImageSections
         readOK = False
-        imageSectionTimestamps = []
 
         for row in csvFile:
             if (row[0] == '1'): # line after "Row"
@@ -59,208 +217,69 @@ def readCSV(file):
             
             # in first line where timestamps are
             if (readOK):
-                roiChangeColumn = row[11][:6]
+                roiChangeColumn = row[11][:6].strip()
 
-                # initializing first image section
-                # this does not have image section parameters,
-                # so it only has "None" values
-                # -> user has not changed roi since start of the session
-                if not ImageSectionList:
-                    ImageSectionList.append(ImageSection(
-                      "None",
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0
-                    ))
-
-                # until there is a new signal for roi change, drop all data
-                if (roiChangeColumn != ROI_CHANGE_SIGNAL):
-                    # ToDo: this should add data to the last image section!
-                    continue
-
+                # drop lines where eye tracking data is empty
                 # when there is a new roi change signal save all currently
                 # collected data to existing image section and create a new one
                 if (roiChangeColumn == ROI_CHANGE_SIGNAL):
-                    ImageSectionList[-1].addTimestamps(imageSectionTimestamps)
-                    ImageSectionList[-1].addEyeTracking(eyeDataList)
+                    # save old file data
 
-                    # after adding collected eye tracking data to corresponding image section
-                    # clear the list for the next image section
+                    # first get all parameters
+                    imageSection = getRoiParameters(row)
+                    
+                    # then add collected lists
+                    imageSection.addTimestamps(imageSectionTimestamps)
+                    imageSection.addEyeTracking(eyeDataList)
+                    
+                    # append image section
+                    ImageSectionList.append(imageSection)
+
+                    # clear collecting lists
                     imageSectionTimestamps.clear()
                     eyeDataList.clear()
 
-                    # now initialise a new ImageSection
-                    # first get all needed parameters from the roi change string
-                    roiChangeString = row[11]
-                    nameStart = roiChangeString.find("Filename")
-                    
-                    if(nameStart == -1):
-                        print("Something has gone terribly wrong. ROI change string has no Filename!")
-                        exit()
-                    
-                    nameStart += 17 # offset for Filename%22%3a%22
-                    nameEnd = roiChangeString.find(".svs")
-                    nameEnd += 4 # offset for .svs
+                    # new file
+                    if (imageSection._fileName != oldFileName):
+                        ImageSectionsDict[oldFileName] = ImageSectionList.copy()
+                        oldFileName = imageSection._fileName
+                        ImageSectionList.clear()                        
 
-                    fileName = roiChangeString[nameStart : nameEnd]
+                # collect imageSectionTimnestamps and eyeDataList here
+                if (roiChangeColumn != ROI_CHANGE_SIGNAL):
+                    # only if there was already a filename in csv file
+                    # otherwise drop data
+                    # also drop lines where are without eye tracking data
+                    if (oldFileName != "None" and row[13] != ''):
+                        imageSectionTimestamps.append(float(row[1]))
 
-                    # center x
-                    centerXStart = roiChangeString.find("CurrentCenterX")
-                    centerXStart += 20
-                    centerXEnd = roiChangeString.find("CurrentCenterY")
-                    centerXEnd -= 6
+                        eyeData = EyeData(
+                            row[13],
+                            row[14],
+                            row[15],
+                            row[16],
+                            row[17],
+                            row[18],
+                            row[19],
+                            row[20],
+                            row[21],
+                            row[22],
+                            row[23],
+                            row[24],
+                            row[25]
+                        )
+                        eyeDataList.append(eyeData)
 
-                    centerX = roiChangeString[centerXStart : centerXEnd]
-
-                    # center y
-                    centerYStart = roiChangeString.find("CurrentCenterY")
-                    centerYStart += 20
-                    centerYEnd = roiChangeString.find("CurrentDownsampleFactor")
-                    centerYEnd -= 6
-
-                    centerY = roiChangeString[centerYStart : centerYEnd]
-
-                    # sample factor
-                    sampleFactorStart = roiChangeString.find("CurrentDownsampleFactor")
-                    sampleFactorStart += 29
-                    sampleFactorEnd = roiChangeString.find("Width")
-                    sampleFactorEnd -= 6
-
-                    sampleFactor = roiChangeString[sampleFactorStart : sampleFactorEnd]
-
-                    # width
-                    widthStart = roiChangeString.find("Width")
-                    widthStart += 11
-                    widthEnd = roiChangeString.find("Height")
-                    widthEnd -= 6
-
-                    width = roiChangeString[widthStart : widthEnd]
-
-                    # height
-
-                    # now a new tmp substring is needed since there are 
-                    # some parameters more than once in this string and otherwise
-                    # and find only returns the location of the first appearance
-                    # of a searched substring
-                    roiChangeSubstring = roiChangeString[widthEnd:]
-                    heightStart = roiChangeSubstring.find("Height")
-                    heightStart += 12
-                    heightEnd = roiChangeSubstring.find("CurrentCenterY")
-                    heightEnd -= 6
-
-                    height = roiChangeSubstring[heightStart : heightEnd]
-
-                    # roi
-                    roiStart = roiChangeSubstring.find("ViewROI")
-                    roiStart += 7
-                    roiEnd = roiChangeSubstring.find("TopLeft")
-
-                    roi = roiChangeSubstring[roiStart : roiEnd]
-
-                    # top left x
-                    topLeftStart = roiChangeSubstring.find("TopLeft")
-                    topLeftStart += 26
-                    topLeftEnd = roiChangeSubstring.find("TopRight")
-                    topLeftSubstring = roiChangeSubstring[topLeftStart : topLeftEnd]
-                    topLeftEnd = topLeftSubstring.find("%2c%22")
-
-                    topLeftX = topLeftSubstring[: topLeftEnd]
-
-                    # top left y
-                    topLeftYStart = topLeftSubstring.find("Y")
-                    topLeftYStart += 7
-                    topLeftYEnd = topLeftSubstring.find("TopRight")
-                    topLeftYEnd -= 8
-
-                    topLeftY = topLeftSubstring[topLeftYStart : topLeftYEnd]
-
-                    # top right y
-                    topRightStart = roiChangeSubstring.find("TopRight")
-                    topRightStart += 27
-                    topRightEnd = roiChangeSubstring.find("BottomLeft")
-                    topRightSubstring = roiChangeSubstring[topRightStart : topRightEnd]
-                    topRightEnd = topRightSubstring.find("%2c%22")
-
-                    topRightX = topRightSubstring[: topRightEnd]
-
-                    # top right y
-                    topRightYStart = topRightSubstring.find("Y")
-                    topRightYStart += 7
-                    topRightYEnd = topRightSubstring.find("BottomLeft")
-                    topRightYEnd -= 8
-
-                    topRightY = topRightSubstring[topRightYStart : topRightYEnd]
-
-                    # bottom left x
-                    bottomLeftStart = roiChangeSubstring.find("BottomLeft")
-                    bottomLeftStart += 29
-                    bottomLeftEnd = roiChangeSubstring.find("BottomRight")
-                    bottomLeftSubstring = roiChangeSubstring[bottomLeftStart : bottomLeftEnd]
-                    bottomLeftEnd = bottomLeftSubstring.find("%2c%22")
-
-                    bottomLeftX = bottomLeftSubstring[: bottomLeftEnd]
-
-                    # bottom left y
-                    bottomLeftYStart = bottomLeftSubstring.find("Y")
-                    bottomLeftYStart += 7
-                    bottomLeftYEnd = bottomLeftSubstring.find("BottomRight")
-                    bottomLeftYEnd -= 8
-
-                    bottomLeftY = bottomLeftSubstring[bottomLeftYStart : bottomLeftYEnd]
-
-                    # bottom right x
-                    bottomRightStart = roiChangeSubstring.find("BottomRight")
-                    bottomRightStart += 30
-                    bottomRightSubstring = roiChangeSubstring[bottomRightStart :]
-                    bottomtRightEnd = bottomRightSubstring.find("%2c%22")
-
-                    bottomRightX = bottomRightSubstring[: bottomtRightEnd]
-
-                    # bottom right y
-                    bottomRightYStart = bottomRightSubstring.find("Y")
-                    bottomRightYStart += 7
-                    bottomRightYEnd = bottomRightSubstring.find("%7d%7d%7d%7d")
-
-                    bottomRightY = bottomRightSubstring[bottomRightYStart : bottomRightYEnd]
-
-                    # now add the filled out image section to the image section list
-                    ImageSectionList.append(ImageSection(
-                      fileName,
-                      centerX,
-                      centerY,
-                      sampleFactor,
-                      width,
-                      height,
-                      roi,
-                      topLeftX,
-                      topLeftY,
-                      topRightX,
-                      topRightY,
-                      bottomLeftX,
-                      bottomLeftY,
-                      bottomRightX,
-                      bottomRightY
-                      ))
-
-        # also don't forget to save all pending eye tracking data
+        # also don't forget to save all pending eye tracking data to last fileName in ImageSectionsDict
         ImageSectionList[-1].addTimestamps(imageSectionTimestamps)
         ImageSectionList[-1].addEyeTracking(eyeDataList)
+
+        ImageSectionsDict[oldFileName] = ImageSectionList.copy()
 
         imageSectionTimestamps.clear()
         eyeDataList.clear()
 
-        return ImageSectionList
+        return ImageSectionsDict.copy()
 
 # checks if the user choosen input makes sense
 def verifyInput(arguments):
@@ -374,7 +393,7 @@ if __name__ == "__main__":
         print("No Filename found inside CSV file. Please specify file.")
         terminate()'''
 
-    personWsiData = loadSVSFiles(csvData)
+    #personWsiData = loadSVSFiles(csvData)
 
     #for smth in personWsiData:
     #    print(f'loaded: {smth}')

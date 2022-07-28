@@ -18,16 +18,16 @@ class EyeData():
       cameraRightX,
       cameraRightY):
 
-        self._gazeLeftX = gazeLeftX
-        self._gazeLeftY = gazeLeftY
-        self._gazeRightX = gazeRightX
-        self._gazeRightY = gazeRightY
-        self._pupilLeft = pupilLeft
-        self._pupilRight = pupilRight
-        self.distanceLeft = distanceLeft
-        self._distanceRight = distanceRight
-        self._timeSignal = timeSignal
-        self._cameraLeftX = cameraLeftX
-        self._cameraLeftY = cameraLeftY
-        self._cameraRightX = cameraRightX
-        self._cameraRightY = cameraRightY
+        self._gazeLeftX = int(float(gazeLeftX))
+        self._gazeLeftY = int(float(gazeLeftY))
+        self._gazeRightX = int(float(gazeRightX))
+        self._gazeRightY = int(float(gazeRightY))
+        self._pupilLeft = float(pupilLeft)
+        self._pupilRight = float(pupilRight)
+        self._distanceLeft = float(distanceLeft)
+        self._distanceRight = float(distanceRight)
+        self._timeSignal = float(timeSignal)
+        self._cameraLeftX = float(cameraLeftX)
+        self._cameraLeftY = float(cameraLeftY)
+        self._cameraRightX = float(cameraRightX)
+        self._cameraRightY = float(cameraRightY)
