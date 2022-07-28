@@ -15,7 +15,7 @@
                 "-s",
                 "data/MUGGRZ-PATH-SCAN-SS7533-1113757.svs",
                 "-r",
-                "16433,13864"
+                "5478,4622"
             ],
             "console": "externalTerminal"
         },
