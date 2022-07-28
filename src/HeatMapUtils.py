@@ -60,23 +60,54 @@ class HeatMapUtils():
         # ToDo if needed
         pass
 
+    # normalizes timestamp data for one image
+    # returns list of normalized values for timestamp
+    def normalizeTimestampData(self, imageSections):
+        normalizedList = [ ]
+        minValue = 1000
+        maxValue = 0
+
+        for imageSection in imageSections:
+            timestampNum = len(imageSection._timestamps)
+            if (timestampNum > maxValue):
+                maxValue = timestampNum
+            if (timestampNum < minValue):
+                minValue = timestampNum
+        
+        for imageSection in imageSections:
+            x = len(imageSection._timestamps)
+            n = (x - minValue) / (maxValue - minValue)
+            normalizedList.append(n)
+
+        return normalizedList.copy()
+
     # draws the Image Sections (ROI) on the extracted wsi layer
     # parts of this code is from Markus
     # returns wsi image with rectangle on it
     def drawRoiOnImage(self, image, imageSections, filling=None, lineWidth=10):
         draw = ImageDraw.Draw(image, "RGBA") # (200, 100, 0, 5) | '#9EFF00'
 
+        # get normalized timestamp data for all image sections
+        normalizedList = self.normalizeTimestampData(imageSections)
+
         # do this for all image sections
-        for imageSection in imageSections:
+        for index, imageSection in enumerate(imageSections, start=0):
             topLeftX = imageSection._topLeftX / imageSection._downsampleFactor
             topLeftY = imageSection._topLeftY / imageSection._downsampleFactor
             bottomRightX = imageSection._bottomRightX / imageSection._downsampleFactor
             bottomRightY = imageSection._bottomRightY / imageSection._downsampleFactor
 
-            sampleFactor = imageSection._downsampleFactor
-            outlineing=(100,200,0, 10)
+            # test
+            #print(f'current roi has {len(imageSection._timestamps)} timestamps')
+            #print(f'index: {index}, normalized len: {len(normalizedList)}')
+            #print(f'normalized: {normalizedList[index]}')
+            # -> normalize timestamp data for roi intensity!
+            # test end
 
-            if sampleFactor < 1:
+            #sampleFactor = imageSection._downsampleFactor
+            outlineing=(0, 0, 0, int(100 * normalizedList[index]))
+
+            '''if sampleFactor < 1:
                 outlineing = (204,255,51, 10)
             elif sampleFactor < 4:
                 outlineing = (102,255,51, 10)
@@ -89,7 +120,7 @@ class HeatMapUtils():
             elif sampleFactor < 40:
                 outlineing = (51,102,255, 10)
             else:
-                outlineing = (102,51,255, 10)
+                outlineing = (102,51,255, 10)'''
 
             draw.rectangle((
                 topLeftX,

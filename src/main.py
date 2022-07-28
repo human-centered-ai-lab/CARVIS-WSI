@@ -6,7 +6,7 @@ draws heatmap of eye tracking on jpeg extraction of whole slide image
 '''
 
 # ToDo:
-# - get rid of None fileName
+# - draw roi intensity for how long it has been on the screen
 #
 
 from curses import newpad
