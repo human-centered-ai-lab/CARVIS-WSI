@@ -10,13 +10,14 @@
 # all eyeData points need to be calculated back to the original image pixels at level 0.
 # data for this is in each corresponding ImageSection.
 
+import math
 from PIL import Image, ImageDraw, ImageFont
 
 class HeatMapUtils():
     CELL_SIZE_X = 100
     CELL_SIZE_Y = 100
-    SCREEN_SIZE_X = 1920
-    SCREEN_SIZE_Y = 1080
+    DISPLAY_X = 1920
+    DISPLAY_Y = 1080
 
     DOWNSAMPLE_1 = (204,255,51, 255)
     DOWNSAMPLE_4 = (102,255,51, 255)
@@ -31,11 +32,14 @@ class HeatMapUtils():
         self.extractedSizeX = int(pixelCountX)
         self.extractedSizeY = int(pixelCountY)
 
-        xCells = self.extractedSizeX // self.CELL_SIZE_X
-        yCells = self.extractedSizeY // self.CELL_SIZE_Y
+        print(f'xPixel {self.extractedSizeX} yPixel {self.extractedSizeY}')
 
-        # create 2D grid for mapping heat
-        self._grid = [[self._grid for i in range(xCells)] for j in range(yCells)]
+        self.xCells = math.ceil(self.extractedSizeX / self.CELL_SIZE_X)
+        self.yCells = math.ceil(self.extractedSizeY / self.CELL_SIZE_Y)
+
+        # create 2D grid [array] for mapping heat
+        self._grid = [[self._grid for i in range(self.xCells)] for j in range(self.yCells)]
+        print(f'{len(self._grid[0])} {len(self._grid)}')
 
     # code is from Markus
     # draws a legend on lefty upper corner for the sample rate
@@ -90,6 +94,28 @@ class HeatMapUtils():
             normalizedList.append(n)
 
         return normalizedList.copy()
+
+    # normalizes grid data for heatmap
+    # returns new grid in size as old one with values
+    # between 0 and 1
+    def normalizeGridData(self):
+        normalizedGrid = [[self._grid for i in range(len(self._grid[0]))] for j in range(len(self._grid))]
+        minValue = 1000
+        maxValue = 0
+
+        for i in range(len(self._grid)):
+            for j in range(len(self._grid[i])):
+                if (self._grid[i][j] > maxValue):
+                    maxValue = self._grid[i][j]
+                if (self._grid[i][j] < minValue):
+                    minValue = self._grid[i][j]
+
+        for i in range(len(self._grid)):
+            for j in range(len(self._grid[i])):
+                x = self._grid[i][j]
+                normalizedGrid[i][j] = (x- minValue) / (maxValue - minValue)
+
+        return normalizedGrid # deep copy 2d array?
 
     # draws the Image Sections (ROI) on the extracted wsi layer
     # parts of this code is from Markus
@@ -157,14 +183,101 @@ class HeatMapUtils():
     def extractJPG(self, slide):
         return slide.get_thumbnail((self.extractedSizeX, self.extractedSizeY))
 
+    # draws the grid values onto given image
+    # grid values need to be normalized first!
+    # returns drawn on image
+    def drawGridValues(self, image, gridValues):
+        draw = ImageDraw.Draw(image, "RGBA")
+        gridColors = [[gridValues for i in range(len(gridValues[0]))] for j in range(len(gridValues))]
+        # first get through array of values to make array of colors
+        for i in range(len(gridValues)):
+            for j in range(len(gridValues[i])):
+                A = 50
+                R = int(255 * gridValues[i][j])
+                G = int(255 * (1 - gridValues[i][j]))
+                B = 0
+                gridColors[i][j] = (A, R, G, B)
+
+                #print(f'gridColors: {gridColors[i][j]} | ARGB: {A, R, G, B}')
+
+        # go through all color values and get the center position of the cell on the image
+        for i in range(len(gridValues)):
+            for j in range(len(gridValues[i])):
+                # map the cell to an image pixel coordinate
+                pixelX = i * self.xCells
+                pixelY = j * self.yCells
+                pixelXEnd = pixelX + 100
+                pixelYEnd = pixelY + 100
+
+                if (pixelX > self.extractedSizeX or pixelXEnd > self.extractedSizeX):
+                    continue
+
+                if (pixelY > self.extractedSizeY or pixelYEnd > self.extractedSizeY):
+                    continue
+                
+                # position calculation does not work like that!
+                # or grid size must be recalculated
+                A = gridColors[i][j][0]
+                R = gridColors[i][j][1]
+                G = gridColors[i][j][2]
+                B = gridColors[i][j][3]
+                draw.rectangle((pixelX+30, pixelY+30, pixelXEnd-30, pixelYEnd-30), fill=(R, G, B, A), width=1)
+
+        # draw there a point of calculated color
+        return image
+
     # calculates heat of grid cells which stretch over an image
     # maps eyeData coordinates onto the grid cells. each hit increases the heat of a cell
     # returns colored (but transparent) cells rendered onto a .jpg
+    # parts of this code is from Markus Plass
     def getHeatmap(self, image, imageSections):
         # https://stackoverflow.com/questions/9816024/coordinates-to-grid-box-number
         # https://stackoverflow.com/questions/20368413/draw-grid-lines-over-an-image-in-matplotlib
-        pass
-    
+
+        for imageSection in imageSections:
+            for eyeData in imageSection._eyeTracking:
+
+                # if incomplete data -> drop datapoint
+                if (eyeData._gazeLeftX < 0
+                  or eyeData._gazeRightX < 0
+                  or eyeData._gazeLeftY < 0
+                  or eyeData._gazeRightY < 0):
+                    continue
+
+                # check if eye point is inside display area of image section
+                gazePointX = int((eyeData._gazeLeftX + eyeData._gazeRightX) / 2)
+                gazePointY = int((eyeData._gazeLeftY + eyeData._gazeRightY) / 2)
+
+                posXBottomRight = self.DISPLAY_X - gazePointX
+                posYBottomRight = self.DISPLAY_Y - gazePointY
+
+                # when eye gaze point is not inside image section -> drop datapoint
+                if (posXBottomRight >= imageSection._width and posYBottomRight <= imageSection._height):
+                    continue
+
+                # rethink this part of the code...   without is better
+                # calculate exect eye look point
+                #gazePointX = imageSection._bottomRightX - posXBottomRight * imageSection._downsampleFactor
+                #gazePointY = imageSection._bottomRightY - posYBottomRight * imageSection._downsampleFactor
+
+                #gazePointX = gazePointX / imageSection._downsampleFactor
+                #gazePointY = gazePointY / imageSection._downsampleFactor
+
+                # now map gazePoint to grid cell
+                # - 1 because we need index
+                xCell = math.ceil((gazePointX / self.xCells)) - 1
+                yCell = math.ceil((gazePointY / self.yCells)) - 1
+
+                #print(f'x: {xCell} y: {yCell} | xCells: {self.xCells} yCells: {self.yCells}')
+
+                self._grid[yCell][xCell] += 1
+        
+        # normalize grid data
+        normalizedGridData = self.normalizeGridData()
+        
+        # draw grid values on image and return
+        return self.drawGridValues(image, normalizedGridData)
+
     # calculates the "heat" of a grid cell by increasing the cells counter by 1
     # every time the eyeData's gaze point hits a cell
     def calculateActivityValues(self, image, imageSections):
@@ -175,7 +288,7 @@ class HeatMapUtils():
 
         for imageSection in imageSections:
             # image section scale factor
-            for eyeGazePosition in imageSection._eyeTracking[0]:
+            for eyeGazePosition in imageSection._eyeTracking:
                 # check if something is saved before converting
                 if (eyeGazePosition._gazeLeftX == ''
                 or eyeGazePosition._gazeLeftY == ''
@@ -212,13 +325,4 @@ class HeatMapUtils():
                 draw.ellipse([(eyePositionX-4, eyePositionY-4), (eyePositionX+4, eyePositionY+4)], fill=('#00cc00'), width=20)
 
         return image
-
-    # calculates on how many pixels the grid does overshoot
-    # if returned pixels are < 0 the grid is bigger than the wsi in layer 0
-    # if the returned pixels are > 0 the grid is smaller than whe wsi in layer 0
-    # returns tuple (x, y) of pixels
-    #def getUndefinedPixels(self, slide):
-    #    overshootX = (self._pixelPerCellX * self.GRID_SIZE_X) - slide.dimensions[0]
-    #    overshootY = (self._pixelPerCellY * self.GRID_SIZE_Y) - slide.dimensions[1]
-    #    return (overshootX, overshootY)
     

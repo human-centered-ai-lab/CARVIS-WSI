@@ -179,10 +179,7 @@ def getRoiParameters(row):
         bottomLeftX,
         bottomLeftY,
         bottomRightX,
-        bottomRightY
-        )
-
-    return fileName, centerX, centerY, sampleFactor, width, height, roi, topLeftX, topLeftY, bottomLeftX, bottomLeftY, topRightX, topRightY, bottomRightX, bottomRightY
+        bottomRightY)
 
 # reds csv and returns a nested list
 # drops all EyeData until first filename is found as ImageSection
@@ -358,11 +355,13 @@ if __name__ == "__main__":
         
         print("drawing roi...")
         roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
-        roiImage.show()
+        roiImage = heatmapUtils.drawLegend(roiImage)
+        #roiImage.show()
 
         print("calculating heatmap...")
         heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
-        #heatmapImage.show()
+        #heatmapImage = heatmapUtils.calculateActivityValues(roiImage, imageSectionsDict[fileName])
+        heatmapImage.show()
 
     # this option needs to specify the image
     #if (arguments.l):
