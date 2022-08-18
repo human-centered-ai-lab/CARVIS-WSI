@@ -18,6 +18,14 @@ class HeatMapUtils():
     SCREEN_SIZE_X = 1920
     SCREEN_SIZE_Y = 1080
 
+    DOWNSAMPLE_1 = (204,255,51, 255)
+    DOWNSAMPLE_4 = (102,255,51, 255)
+    DOWNSAMPLE_10 = (51,255,102, 255)
+    DOWNSAMPLE_20 = (51,255,204, 255)
+    DOWNSAMPLE_30 = (51,204,255, 255)
+    DOWNSAMPLE_40 = (51,102,255, 255)
+    DOWNSAMPLE_X = (102,51,255, 255)
+
     def __init__(self, pixelCountX, pixelCountY):
         self._grid = 0
         self.extractedSizeX = int(pixelCountX)
@@ -33,24 +41,26 @@ class HeatMapUtils():
     # draws a legend on lefty upper corner for the sample rate
     # returns image with drawn on legend
     def drawLegend(self, image):
+        # https://stackoverflow.com/questions/41405632/draw-a-rectangle-and-a-text-in-it-using-pil
         draw = ImageDraw.Draw(image, "RGBA")
 
         # draw samplerates and colors
         font = ImageFont.truetype("arial.ttf", 100)
-        draw.rectangle((0, 0, 800, 100), fill=(204,255,51, 255),width=25)
-        draw.text((0, 0),"Downsample <1",(0,0,0), font = font)
-        draw.rectangle((0, 100, 800, 200), fill=(102,255,51, 255),width=25)
-        draw.text((0, 100),"Downsample <4",(0,0,0), font = font)
-        draw.rectangle((0, 200, 800, 300), fill=(51,255,102, 255),width=25)
-        draw.text((0, 200),"Downsample <10",(0,0,0), font = font)
-        draw.rectangle((0, 300, 800, 400), fill=(51,255,204, 255),width=25)
-        draw.text((0, 300),"Downsample <20",(0,0,0), font = font)
-        draw.rectangle((0, 400, 800, 500), fill=(51,204,255, 255),width=25)
-        draw.text((0, 400),"Downsample <30",(0,0,0), font = font)
-        draw.rectangle((0, 500, 800, 600), fill=(51,102,255, 255),width=25)
-        draw.text((0, 500),"Downsample <40",(0,0,0), font = font)
-        draw.rectangle((0, 600, 800, 700), fill=(102,51,255, 255),width=25)
-        draw.text((0, 600),"Downsample >40",(0,0,0), font = font)
+        #font = None
+        draw.rectangle((0, 0, 800, 100), fill=self.DOWNSAMPLE_1, width=25)
+        draw.text((0, 0),"Downsample < 1",(0,0,0), font = font)
+        draw.rectangle((0, 100, 800, 200), fill=self.DOWNSAMPLE_4, width=25)
+        draw.text((0, 100),"Downsample < 4",(0,0,0), font = font)
+        draw.rectangle((0, 200, 800, 300), fill=self.DOWNSAMPLE_10, width=25)
+        draw.text((0, 200),"Downsample < 10",(0,0,0), font = font)
+        draw.rectangle((0, 300, 800, 400), fill=self.DOWNSAMPLE_20, width=25)
+        draw.text((0, 300),"Downsample < 20",(0,0,0), font = font)
+        draw.rectangle((0, 400, 800, 500), fill=self.DOWNSAMPLE_30, width=25)
+        draw.text((0, 400),"Downsample < 30",(0,0,0), font = font)
+        draw.rectangle((0, 500, 800, 600), fill=self.DOWNSAMPLE_40, width=25)
+        draw.text((0, 500),"Downsample < 40",(0,0,0), font = font)
+        draw.rectangle((0, 600, 800, 700), fill=self.DOWNSAMPLE_X, width=25)
+        draw.text((0, 600),"Downsample > 40",(0,0,0), font = font)
         
         return image
 
@@ -97,7 +107,35 @@ class HeatMapUtils():
             bottomRightX = imageSection._bottomRightX / imageSection._downsampleFactor
             bottomRightY = imageSection._bottomRightY / imageSection._downsampleFactor
 
-            outlineing=(0, 0, 0, int(100 * normalizedList[index]))
+            sampleFactor = imageSection._downsampleFactor
+            outlineColor = (0, 0, 0)
+
+            if (sampleFactor < 1):
+                outlineColor = self.DOWNSAMPLE_1
+            
+            elif (sampleFactor < 4 and sampleFactor >= 1):
+                outlineColor = self.DOWNSAMPLE_4
+            
+            elif (sampleFactor < 10 and sampleFactor >= 4):
+                outlineColor = self.DOWNSAMPLE_10
+            
+            elif (sampleFactor < 20 and sampleFactor >= 10):
+                outlineColor = self.DOWNSAMPLE_20
+
+            elif (sampleFactor < 30 and sampleFactor >= 20):
+                outlineColor = self.DOWNSAMPLE_30
+            
+            elif (sampleFactor < 40 and sampleFactor >= 30):
+                outlineColor = self.DOWNSAMPLE_30
+            
+            elif (sampleFactor > 40):
+                outlineColor = self.DOWNSAMPLE_X
+
+            outlineing=(
+              outlineColor[0],
+              outlineColor[1],
+              outlineColor[2],
+              int(100 * normalizedList[index]))
 
             draw.rectangle((
                 topLeftX,
