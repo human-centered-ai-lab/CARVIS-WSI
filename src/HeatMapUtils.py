@@ -131,6 +131,7 @@ class HeatMapUtils():
 
         # do this for all image sections
         for index, imageSection in enumerate(imageSections, start=0):
+
             topLeftX = imageSection._topLeftX / imageSection._downsampleFactor
             topLeftY = imageSection._topLeftY / imageSection._downsampleFactor
             bottomRightX = imageSection._bottomRightX / imageSection._downsampleFactor
@@ -230,7 +231,7 @@ class HeatMapUtils():
         return image
 
     # calculates heat of grid cells which stretch over an image
-    # maps eyeData coordinates onto the grid cells. each hit increases the heat of a cell
+    # maps eyeData coordinates onto the grid cells. each hit increases the heat of the cell
     # returns colored (but transparent) cells rendered onto a .jpg
     # parts of this code is from Markus Plass
     def getHeatmap(self, image, imageSections):
@@ -248,7 +249,7 @@ class HeatMapUtils():
                     continue
 
                 # check if eye gaze point is inside display area of image section
-                # (inside iMotions window)
+                # (=inside iMotions window)
                 gazePointX = int((eyeData._gazeLeftX + eyeData._gazeRightX) / 2)
                 gazePointY = int((eyeData._gazeLeftY + eyeData._gazeRightY) / 2)
 
@@ -259,13 +260,29 @@ class HeatMapUtils():
                 if (posXBottomRight >= imageSection._width and posYBottomRight <= imageSection._height):
                     continue
 
-                # rethink this part of the code...   without is better
-                # calculate exect eye look point
+                '''# rethink this part of the code...   without is better
+                # calculate exect eye gaze point
                 #gazePointX = imageSection._bottomRightX - posXBottomRight * imageSection._downsampleFactor
                 #gazePointY = imageSection._bottomRightY - posYBottomRight * imageSection._downsampleFactor
 
                 #gazePointX = gazePointX / imageSection._downsampleFactor
-                #gazePointY = gazePointY / imageSection._downsampleFactor
+                #gazePointY = gazePointY / imageSection._downsampleFactor'''
+
+                # new approach for calculating gaze point
+                gazePointX = int((eyeData._gazeLeftX + eyeData._gazeRightX) / 2)
+                gazePointY = int((eyeData._gazeLeftY + eyeData._gazeRightY) / 2)
+
+                # check if gaze point is inside image section frame
+                if (gazePointX > imageSection._bottomRightX and not gazePointX < 0):
+                    continue
+                if (gazePointY > imageSection._bottomLeftY and not gazePointY < 0):
+                    continue
+
+                # map gaze point to image pixel coordinates
+                print(gazePointX * imageSection._downsampleFactor)
+
+                print(f'gaze point [x,y] {gazePointX, gazePointY} [width,height]: {imageSection._width, imageSection._height} sampleFactor: {imageSection._downsampleFactor}')
+
 
                 # now map gazePoint to grid cell
                 # - 1 because we need index
