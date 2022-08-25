@@ -4,7 +4,7 @@ This Project aims to render heatmap data onto an extracted WSI using eye trackin
 ## Installation
 To setup this programm you need to clone the master branch of this repository.
 
-`git@github.com:human-centered-ai-lab/SlideHeatmap.git`
+`git clone git@github.com:human-centered-ai-lab/SlideHeatmap.git`
 
 Then install all requirements listed in [requirements.txt](requirements.txt).
 
