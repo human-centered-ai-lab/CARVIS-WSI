@@ -11,4 +11,5 @@ Then install all requirements listed in [requirements.txt](requirements.txt).
 ## Usage
 ToDo
 
+<br />
 > **_NOTE:_** This Project is currently WIP! When features are implemented they get merged into master branch.
