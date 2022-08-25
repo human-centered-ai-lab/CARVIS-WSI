@@ -60,7 +60,20 @@
             "console": "externalTerminal"
         },
         {
-            "name": "WSI Data with layer extraction",
+            "name": "WSI Data with big layer extraction",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/008_P013.csv",
+                "-l",
+                "2"
+            ],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "WSI Data with small layer extraction",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
