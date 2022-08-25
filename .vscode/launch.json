@@ -45,6 +45,19 @@
                 "16433,13864"
             ],
             "console": "externalTerminal"
+        },
+        {
+            "name": "Testrun person wsi data, small resolution",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/008_P013.csv",
+                "-r",
+                "5478,4622"
+            ],
+            "console": "externalTerminal"
         }
     ]
 }
