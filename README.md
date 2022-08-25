@@ -29,7 +29,12 @@ To get heatmap data rendered on all wsi files used in one iMotions meeting, use 
 python3 src/main.py -c data/testMeeting.csv -r 5478,4622
 `
 
+Important to know is that a resolution with the same width/height ratio as the original wsi files has to be chosen.
+Otherwise it is possible that only a part of the original wsi is being extracted.
+
 > Note: Inside `data` directory must be all .svs files stored which where used by this iMotions meeting!
+
+When the programm is done with all renderings, "done." will be printed and it wait's for some input to terminate.
 
 ## Folder Structure
     .                           # Repository Root Folder
