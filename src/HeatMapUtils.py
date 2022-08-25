@@ -245,7 +245,8 @@ class HeatMapUtils():
                   or eyeData._gazeRightY < 0):
                     continue
 
-                # check if eye point is inside display area of image section
+                # check if eye gaze point is inside display area of image section
+                # (inside iMotions window)
                 gazePointX = int((eyeData._gazeLeftX + eyeData._gazeRightX) / 2)
                 gazePointY = int((eyeData._gazeLeftY + eyeData._gazeRightY) / 2)
 
