@@ -10,6 +10,7 @@
 # all eyeData points need to be calculated back to the original image pixels at level 0.
 # data for this is in each corresponding ImageSection.
 
+import sys
 import math
 from PIL import Image, ImageDraw, ImageFont
 
@@ -39,8 +40,9 @@ class HeatMapUtils():
         print(f'grid width/height ratio: {self.xCells/self.yCells}')
 
         # create 2D grid [array] for mapping heat
-        self._grid = [[self._grid for i in range(self.xCells)] for j in range(self.yCells)]
-        print(f'grid size [width/height]: {len(self._grid[0])} {len(self._grid)}')
+        # [height, width] (for all rows make the columns)
+        self._grid = [[self._grid for i in range(self.yCells)] for j in range(self.xCells)]
+        print(f'grid size [width/height]: {len(self._grid)} {len(self._grid[0])}')
 
     # code is from Markus
     # draws a legend on lefty upper corner for the sample rate
@@ -79,7 +81,7 @@ class HeatMapUtils():
     # returns list of normalized values for timestamp
     def normalizeTimestampData(self, imageSections):
         normalizedList = [ ]
-        minValue = 1000
+        minValue = sys.maxsize
         maxValue = 0
 
         for imageSection in imageSections:
@@ -101,7 +103,7 @@ class HeatMapUtils():
     # between 0 and 1
     def normalizeGridData(self):
         normalizedGrid = [[self._grid for i in range(len(self._grid[0]))] for j in range(len(self._grid))]
-        minValue = 1000
+        minValue = sys.maxsize
         maxValue = 0
 
         for i in range(len(self._grid)):
@@ -189,24 +191,24 @@ class HeatMapUtils():
     # returns drawn on image
     def drawGridValues(self, image, gridValues):
         draw = ImageDraw.Draw(image, "RGBA")
+        # [height, width] (for all rows make the columns)
         gridColors = [[gridValues for i in range(len(gridValues[0]))] for j in range(len(gridValues))]
+
         # first get through array of values to make array of colors
-        for i in range(len(gridValues)):
-            for j in range(len(gridValues[i])):
+        for yCell in range(len(gridValues[0])):
+            for xCell in range(len(gridValues)):
                 A = 50
-                R = int(255 * gridValues[i][j])
-                G = int(255 * (1 - gridValues[i][j]))
-                B = 0
-                gridColors[i][j] = (A, R, G, B)
+                B = int(255 * gridValues[xCell][yCell])
+                G = int(255 * (1 - gridValues[xCell][yCell]))
+                R = 0
+                gridColors[xCell][yCell] = (A, R, G, B)
 
-                #print(f'gridColors: {gridColors[i][j]} | ARGB: {A, R, G, B}')
-
-        # go through all color values and get the center position of the cell on the image
-        for i in range(len(gridValues)):
-            for j in range(len(gridValues[i])):
+        # go through all grid cells and get the center position on the image
+        for xCell in range(len(gridValues)):
+            for yCell in range(len(gridValues[xCell])):
                 # map the cell to an image pixel coordinate
-                pixelX = i * self.xCells
-                pixelY = j * self.yCells
+                pixelX = xCell * self.CELL_SIZE_X
+                pixelY = yCell * self.CELL_SIZE_Y
                 pixelXEnd = pixelX + 100
                 pixelYEnd = pixelY + 100
 
@@ -218,11 +220,11 @@ class HeatMapUtils():
                 
                 # position calculation does not work like that!
                 # or grid size must be recalculated
-                A = gridColors[i][j][0]
-                R = gridColors[i][j][1]
-                G = gridColors[i][j][2]
-                B = gridColors[i][j][3]
-                draw.rectangle((pixelX+30, pixelY+30, pixelXEnd-30, pixelYEnd-30), fill=(R, G, B, A), width=1)
+                A = gridColors[xCell][yCell][0]
+                R = gridColors[xCell][yCell][1]
+                G = gridColors[xCell][yCell][2]
+                B = gridColors[xCell][yCell][3]
+                draw.rectangle((pixelX+10, pixelY+10, pixelXEnd-10, pixelYEnd-10), fill=(R, G, B, A), width=1)
 
         # draw there a point of calculated color
         return image
