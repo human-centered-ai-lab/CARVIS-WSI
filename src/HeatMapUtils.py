@@ -32,14 +32,15 @@ class HeatMapUtils():
         self.extractedSizeX = int(pixelCountX)
         self.extractedSizeY = int(pixelCountY)
 
-        print(f'xPixel {self.extractedSizeX} yPixel {self.extractedSizeY}')
+        print(f'image width/height ratio: {self.extractedSizeX/self.extractedSizeY}')
 
         self.xCells = math.ceil(self.extractedSizeX / self.CELL_SIZE_X)
         self.yCells = math.ceil(self.extractedSizeY / self.CELL_SIZE_Y)
+        print(f'grid width/height ratio: {self.xCells/self.yCells}')
 
         # create 2D grid [array] for mapping heat
         self._grid = [[self._grid for i in range(self.xCells)] for j in range(self.yCells)]
-        print(f'{len(self._grid[0])} {len(self._grid)}')
+        print(f'grid size [width/height]: {len(self._grid[0])} {len(self._grid)}')
 
     # code is from Markus
     # draws a legend on lefty upper corner for the sample rate
