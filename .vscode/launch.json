@@ -58,6 +58,19 @@
                 "5478,4622"
             ],
             "console": "externalTerminal"
+        },
+        {
+            "name": "WSI Data with layer extraction",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/008_P013.csv",
+                "-l",
+                "3"
+            ],
+            "console": "externalTerminal"
         }
     ]
 }

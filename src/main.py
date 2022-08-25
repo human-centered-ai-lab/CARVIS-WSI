@@ -303,9 +303,9 @@ def initArgumentParser():
     global parser
     parser = argparse.ArgumentParser(description="Extract a jpg of given resolution out of a wsi and draw a heatmap out of given csv file data.")
     parser.add_argument("-c", type=str, help="Csv file path (relative to current path)")
-    parser.add_argument("-r", help="Tuple of resolution [x,y]. You will need to make sure to use the correct aspect ratio.")
-    parser.add_argument("-s", nargs='?', type=str, help="[OPTIONAL] Svs file path (relative to current path)")
-    parser.add_argument("l", nargs='?', help="Specify extraction layer. Resolution of layer will be read from the wsi metadata for every image seperately.")
+    parser.add_argument("-r", nargs='?', help="Tuple of resolution [x,y]. You will need to make sure to use the correct aspect ratio.")
+    parser.add_argument("-s", nargs='?', type=str, help="[OPTIONAL] Svs file path (relative to current path).")
+    parser.add_argument("-l", nargs='?', help="Specify extraction layer. Resolution of layer will be read from the wsi metadata for every image seperately.")
 
 # gets relsolution from input argument
 # returns (x, y) integer
@@ -347,9 +347,27 @@ if __name__ == "__main__":
     print("loading svs...")
     wsiFilesDict = loadSVSFiles(imageSectionsDict)
 
-    pixelCountX, pixelCountY = getResolutionFromArgs(arguments)
-    heatmapUtils = HeatMapUtils(pixelCountX, pixelCountY)
+    
     for fileName in wsiFilesDict:
+        pixelCountX = 0
+        pixelCountY = 0
+        
+        # check if ether -l or -r is specified
+        if (arguments.l):
+            print(f'Layer resolution: {wsiFilesDict[fileName].level_dimensions[int(arguments.l)]}')
+            resolution = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
+            pixelCountX = resolution[0]
+            pixelCountY = resolution[1]
+            print(f'x: {pixelCountX}')
+
+        elif (arguments.r):
+            pixelCountX, pixelCountY = getResolutionFromArgs(arguments)
+
+        else:
+            terminate()
+
+        heatmapUtils = HeatMapUtils(pixelCountX, pixelCountY)
+
         # get base image and draw roi on image
         print(f'rendering thumbnail for {fileName}...')
         baseImage = heatmapUtils.extractJPG(wsiFilesDict[fileName])
@@ -363,11 +381,6 @@ if __name__ == "__main__":
         heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
         #heatmapImage = heatmapUtils.calculateActivityValues(roiImage, imageSectionsDict[fileName])
         heatmapImage.show()
-
-    # this option needs to specify the image
-    #if (arguments.l):
-    #    print(f'Layer resolutions: {wsiSlide.level_dimensions}')
-    #    exit()
 
     print("done.")
     input()

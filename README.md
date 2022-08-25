@@ -21,6 +21,7 @@ To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed i
 | ------ | ----------- |
 |   -c   | input CSV file |
 |   -r   | render resolution for WSI |
+|   -l   | specify extraction layer (extraction resolution will be read from WSI metadata) |
 |   -s   | (optional) svs file path |
 
 ### Simple working example
