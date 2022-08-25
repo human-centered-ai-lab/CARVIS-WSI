@@ -346,7 +346,6 @@ if __name__ == "__main__":
     imageSectionsDict = readCSV(arguments.c)
     print("loading svs...")
     wsiFilesDict = loadSVSFiles(imageSectionsDict)
-
     
     for fileName in wsiFilesDict:
         pixelCountX = 0
@@ -354,11 +353,9 @@ if __name__ == "__main__":
         
         # check if ether -l or -r is specified
         if (arguments.l):
-            print(f'Layer resolution: {wsiFilesDict[fileName].level_dimensions[int(arguments.l)]}')
             resolution = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
             pixelCountX = resolution[0]
             pixelCountY = resolution[1]
-            print(f'x: {pixelCountX}')
 
         elif (arguments.r):
             pixelCountX, pixelCountY = getResolutionFromArgs(arguments)
@@ -379,7 +376,6 @@ if __name__ == "__main__":
 
         print("calculating heatmap...")
         heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
-        #heatmapImage = heatmapUtils.calculateActivityValues(roiImage, imageSectionsDict[fileName])
         heatmapImage.show()
 
     print("done.")

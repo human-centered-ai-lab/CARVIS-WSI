@@ -32,11 +32,11 @@ class HeatMapUtils():
         self._grid = 0
         self.extractedSizeX = int(pixelCountX)
         self.extractedSizeY = int(pixelCountY)
-
+        print(f'extracted size[x,y]: {self.extractedSizeX, self.extractedSizeY}')
         print(f'image width/height ratio: {self.extractedSizeX/self.extractedSizeY}')
 
-        self.xCells = math.ceil(self.extractedSizeX / self.CELL_SIZE_X)
-        self.yCells = math.ceil(self.extractedSizeY / self.CELL_SIZE_Y)
+        self.xCells = math.ceil(self.extractedSizeX/self.CELL_SIZE_X)
+        self.yCells = math.ceil(self.extractedSizeY/self.CELL_SIZE_Y)
         print(f'grid width/height ratio: {self.xCells/self.yCells}')
 
         # create 2D grid [array] for mapping heat
@@ -205,8 +205,8 @@ class HeatMapUtils():
                 gridColors[xCell][yCell] = (A, R, G, B)
 
         # go through all grid cells and get the center position on the image
-        for xCell in range(len(gridValues)):
-            for yCell in range(len(gridValues[xCell])):
+        for yCell in range(len(gridValues[0])):
+            for xCell in range(len(gridValues)):
                 # map the cell to an image pixel coordinate
                 pixelX = xCell * self.CELL_SIZE_X
                 pixelY = yCell * self.CELL_SIZE_Y
@@ -279,8 +279,6 @@ class HeatMapUtils():
                     continue
 
                 # map gaze point to image pixel coordinates
-                print(gazePointX * imageSection._downsampleFactor)
-
                 print(f'gaze point [x,y] {gazePointX, gazePointY} [width,height]: {imageSection._width, imageSection._height} sampleFactor: {imageSection._downsampleFactor}')
 
 
@@ -289,7 +287,8 @@ class HeatMapUtils():
                 xCell = math.ceil((gazePointX / self.xCells)) - 1
                 yCell = math.ceil((gazePointY / self.yCells)) - 1
 
-                #print(f'x: {xCell} y: {yCell} | xCells: {self.xCells} yCells: {self.yCells}')
+                print(f'x: {xCell} y: {yCell} | xCells: {self.xCells} yCells: {self.yCells}')
+                print(f'gazePoint[x,y]: {gazePointX, gazePointY} Cells [x,y]: {self.xCells, self.yCells}')
 
                 self._grid[yCell][xCell] += 1
         
