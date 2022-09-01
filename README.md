@@ -2,9 +2,9 @@
 This Project aims to render heatmap data onto an extracted WSI using eye tracking data collected with iMotions.
 
 Here are some up to date output sample files:
-![sample 1(images/sample_1.png)
-![sample 2(images/sample_2.png)
-![sample 3(images/sample_3.png)
+<img src="/images/sample_1.png">
+<img src="/images/sample_2.png">
+<img src="/images/sample_3.png">
 
 ## Installation
 To setup this programm you need to clone the master branch of this repository.
