@@ -1,6 +1,11 @@
 # SlideHeatmap
 This Project aims to render heatmap data onto an extracted WSI using eye tracking data collected with iMotions.
 
+Here are some up to date output sample files:
+![sample 1(images/sample_1.png)
+![sample 2(images/sample_2.png)
+![sample 3(images/sample_3.png)
+
 ## Installation
 To setup this programm you need to clone the master branch of this repository.
 
@@ -40,6 +45,7 @@ When the programm is done with all renderings, "done." will be printed and it wa
     .                           # Repository Root Folder
     ├── .vscode                 # VS Code settings (like run and debug settings)
     ├── src                     # Program Source Files
+    ├── images                  # Sample output images
     └── data                    # Stores iMotions and Whole Slide Image files
 
 <br />
