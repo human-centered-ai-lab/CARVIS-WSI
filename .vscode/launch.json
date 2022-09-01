@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Testrun with data",
+            "name": "Testrun with csv and svs",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
@@ -20,16 +20,15 @@
             "console": "externalTerminal"
         },
         {
-            "name": "Test Layer Resolution output",
+            "name": "Test Layer output",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
             "args": [
                 "-c",
                 "data/008_P013.csv",
-                "-s",
-                "data/MUGGRZ-PATH-SCAN-SS7533-1113757.svs",
-                "-l"
+                "-l",
+                "3"
             ],
             "console": "externalTerminal"
         },
@@ -56,6 +55,32 @@
                 "data/008_P013.csv",
                 "-r",
                 "5478,4622"
+            ],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "WSI Data with big layer extraction",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/008_P013.csv",
+                "-l",
+                "2"
+            ],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "WSI Data with small layer extraction",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/008_P013.csv",
+                "-l",
+                "3"
             ],
             "console": "externalTerminal"
         }

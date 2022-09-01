@@ -5,12 +5,6 @@ main.py
 draws heatmap of eye tracking on jpeg extraction of whole slide image
 '''
 
-# ToDo:
-#
-# - draw roi intensity for how long it has been on the screen
-# - should heatmap grid size be spacifyed by the user?
-#
-
 import os
 import sys
 import csv
@@ -269,18 +263,22 @@ def readCSV(file):
 
 # checks if the user choosen input makes sense
 def verifyInput(arguments):
-    if (len(sys.argv) < 3):
+    if (len(sys.argv) < 2):
         terminate()
 
     if (not os.path.isfile(arguments.c)):
-        print("CSV file not found!")
+        print("ERROR: CSV file not found!\n")
         print(arguments.c)
         terminate()
 
-    if (not arguments.s is None):
-        if (not os.path.isfile(arguments.s)):
-            print("SVS file not found!")
-            terminate()
+    #if (not arguments.s is None):
+    #    if (not os.path.isfile(arguments.s)):
+    #        print("ERROR: SVS file not found!\n")
+    #        terminate()
+
+    if (arguments.r is None and arguments.l is None):
+        print("ERROR: Specify ether render resolution or extraction layer!\n")
+        terminate()
 
 # prints usage and exits
 def terminate():
@@ -303,8 +301,9 @@ def initArgumentParser():
     global parser
     parser = argparse.ArgumentParser(description="Extract a jpg of given resolution out of a wsi and draw a heatmap out of given csv file data.")
     parser.add_argument("-c", type=str, help="Csv file path (relative to current path)")
-    parser.add_argument("-r", help="Tuple of resolution [x,y]. You will need to make sure to use the correct aspect ratio.")
-    parser.add_argument("-s", nargs='?', type=str, help="[OPTIONAL] Svs file path (relative to current path)")
+    parser.add_argument("-r", nargs='?', help="Tuple of resolution [x,y]. You may want to make sure to use the correct aspect ratio.")
+    #parser.add_argument("-s", nargs='?', type=str, help="[OPTIONAL] Svs file path (relative to current path).")
+    parser.add_argument("-l", nargs='?', help="[OPTIONAL] Specify extraction layer. Resolution of layer will be read from the wsi metadata for every image seperately. Use when -r is not used.")
 
 # gets relsolution from input argument
 # returns (x, y) integer
@@ -345,10 +344,21 @@ if __name__ == "__main__":
     imageSectionsDict = readCSV(arguments.c)
     print("loading svs...")
     wsiFilesDict = loadSVSFiles(imageSectionsDict)
-
-    pixelCountX, pixelCountY = getResolutionFromArgs(arguments)
-    heatmapUtils = HeatMapUtils(pixelCountX, pixelCountY)
+    
     for fileName in wsiFilesDict:
+        pixelCountX = 0
+        pixelCountY = 0
+        
+        # work with given resolution
+        if (arguments.r):
+            pixelCountX = int(arguments.r[0])
+            pixelCountY = int(arguments.r[1])
+
+        else:
+            pixelCountX, pixelCountY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
+
+        heatmapUtils = HeatMapUtils(pixelCountX, pixelCountY)
+
         # get base image and draw roi on image
         print(f'rendering thumbnail for {fileName}...')
         baseImage = heatmapUtils.extractJPG(wsiFilesDict[fileName])
@@ -358,15 +368,9 @@ if __name__ == "__main__":
         roiImage = heatmapUtils.drawLegend(roiImage)
         #roiImage.show()
 
-        print("calculating heatmap...")
+        print("working on heatmap...")
         heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
-        #heatmapImage = heatmapUtils.calculateActivityValues(roiImage, imageSectionsDict[fileName])
         heatmapImage.show()
-
-    # this option needs to specify the image
-    #if (arguments.l):
-    #    print(f'Layer resolutions: {wsiSlide.level_dimensions}')
-    #    exit()
 
     print("done.")
     input()
