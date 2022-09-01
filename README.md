@@ -1,7 +1,7 @@
 # SlideHeatmap
 This Project aims to render heatmap data onto an extracted WSI using eye tracking data collected with iMotions.
 
-<details open>
+<details>
 <summary>Here are some up to date output sample files:</summary>
 <br><img src="/images/sample_1.png"></br>
 <br><img src="/images/sample_2.png"></br>
