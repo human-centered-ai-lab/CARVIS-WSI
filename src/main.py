@@ -346,18 +346,24 @@ if __name__ == "__main__":
     wsiFilesDict = loadSVSFiles(imageSectionsDict)
     
     for fileName in wsiFilesDict:
+
+        # debug
+        print(f'layer 0 res: {wsiFilesDict[fileName].level_dimensions[0]}')
+        #
+
         pixelCountX = 0
         pixelCountY = 0
+
+        layer0Width, layer0Height = wsiFilesDict[fileName].level_dimensions[0]
         
         # work with given resolution
         if (arguments.r):
-            pixelCountX = int(arguments.r[0])
-            pixelCountY = int(arguments.r[1])
+            pixelCountX, pixelCountY = getResolutionFromArgs(arguments)
 
         else:
             pixelCountX, pixelCountY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
 
-        heatmapUtils = HeatMapUtils(pixelCountX, pixelCountY)
+        heatmapUtils = HeatMapUtils(pixelCountX, pixelCountY, layer0Width, layer0Height)
 
         # get base image and draw roi on image
         print(f'rendering thumbnail for {fileName}...')

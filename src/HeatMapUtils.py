@@ -28,21 +28,22 @@ class HeatMapUtils():
     DOWNSAMPLE_40 = (51,102,255, 255)
     DOWNSAMPLE_X = (102,51,255, 255)
 
-    def __init__(self, pixelCountX, pixelCountY):
+    def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y):
         self._grid = 0
         self.extractedSizeX = int(pixelCountX)
         self.extractedSizeY = int(pixelCountY)
+        self._layer0X = int(layer0X)
+        self._layer0Y = int(layer0Y)
         print(f'extracted size[x,y]: {self.extractedSizeX, self.extractedSizeY}')
         print(f'image width/height ratio: {self.extractedSizeX/self.extractedSizeY}')
 
-        self.xCells = math.ceil(self.extractedSizeX/self.CELL_SIZE_X)
-        self.yCells = math.ceil(self.extractedSizeY/self.CELL_SIZE_Y)
-        print(f'grid width/height ratio: {self.xCells/self.yCells}')
+        self._gridWidth = math.ceil(self.extractedSizeX/self.CELL_SIZE_X)
+        self._gridHeight = math.ceil(self.extractedSizeY/self.CELL_SIZE_Y)
+        print(f'grid width/height ratio: {self._gridWidth/self._gridHeight}')
 
         # create 2D grid [array] for mapping heat
         # [height, width] (for all rows make the columns)
-        self._grid = [[self._grid for i in range(self.yCells)] for j in range(self.xCells)]
-        print(f'grid size [width/height]: {len(self._grid)} {len(self._grid[0])}')
+        self._grid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
     # code is from Markus
     # draws a legend on lefty upper corner for the sample rate
@@ -102,21 +103,21 @@ class HeatMapUtils():
     # returns new grid in size as old one with values
     # between 0 and 1
     def normalizeGridData(self):
-        normalizedGrid = [[self._grid for i in range(len(self._grid[0]))] for j in range(len(self._grid))]
+        normalizedGrid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
         minValue = sys.maxsize
         maxValue = 0
 
-        for i in range(len(self._grid)):
-            for j in range(len(self._grid[i])):
-                if (self._grid[i][j] > maxValue):
-                    maxValue = self._grid[i][j]
-                if (self._grid[i][j] < minValue):
-                    minValue = self._grid[i][j]
+        for y in range(self._gridHeight):
+            for x in range(self._gridWidth):
+                if (self._grid[y][x] > maxValue):
+                    maxValue = self._grid[y][x]
+                if (self._grid[y][x] < minValue):
+                    minValue = self._grid[y][x]
 
-        for i in range(len(self._grid)):
-            for j in range(len(self._grid[i])):
-                x = self._grid[i][j]
-                normalizedGrid[i][j] = (x- minValue) / (maxValue - minValue)
+        for y in range(self._gridHeight):
+            for x in range(self._gridWidth):
+                value = self._grid[y][x]
+                normalizedGrid[y][x] = (value - minValue) / (maxValue - minValue)
 
         return normalizedGrid # deep copy 2d array?
 
@@ -192,21 +193,21 @@ class HeatMapUtils():
     # returns drawn on image
     def drawGridValues(self, image, gridValues):
         draw = ImageDraw.Draw(image, "RGBA")
-        # [height, width] (for all rows make the columns)
-        gridColors = [[gridValues for i in range(len(gridValues[0]))] for j in range(len(gridValues))]
+        # [width, height] (for all rows make the columns)
+        gridColors = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
         # first get through array of values to make array of colors
-        for yCell in range(len(gridValues[0])):
-            for xCell in range(len(gridValues)):
-                A = 50
-                B = int(255 * gridValues[xCell][yCell])
-                G = int(255 * (1 - gridValues[xCell][yCell]))
-                R = 0
-                gridColors[xCell][yCell] = (A, R, G, B)
+        for yCell in range(self._gridHeight):
+            for xCell in range(self._gridWidth):
+                A = (int(255 * gridValues[yCell][xCell]))
+                B = 205
+                G = 244
+                R = 50
+                gridColors[yCell][xCell] = (A, R, G, B)
 
-        # go through all grid cells and get the center position on the image
-        for yCell in range(len(gridValues[0])):
-            for xCell in range(len(gridValues)):
+        # go through all grid cells and get the center position (of the cell) on the image
+        for yCell in range(self._gridHeight):
+            for xCell in range(self._gridWidth):
                 # map the cell to an image pixel coordinate
                 pixelX = xCell * self.CELL_SIZE_X
                 pixelY = yCell * self.CELL_SIZE_Y
@@ -219,25 +220,64 @@ class HeatMapUtils():
                 if (pixelY > self.extractedSizeY or pixelYEnd > self.extractedSizeY):
                     continue
                 
-                # position calculation does not work like that!
                 # or grid size must be recalculated
-                A = gridColors[xCell][yCell][0]
-                R = gridColors[xCell][yCell][1]
-                G = gridColors[xCell][yCell][2]
-                B = gridColors[xCell][yCell][3]
+                A = gridColors[yCell][xCell][0]
+                R = gridColors[yCell][xCell][1]
+                G = gridColors[yCell][xCell][2]
+                B = gridColors[yCell][xCell][3]
+
                 draw.rectangle((pixelX+10, pixelY+10, pixelXEnd-10, pixelYEnd-10), fill=(R, G, B, A), width=1)
 
         # draw there a point of calculated color
         return image
 
+    # returns gaze point mapped to export resolution
+    def mapGazePoint(self, imageSection, eyeData):
+        # center gaze point
+        # relative to monitor upper left corner
+        gazeX = int((eyeData._gazeLeftX + eyeData._gazeRightX) / 2)
+        gazeY = int((eyeData._gazeLeftY + eyeData._gazeRightY) / 2)
+        
+        # eye data (or "gaze point") is relative to upper left corner of monitor
+        # need to turn monitor related position into wsi (layer 0) related position
+
+        # calculate dead part on recording monitor, which is the iMotions window
+        deadWidth = self.DISPLAY_X - imageSection._width
+        deadHeight = self.DISPLAY_Y - imageSection._height
+
+        # current height, current width are relative to wsi
+        # calculate gaze point relative to frame. image section is shown on monitor
+        # with iMotions window
+        relativeGazePointX = gazeX - deadWidth
+        relativeGazePointY = gazeY - deadHeight
+
+        # next step is to calculate gaze point relative to wsi
+        # image section corner points (view roi) are relative to wsi so use them
+        realGazeX = imageSection._topLeftX + relativeGazePointX
+        realGazeY = imageSection._topLeftY + relativeGazePointY
+
+        # now map gaze points to export resolution
+        resolutionFactorX = self.extractedSizeX / self._layer0X
+        resolutionFactorY = self.extractedSizeY / self._layer0Y
+
+        exportGazeX = int(realGazeX * resolutionFactorX)
+        exportGazeY = int(realGazeY * resolutionFactorY)
+
+        # this should be it
+
+        return (exportGazeX, exportGazeY) # how got sometimes negative indexes?
+
+    # returns mapped Cell on grid [x, y]
+    def mapToCell(self, gazeX, gazeY):
+        xCell = math.ceil(gazeX / self.CELL_SIZE_X)
+        yCell = math.ceil(gazeY / self.CELL_SIZE_Y)
+
+        return (xCell, yCell)
+
     # calculates heat of grid cells which stretch over an image
     # maps eyeData coordinates onto the grid cells. each hit increases the heat of the cell
     # returns colored (but transparent) cells rendered onto a .jpg
-    # parts of this code is from Markus Plass
     def getHeatmap(self, image, imageSections):
-        # https://stackoverflow.com/questions/9816024/coordinates-to-grid-box-number
-        # https://stackoverflow.com/questions/20368413/draw-grid-lines-over-an-image-in-matplotlib
-
         for imageSection in imageSections:
             for eyeData in imageSection._eyeTracking:
 
@@ -248,48 +288,20 @@ class HeatMapUtils():
                   or eyeData._gazeRightY < 0):
                     continue
 
-                # check if eye gaze point is inside display area of image section
-                # (=inside iMotions window)
-                gazePointX = int((eyeData._gazeLeftX + eyeData._gazeRightX) / 2)
-                gazePointY = int((eyeData._gazeLeftY + eyeData._gazeRightY) / 2)
-
-                posXBottomRight = self.DISPLAY_X - gazePointX
-                posYBottomRight = self.DISPLAY_Y - gazePointY
-
-                # when eye gaze point is not inside image section -> drop datapoint
-                if (posXBottomRight >= imageSection._width and posYBottomRight <= imageSection._height):
-                    continue
-
-                '''# rethink this part of the code...   without is better
-                # calculate exect eye gaze point
-                #gazePointX = imageSection._bottomRightX - posXBottomRight * imageSection._downsampleFactor
-                #gazePointY = imageSection._bottomRightY - posYBottomRight * imageSection._downsampleFactor
-
-                #gazePointX = gazePointX / imageSection._downsampleFactor
-                #gazePointY = gazePointY / imageSection._downsampleFactor'''
-
-                # new approach for calculating gaze point
-                gazePointX = int((eyeData._gazeLeftX + eyeData._gazeRightX) / 2)
-                gazePointY = int((eyeData._gazeLeftY + eyeData._gazeRightY) / 2)
+                # map eye data to gaze point on output resolution image
+                gazePointX, gazePointY = self.mapGazePoint(imageSection, eyeData)
+                print(f'mapped gaze point (L0): {gazePointX} {gazePointY}')
 
                 # check if gaze point is inside image section frame
-                if (gazePointX > imageSection._bottomRightX and not gazePointX < 0):
+                if (gazePointX > imageSection._bottomRightX or gazePointX < 0):
+                    # when not drop it
                     continue
-                if (gazePointY > imageSection._bottomLeftY and not gazePointY < 0):
+                if (gazePointY > imageSection._bottomLeftY or gazePointY < 0):
+                    # when not drop it
                     continue
 
-                # map gaze point to image pixel coordinates
-                print(f'gaze point [x,y] {gazePointX, gazePointY} [width,height]: {imageSection._width, imageSection._height} sampleFactor: {imageSection._downsampleFactor}')
-
-
-                # now map gazePoint to grid cell
-                # - 1 because we need index
-                xCell = math.ceil((gazePointX / self.xCells)) - 1
-                yCell = math.ceil((gazePointY / self.yCells)) - 1
-
-                print(f'x: {xCell} y: {yCell} | xCells: {self.xCells} yCells: {self.yCells}')
-                print(f'gazePoint[x,y]: {gazePointX, gazePointY} Cells [x,y]: {self.xCells, self.yCells}')
-
+                # map gaze point to cell in grid and increase hit counter
+                xCell, yCell = self.mapToCell(gazePointX, gazePointY)
                 self._grid[yCell][xCell] += 1
         
         # normalize grid data
@@ -297,52 +309,3 @@ class HeatMapUtils():
         
         # draw grid values on image and return
         return self.drawGridValues(image, normalizedGridData)
-
-    # calculates the "heat" of a grid cell by increasing the cells counter by 1
-    # every time the eyeData's gaze point hits a cell
-    def calculateActivityValues(self, image, imageSections):
-        # go through all image sections
-        # go through all eyeData and calculate eye position according to image section frame
-        # check if position is in picture frame
-        # add 1 to every matrix cell where eyeData fits the cell
-
-        for imageSection in imageSections:
-            # image section scale factor
-            for eyeGazePosition in imageSection._eyeTracking:
-                # check if something is saved before converting
-                if (eyeGazePosition._gazeLeftX == ''
-                or eyeGazePosition._gazeLeftY == ''
-                or eyeGazePosition._gazeRightX == ''
-                or eyeGazePosition._gazeRightY == ''):
-                        continue
-
-                # check if eye position was tracked
-                if (not int(float(eyeGazePosition._gazeLeftX)) > -1
-                or not int(float(eyeGazePosition._gazeLeftY)) > -1
-                or not int(float(eyeGazePosition._gazeRightX)) > -1
-                or not int(float(eyeGazePosition._gazeRightY)) > -1):
-                        continue
-
-                gazeLeftX = int(float(eyeGazePosition._gazeLeftX))
-                gazeLeftY = int(float(eyeGazePosition._gazeLeftY))
-                gazeRightX = int(float(eyeGazePosition._gazeRightX))
-                gazeRightY = int(float(eyeGazePosition._gazeRightY))
-
-                # calc eye position
-                eyePositionX = int((gazeLeftX + gazeRightX) / 2)
-                eyePositionY = int((gazeLeftY + gazeRightY) / 2)
-
-                # take image section sample factor into account
-                eyePositionX = int(float(eyePositionX) * float(imageSection._downsampleFactor))
-                eyePositionY = int(float(eyePositionY) * float(imageSection._downsampleFactor))
-
-                # map grid cells to image positoins to make the counter thing working
-
-
-                # until this works now: draw point on image
-                draw = ImageDraw.Draw(image, "RGBA")
-                #draw.point((eyePositionX, eyePositionY), fill=(100,200,0, 10))
-                draw.ellipse([(eyePositionX-4, eyePositionY-4), (eyePositionX+4, eyePositionY+4)], fill=('#00cc00'), width=20)
-
-        return image
-    
