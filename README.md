@@ -50,6 +50,7 @@ When the programm is done with all renderings, "done." will be printed and it wa
     ├── .vscode                 # VS Code settings (like run and debug settings)
     ├── src                     # Program Source Files
     ├── images                  # Sample output images
+    ├── export                  # JPG's with rendered heatmaps are exported here
     └── data                    # Stores iMotions and Whole Slide Image files
 
 <br />

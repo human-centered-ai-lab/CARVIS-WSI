@@ -290,7 +290,6 @@ class HeatMapUtils():
 
                 # map eye data to gaze point on output resolution image
                 gazePointX, gazePointY = self.mapGazePoint(imageSection, eyeData)
-                print(f'mapped gaze point (L0): {gazePointX} {gazePointY}')
 
                 # check if gaze point is inside image section frame
                 if (gazePointX > imageSection._bottomRightX or gazePointX < 0):

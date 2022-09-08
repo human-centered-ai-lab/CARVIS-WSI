@@ -14,9 +14,8 @@ from ImageSection import ImageSection
 from EyeData import EyeData
 from HeatMapUtils import HeatMapUtils
 from openslide import open_slide
-from openslide import OpenSlide, OpenSlideError
-from openslide.deepzoom import DeepZoomGenerator
 
+exportDirectory = "export/"
 ROI_CHANGE_SIGNAL = "%7b%22"
 wsiFileName = ""
 wsiLevel = 0
@@ -339,6 +338,10 @@ if __name__ == "__main__":
     arguments = parser.parse_args()
     verifyInput(arguments)
 
+    # check if export directory exists. if not create it
+    if (not os.path.exists(exportDirectory)):
+        os.makedirs(exportDirectory)
+
     # read csv and svs files
     print("loading csv...")
     imageSectionsDict = readCSV(arguments.c)
@@ -376,7 +379,18 @@ if __name__ == "__main__":
 
         print("working on heatmap...")
         heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
-        heatmapImage.show()
+        #heatmapImage.show()
+
+        # remove .svs and turn filename into .jpg
+        saveName = fileName[: len(fileName) - 4]
+        saveName += "_heatmap.jpg"
+        print(f'saving file: {saveName}')
+
+        # now save save image
+        heatmapImage.save(exportDirectory + saveName)
+
+        # new line for easier reading debug output
+        print(" ")
 
     print("done.")
     input()
