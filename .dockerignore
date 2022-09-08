@@ -1,0 +1,7 @@
+.vscode/
+data/
+export/
+images/
+.gitignore
+README.md
+requirements.txt

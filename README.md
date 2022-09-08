@@ -13,12 +13,31 @@ To setup this programm you need to clone the master branch of this repository.
 
 `git clone git@github.com:human-centered-ai-lab/SlideHeatmap.git`
 
-Then install all requirements listed in [requirements.txt](requirements.txt).
-Before usage, the `data` directory must be created.
+Now create both a directory for input data and one for export data inside the repository.
 
-`mkdir data`
+`mkdir data export`
 
-Inside the `data` directory all .csv and WSI files (in the .svs file format) will be stored.
+Then build the docker container.
+
+`docker build -t slide-heatmap .`
+
+This command will take some time to run, depending on your system. It downloads the latest Docker Python image, installs all dependencies and builds and installs pixman from source, since the prebuild version has a bug with openslide. Then it runs some tests and cleans up afterwards. Expect some more output while doing so.
+
+Run the container with following parameters:
+
+```
+docker run --name slide-heatmap \
+    -v /absolute/path/to/data/:/data/ \
+    -v /absolute/path/to/export/:/export/ \
+    slide-heatmap \
+    008_P013.csv \
+    3
+```
+
+The `-d` (detached) option can be omitted if program output is desired.
+If there is no desire for a container name, the `-name` parameter can also be omitted. \
+The `-v` parameter bind mounts a local directory to a directory inside the container. It uses following convention: `local_dir : container_dir`. Don't forget to use abolute paths for this parameter! \
+The last two lines are the parameters which are getting passed to the program. The first one is the desired .csv file and the second is the required output layer. Note that the output layer parameter reads the WSI metadata and uses the resolution of the given layer to render a thumnail of the WSI at layer 0. This ensures that the right aspect ratio is being used.
 
 ## Usage
 To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed in the iMotions meeting must be present inside `data` directory.
