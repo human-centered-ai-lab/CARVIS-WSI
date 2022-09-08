@@ -1,14 +1,6 @@
 # HeatMapUtils
 
-''' holds all functionallity which is used for drawing the heatmaps '''
-
-# a fine grid needs to be layed over the image. when an eyeData point
-# hits a grid cell, it's counter will be increased. then the grid will get
-# colorised according to it cell's hit rate and displayed over the original
-# wsi image layer.
-#
-# all eyeData points need to be calculated back to the original image pixels at level 0.
-# data for this is in each corresponding ImageSection.
+''' holds all functionallity which is used for drawing heatmaps '''
 
 import sys
 import math
@@ -30,26 +22,20 @@ class HeatMapUtils():
 
     def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y):
         self._grid = 0
-        self.extractedSizeX = int(pixelCountX)
-        self.extractedSizeY = int(pixelCountY)
+        self._exportWidth = int(pixelCountX)
+        self._exportHeight = int(pixelCountY)
         self._layer0X = int(layer0X)
         self._layer0Y = int(layer0Y)
-        print(f'extracted size[x,y]: {self.extractedSizeX, self.extractedSizeY}')
-        print(f'image width/height ratio: {self.extractedSizeX/self.extractedSizeY}')
+        self._gridWidth = math.ceil(self._exportWidth/self.CELL_SIZE_X)
+        self._gridHeight = math.ceil(self._exportHeight/self.CELL_SIZE_Y)
 
-        self._gridWidth = math.ceil(self.extractedSizeX/self.CELL_SIZE_X)
-        self._gridHeight = math.ceil(self.extractedSizeY/self.CELL_SIZE_Y)
-        print(f'grid width/height ratio: {self._gridWidth/self._gridHeight}')
-
-        # create 2D grid [array] for mapping heat
-        # [height, width] (for all rows make the columns)
+        # create 2D grid array for mapping gaze points
         self._grid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
     # code is from Markus
     # draws a legend on lefty upper corner for the sample rate
     # returns image with drawn on legend
     def drawLegend(self, image):
-        # https://stackoverflow.com/questions/41405632/draw-a-rectangle-and-a-text-in-it-using-pil
         draw = ImageDraw.Draw(image, "RGBA")
 
         # draw samplerates and colors
@@ -72,14 +58,8 @@ class HeatMapUtils():
         
         return image
 
-    # draws the path of eyes on the wsi extracted layer
-    # returns wsi layer with path drawing on it
-    def drawViewPath(self, image, viewPoints, color, lineThicknes):
-        # ToDo if needed
-        pass
-
     # normalizes timestamp data for one image
-    # returns list of normalized values for timestamp
+    # returns list of normalized values for timestamp between 0 and 1
     def normalizeTimestampData(self, imageSections):
         normalizedList = [ ]
         minValue = sys.maxsize
@@ -119,13 +99,13 @@ class HeatMapUtils():
                 value = self._grid[y][x]
                 normalizedGrid[y][x] = (value - minValue) / (maxValue - minValue)
 
-        return normalizedGrid # deep copy 2d array?
+        return normalizedGrid
 
     # draws the Image Sections (ROI) on the extracted wsi layer
     # parts of this code is from Markus
     # returns wsi image with rectangle on it
     def drawRoiOnImage(self, image, imageSections, filling=None, lineWidth=10):
-        draw = ImageDraw.Draw(image, "RGBA") # (200, 100, 0, 5) | '#9EFF00'
+        draw = ImageDraw.Draw(image, "RGBA")
 
         # get normalized timestamp data for all image sections
         normalizedList = self.normalizeTimestampData(imageSections)
@@ -133,11 +113,13 @@ class HeatMapUtils():
         # do this for all image sections
         for index, imageSection in enumerate(imageSections, start=0):
 
+            # get corner points
             topLeftX = imageSection._topLeftX / imageSection._downsampleFactor
             topLeftY = imageSection._topLeftY / imageSection._downsampleFactor
             bottomRightX = imageSection._bottomRightX / imageSection._downsampleFactor
             bottomRightY = imageSection._bottomRightY / imageSection._downsampleFactor
 
+            # check sample factor and draw lines in corresponding colors
             sampleFactor = imageSection._downsampleFactor
             outlineColor = (0, 0, 0)
 
@@ -181,16 +163,12 @@ class HeatMapUtils():
 
     # extracts a "level" (only resolution) of the whole slide image and converts it to a jpg
     # returns the level on success or None on failure
-    '''
-    Note: when there are some issues with extracting an level/roi, 
-          this might help: https://www.linuxfromscratch.org/blfs/view/cvs/general/pixman.html
-    '''
     def extractJPG(self, slide):
-        return slide.get_thumbnail((self.extractedSizeX, self.extractedSizeY))
+        return slide.get_thumbnail((self._exportWidth, self._exportHeight))
 
-    # draws the grid values onto given image
+    # turns grid values into cell colors and draws them on given image
     # grid values need to be normalized first!
-    # returns drawn on image
+    # returns drawing on image
     def drawGridValues(self, image, gridValues):
         draw = ImageDraw.Draw(image, "RGBA")
         # [width, height] (for all rows make the columns)
@@ -214,10 +192,10 @@ class HeatMapUtils():
                 pixelXEnd = pixelX + 100
                 pixelYEnd = pixelY + 100
 
-                if (pixelX > self.extractedSizeX or pixelXEnd > self.extractedSizeX):
+                if (pixelX > self._exportWidth or pixelXEnd > self._exportWidth):
                     continue
 
-                if (pixelY > self.extractedSizeY or pixelYEnd > self.extractedSizeY):
+                if (pixelY > self._exportHeight or pixelYEnd > self._exportHeight):
                     continue
                 
                 # or grid size must be recalculated
@@ -231,12 +209,12 @@ class HeatMapUtils():
         # draw there a point of calculated color
         return image
 
-    # returns gaze point mapped to export resolution
-    def mapGazePoint(self, imageSection, eyeData):
+    # returns gaze point mapped to the export resolution [x, y]
+    def mapGazePoint(self, imageSection, gazePoints):
         # center gaze point
         # relative to monitor upper left corner
-        gazeX = int((eyeData._gazeLeftX + eyeData._gazeRightX) / 2)
-        gazeY = int((eyeData._gazeLeftY + eyeData._gazeRightY) / 2)
+        gazeX = int((gazePoints._leftX + gazePoints._rightX) / 2)
+        gazeY = int((gazePoints._leftY + gazePoints._rightY) / 2)
         
         # eye data (or "gaze point") is relative to upper left corner of monitor
         # need to turn monitor related position into wsi (layer 0) related position
@@ -257,8 +235,8 @@ class HeatMapUtils():
         realGazeY = imageSection._topLeftY + relativeGazePointY
 
         # now map gaze points to export resolution
-        resolutionFactorX = self.extractedSizeX / self._layer0X
-        resolutionFactorY = self.extractedSizeY / self._layer0Y
+        resolutionFactorX = self._exportWidth / self._layer0X
+        resolutionFactorY = self._exportHeight / self._layer0Y
 
         exportGazeX = int(realGazeX * resolutionFactorX)
         exportGazeY = int(realGazeY * resolutionFactorY)
@@ -274,22 +252,23 @@ class HeatMapUtils():
 
         return (xCell, yCell)
 
-    # calculates heat of grid cells which stretch over an image
-    # maps eyeData coordinates onto the grid cells. each hit increases the heat of the cell
-    # returns colored (but transparent) cells rendered onto a .jpg
+    # calculates heat of grid cells
+    # uses GazePoints, which are mapped to export resolution
+    # to draw a map on an image
+    # returns colored, mostly transparent, cells rendered onto a .jpg
     def getHeatmap(self, image, imageSections):
         for imageSection in imageSections:
-            for eyeData in imageSection._eyeTracking:
+            for gazePoints in imageSection._eyeTracking:
 
-                # if incomplete data -> drop datapoint
-                if (eyeData._gazeLeftX < 0
-                  or eyeData._gazeRightX < 0
-                  or eyeData._gazeLeftY < 0
-                  or eyeData._gazeRightY < 0):
+                # if incomplete data -> drop gazepoint
+                if (gazePoints._leftX < 0
+                  or gazePoints._rightX < 0
+                  or gazePoints._leftY < 0
+                  or gazePoints._rightY < 0):
                     continue
 
                 # map eye data to gaze point on output resolution image
-                gazePointX, gazePointY = self.mapGazePoint(imageSection, eyeData)
+                gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoints)
 
                 # check if gaze point is inside image section frame
                 if (gazePointX > imageSection._bottomRightX or gazePointX < 0):

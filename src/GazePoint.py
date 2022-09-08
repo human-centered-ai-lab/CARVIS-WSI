@@ -2,7 +2,7 @@
 
 ''' every EyeData gets an ImageSections assigned '''
 
-class EyeData():
+class GazePoint():
     def __init__(self,
       gazeLeftX,
       gazeLeftY,
@@ -18,10 +18,10 @@ class EyeData():
       cameraRightX,
       cameraRightY):
 
-        self._gazeLeftX = int(float(gazeLeftX))
-        self._gazeLeftY = int(float(gazeLeftY))
-        self._gazeRightX = int(float(gazeRightX))
-        self._gazeRightY = int(float(gazeRightY))
+        self._leftX = int(float(gazeLeftX))
+        self._leftY = int(float(gazeLeftY))
+        self._rightX = int(float(gazeRightX))
+        self._rightY = int(float(gazeRightY))
         self._pupilLeft = float(pupilLeft)
         self._pupilRight = float(pupilRight)
         self._distanceLeft = float(distanceLeft)

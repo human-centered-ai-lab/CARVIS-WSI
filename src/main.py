@@ -11,17 +11,17 @@ import csv
 import argparse
 from os.path import exists
 from ImageSection import ImageSection
-from EyeData import EyeData
+from GazePoint import GazePoint
 from HeatMapUtils import HeatMapUtils
 from openslide import open_slide
 
-exportDirectory = "export/"
+EXPORT_DIR = "export/"
 ROI_CHANGE_SIGNAL = "%7b%22"
-wsiFileName = ""
+
 wsiLevel = 0
 parser = None
 
-# parses all EyeData parameters out of a roi string
+# parses all GazePoint parameters out of a roi string
 # returns image section with only the parsed parameters
 def getRoiParameters(row):
     # first get all needed parameters from the roi change string
@@ -175,12 +175,12 @@ def getRoiParameters(row):
         bottomRightY)
 
 # reds csv and returns a nested list
-# drops all EyeData until first filename is found as ImageSection
+# drops all GazePoints until first filename is found as ImageSection
 def readCSV(file):
     ImageSectionsDict = { } # holds all image sections as list with filename as key
     ImageSectionList = [ ]  # holds all image sections with eye data and timestamps per image section
     imageSectionTimestamps = [ ] # holds all timestamps 
-    eyeDataList = [ ]   # all eye data
+    gazePointList = [ ]   # all eye data
     oldFileName = "None"
 
     with open(file, newline='') as csvfile:
@@ -209,14 +209,14 @@ def readCSV(file):
                     
                     # then add collected lists
                     imageSection.addTimestamps(imageSectionTimestamps)
-                    imageSection.addEyeTracking(eyeDataList)
+                    imageSection.addEyeTracking(gazePointList)
                     
                     # append image section
                     ImageSectionList.append(imageSection)
 
                     # clear collecting lists
                     imageSectionTimestamps.clear()
-                    eyeDataList.clear()
+                    gazePointList.clear()
 
                     # new file
                     if (imageSection._fileName != oldFileName):
@@ -224,7 +224,7 @@ def readCSV(file):
                         oldFileName = imageSection._fileName
                         ImageSectionList.clear()                        
 
-                # collect imageSectionTimnestamps and eyeDataList here
+                # collect imageSectionTimnestamps and gazePointList here
                 if (roiChangeColumn != ROI_CHANGE_SIGNAL):
                     # only if there was already a filename in csv file
                     # otherwise drop data
@@ -232,7 +232,7 @@ def readCSV(file):
                     if (oldFileName != "None" and row[13] != ''):
                         imageSectionTimestamps.append(float(row[1]))
 
-                        eyeData = EyeData(
+                        gazePoint = GazePoint(
                             row[13],
                             row[14],
                             row[15],
@@ -247,16 +247,16 @@ def readCSV(file):
                             row[24],
                             row[25]
                         )
-                        eyeDataList.append(eyeData)
+                        gazePointList.append(gazePoint)
 
         # also don't forget to save all pending eye tracking data to last fileName in ImageSectionsDict
         ImageSectionList[-1].addTimestamps(imageSectionTimestamps)
-        ImageSectionList[-1].addEyeTracking(eyeDataList)
+        ImageSectionList[-1].addEyeTracking(gazePointList)
 
         ImageSectionsDict[oldFileName] = ImageSectionList.copy()
 
         imageSectionTimestamps.clear()
-        eyeDataList.clear()
+        gazePointList.clear()
 
         return ImageSectionsDict.copy()
 
@@ -284,7 +284,7 @@ def terminate():
     parser.print_help()
     parser.exit()
 
-# reads the svs file and extracs the needed
+# reads the svs file and returns it
 def readSVS(file):
     file = "data/" + file
 
@@ -305,7 +305,7 @@ def initArgumentParser():
     parser.add_argument("-l", nargs='?', help="[OPTIONAL] Specify extraction layer. Resolution of layer will be read from the wsi metadata for every image seperately. Use when -r is not used.")
 
 # gets relsolution from input argument
-# returns (x, y) integer
+# returns [x, y] tuple
 def getResolutionFromArgs(arguments):
     # get resolution from string
     comma = arguments.r.find(",")
@@ -320,7 +320,7 @@ def debugCSV(csvData):
     for imageSection in csvData:
         print(f'fileName: {imageSection._fileName}')
 
-# loads all svs files found inside the csv file into a dict
+# loads all svs files found inside the csv file into a dictionary
 # returns dict where filename is key and an wsi as the value
 def loadSVSFiles(imageSectionDict):
     wsiFiles = { }
@@ -339,8 +339,8 @@ if __name__ == "__main__":
     verifyInput(arguments)
 
     # check if export directory exists. if not create it
-    if (not os.path.exists(exportDirectory)):
-        os.makedirs(exportDirectory)
+    if (not os.path.exists(EXPORT_DIR)):
+        os.makedirs(EXPORT_DIR)
 
     # read csv and svs files
     print("loading csv...")
@@ -349,37 +349,30 @@ if __name__ == "__main__":
     wsiFilesDict = loadSVSFiles(imageSectionsDict)
     
     for fileName in wsiFilesDict:
-
-        # debug
-        print(f'layer 0 res: {wsiFilesDict[fileName].level_dimensions[0]}')
-        #
-
-        pixelCountX = 0
-        pixelCountY = 0
-
         layer0Width, layer0Height = wsiFilesDict[fileName].level_dimensions[0]
         
-        # work with given resolution
+        # check if layer or resolution is given for export
+        exportPixelX = 0
+        exportPixelY = 0
+
         if (arguments.r):
-            pixelCountX, pixelCountY = getResolutionFromArgs(arguments)
-
+            exportPixelX, exportPixelY = getResolutionFromArgs(arguments)
+        
         else:
-            pixelCountX, pixelCountY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
+            exportPixelX, exportPixelY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
 
-        heatmapUtils = HeatMapUtils(pixelCountX, pixelCountY, layer0Width, layer0Height)
+        heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height)
 
-        # get base image and draw roi on image
+        # working with files and extract information
         print(f'rendering thumbnail for {fileName}...')
         baseImage = heatmapUtils.extractJPG(wsiFilesDict[fileName])
         
         print("drawing roi...")
         roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
         roiImage = heatmapUtils.drawLegend(roiImage)
-        #roiImage.show()
 
         print("working on heatmap...")
         heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
-        #heatmapImage.show()
 
         # remove .svs and turn filename into .jpg
         saveName = fileName[: len(fileName) - 4]
@@ -387,7 +380,7 @@ if __name__ == "__main__":
         print(f'saving file: {saveName}')
 
         # now save save image
-        heatmapImage.save(exportDirectory + saveName)
+        heatmapImage.save(EXPORT_DIR + saveName)
 
         # new line for easier reading debug output
         print(" ")
