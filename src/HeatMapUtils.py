@@ -125,12 +125,14 @@ class HeatMapUtils():
 
         # do this for all image sections
         for index, imageSection in enumerate(imageSections, start=0):
+            # scale to export resolution
+            scaleFactorX = self._exportWidth / self._layer0X
+            scaleFactorY = self._exportHeight / self._layer0Y
 
-            # get corner points
-            topLeftX = imageSection._topLeftX / imageSection._downsampleFactor
-            topLeftY = imageSection._topLeftY / imageSection._downsampleFactor
-            bottomRightX = imageSection._bottomRightX / imageSection._downsampleFactor
-            bottomRightY = imageSection._bottomRightY / imageSection._downsampleFactor
+            topLeftX = int(imageSection._topLeftX * scaleFactorX)
+            topLeftY = int(imageSection._topLeftY * scaleFactorY)
+            bottomRightX = int(imageSection._bottomRightX * scaleFactorX)
+            bottomRightY = int(imageSection._bottomRightY * scaleFactorY)
 
             # check sample factor and draw lines in corresponding colors
             sampleFactor = imageSection._downsampleFactor
@@ -217,7 +219,7 @@ class HeatMapUtils():
                 G = gridColors[yCell][xCell][2]
                 B = gridColors[yCell][xCell][3]
 
-                draw.rectangle((pixelX+10, pixelY+10, pixelXEnd-10, pixelYEnd-10), fill=(R, G, B, A), width=1)
+                draw.rectangle((pixelX+1, pixelY+1, pixelXEnd-1, pixelYEnd-1), fill=(R, G, B, A), width=1)
 
         # draw there a point of calculated color
         return image
