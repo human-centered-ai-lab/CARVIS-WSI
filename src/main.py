@@ -266,13 +266,13 @@ def readCSV(file):
 
 # checks if the user choosen input makes sense
 def verifyInput(arguments):
-    if (len(sys.argv) < 2):
+    if (len(sys.argv) < 1):
         terminate()
 
-    if (not os.path.isfile(arguments.c)):
-        print("ERROR: CSV file not found!\n")
-        print(arguments.c)
-        terminate()
+    #if (not os.path.isfile(arguments.c)):
+    #    print("ERROR: CSV file not found!\n")
+    #    print(arguments.c)
+    #    terminate()
 
     #if (not arguments.s is None):
     #    if (not os.path.isfile(arguments.s)):
@@ -303,10 +303,9 @@ def readSVS(file):
 def initArgumentParser():
     global parser
     parser = argparse.ArgumentParser(description="Extract a jpg of given resolution out of a wsi and draw a heatmap out of given csv file data.")
-    parser.add_argument("-c", type=str, help="Csv file path (relative to current path)")
+    parser.add_argument("-c", nargs='?', type=str, help="input directory path or csv file path (relative to current path. needs to contain svs files too.)")
     parser.add_argument("-r", nargs='?', help="Tuple of resolution [x,y]. You may want to make sure to use the correct aspect ratio.")
-    #parser.add_argument("-s", nargs='?', type=str, help="[OPTIONAL] Svs file path (relative to current path).")
-    parser.add_argument("-l", nargs='?', help="[OPTIONAL] Specify extraction layer. Resolution of layer will be read from the wsi metadata for every image seperately. Use when -r is not used.")
+    parser.add_argument("-l", nargs='?', help="[OPTIONAL] Specify extraction layer. Resolution of layer will be read from the wsi metadata for every image seperately. Needed when -r is not used.")
 
 # gets relsolution from input argument
 # returns [x, y] tuple
@@ -342,58 +341,83 @@ if __name__ == "__main__":
     arguments = parser.parse_args()
     verifyInput(arguments)
 
+    csvFileList = []
+
     # check if export directory exists. if not create it
     if (not os.path.exists(EXPORT_DIR)):
         os.makedirs(EXPORT_DIR)
 
-    # read csv and svs files
-    print("loading csv...")
-    imageSectionsDict = readCSV(arguments.c)
+    # check if user has specifyed file or a directory
+    if (not os.path.isfile(arguments.c)):
+        print("No file specifyed, looking for a directory...")
+        if (not os.path.isdir(arguments.c)):
+            print("Need to specify at least input directory!")
+            terminate()        
 
-    # check if meeting produced correct data
-    if (imageSectionsDict is None):
-        print("CSV File does not contain correct Image Section data!")
-        exit()
-
-    print("loading svs...")
-    wsiFilesDict = loadSVSFiles(imageSectionsDict)
-    
-    for fileName in wsiFilesDict:
-        layer0Width, layer0Height = wsiFilesDict[fileName].level_dimensions[0]
-        
-        # check if layer or resolution is given for export
-        exportPixelX = 0
-        exportPixelY = 0
-
-        if (arguments.r):
-            exportPixelX, exportPixelY = getResolutionFromArgs(arguments)
-        
-        else:
-            exportPixelX, exportPixelY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
-
-        heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height)
-
-        # working with files and extract information
-        print(f'rendering thumbnail for {fileName}...')
-        baseImage = heatmapUtils.extractJPG(wsiFilesDict[fileName])
-        
-        print("drawing roi...")
-        roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
-        roiImage = heatmapUtils.drawLegend(roiImage)
-
-        print("working on heatmap...")
-        heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
-
-        # remove .svs and turn filename into .jpg
-        saveName = fileName[: len(fileName) - 4]
-        saveName += "_heatmap.jpg"
-        print(f'saving file: {saveName}')
-
-        # now save save image
-        heatmapImage.save(EXPORT_DIR + saveName)
-
-        # new line for easier reading debug output
+        # search for csv files inside given data directory
+        for file in os.listdir(arguments.c):
+            if (file.endswith(".csv")):
+                inputDirectoryFile = arguments.c + file
+                csvFileList.append(inputDirectoryFile)
+                print(f'found: {file}')
         print(" ")
+    else:
+        csvFileList.append(arguments.c)        
+
+    # now do this for every csv file
+    for file in csvFileList:
+        # read csv and svs files
+        print(f'parsing {file}...')
+        imageSectionsDict = readCSV(file)
+
+        # check if meeting produced correct data
+        if (imageSectionsDict is None):
+            print("CSV File does not contain correct Image Section data!")
+            print("-------------")
+            continue
+
+        print("loading svs...")
+        wsiFilesDict = loadSVSFiles(imageSectionsDict)
+        
+        for fileName in wsiFilesDict:
+            layer0Width, layer0Height = wsiFilesDict[fileName].level_dimensions[0]
+            
+            # check if layer or resolution is given for export
+            exportPixelX = 0
+            exportPixelY = 0
+
+            if (arguments.r):
+                exportPixelX, exportPixelY = getResolutionFromArgs(arguments)
+            
+            else:
+                exportPixelX, exportPixelY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
+
+            heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height)
+
+            # working with files and extract information
+            print(f'rendering thumbnail for {fileName}...')
+            baseImage = heatmapUtils.extractJPG(wsiFilesDict[fileName])
+            
+            print("drawing roi...")
+            roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
+            roiImage = heatmapUtils.drawLegend(roiImage)
+
+            print("working on heatmap...")
+            heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
+
+            # remove .svs and turn filename into .jpg
+            saveName = fileName[: len(fileName) - 4]
+            saveName += "_heatmap.jpg"
+            print(f'saving file: {saveName}')
+
+            # now save save image
+            heatmapImage.save(EXPORT_DIR + saveName)
+
+            # new line for every svs
+            print(" ")
+
+        # split off output for every csv file
+        print("-------------")
 
     print("done.")
     

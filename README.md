@@ -46,12 +46,13 @@ The `-d` (detached) option can be omitted if program output is desired.
 If there is no desire for a container name, the `-name` parameter can also be omitted. \
 The `-v` parameter bind mounts a local directory to a directory inside the container. It uses following convention: `local_dir : container_dir`. Don't forget to use abolute paths for this parameter! \
 Also make sure to have write permissions to the export directory! \
-The last two lines are the parameters which are getting passed to the program. The first one is the desired .csv file and the second is the required output layer. Note that the output layer parameter reads the WSI metadata and uses the resolution of the given layer to render a thumnail of the WSI at layer 0. This ensures that the right aspect ratio is being used. 
+The last two lines are the parameters which are getting passed to the program. The first one is the desired .csv file, which can be left away, and the second is the required output layer. If no desired .csv file is specifyed, all present csv files inside `/data/` will be parsed. \
+Note that the output layer parameter reads the WSI metadata and uses the resolution of the given layer to render a thumnail of the WSI at layer 0. This ensures that the right aspect ratio is being used. 
 
 ### Input parameters and their usage:
 | Option | Description |
 | ------ | ----------- |
-|   -c   | input CSV file |
+|   -c   | input CSV file or input file directory (CSV and SVS files need to be inside here) |
 |   -l   | specify extraction layer (extraction resolution will be read from WSI metadata) |
 |   -r   | render resolution for WSI (only needed of no -l is given) |
 

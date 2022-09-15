@@ -85,13 +85,13 @@
             "console": "externalTerminal"
         },
         {
-            "name": "WSI Data run with other csv",
+            "name": "WSI Data run with directory input",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
             "args": [
                 "-c",
-                "data/014_P016.csv",
+                "data/",
                 "-l",
                 "3"
             ],
