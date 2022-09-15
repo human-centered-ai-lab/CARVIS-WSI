@@ -405,9 +405,11 @@ if __name__ == "__main__":
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
 
-            # remove .svs and turn filename into .jpg
+            # remove .svs and turn filename into .jpg + add pthologist identifyer
             saveName = fileName[: len(fileName) - 4]
-            saveName += "_heatmap.jpg"
+            saveName += "_heatmap_"
+            saveName += file[6 : len(file) - 4]
+            saveName += ".jpg"
             print(f'saving file: {saveName}')
 
             # now save save image

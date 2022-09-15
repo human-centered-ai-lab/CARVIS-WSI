@@ -74,7 +74,14 @@ class HeatMapUtils():
         
         for imageSection in imageSections:
             x = len(imageSection._timestamps)
-            n = (x - minValue) / (maxValue - minValue)
+
+            # catch edge case
+            n = 0.0
+            if (minValue == maxValue):
+                n = 0.5
+            else:
+                n = (x - minValue) / (maxValue - minValue)
+            
             normalizedList.append(n)
 
         return normalizedList.copy()
@@ -97,7 +104,13 @@ class HeatMapUtils():
         for y in range(self._gridHeight):
             for x in range(self._gridWidth):
                 value = self._grid[y][x]
-                normalizedGrid[y][x] = (value - minValue) / (maxValue - minValue)
+
+                # catch edge case
+                if (value == 0 and minValue == 0 and maxValue == 0):
+                    normalizedGrid[y][x] = 0.0
+                
+                else:
+                    normalizedGrid[y][x] = (value - minValue) / (maxValue - minValue)
 
         return normalizedGrid
 
@@ -280,6 +293,18 @@ class HeatMapUtils():
 
                 # map gaze point to cell in grid and increase hit counter
                 xCell, yCell = self.mapToCell(gazePointX, gazePointY)
+
+                # edge case protection
+                # it is not known why xCell and yCell sometimes exceed the limits
+                if (yCell >= self._gridHeight):
+                    yCell = self._gridHeight - 1
+                if (yCell < 0):
+                    yCell = 0
+                if (xCell >= self._gridWidth):
+                    xCell = self._gridWidth - 1
+                if (xCell < 0):
+                    xCell = 0
+                
                 self._grid[yCell][xCell] += 1
         
         # normalize grid data
