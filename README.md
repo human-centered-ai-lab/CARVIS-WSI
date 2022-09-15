@@ -23,7 +23,7 @@ Then build the docker container.
 
 This command will take some time to run, depending on your system. It downloads the latest Docker Python image, installs all dependencies and builds and installs pixman from source, since the prebuild version has a bug with openslide. Then it runs some tests and cleans up afterwards. Expect some more output while doing so.
 
-Run the container with following parameters:
+Run a new container with following parameters:
 
 ```
 docker run --name slide-heatmap \
@@ -37,7 +37,7 @@ docker run --name slide-heatmap \
 The `-d` (detached) option can be omitted if program output is desired.
 If there is no desire for a container name, the `-name` parameter can also be omitted. \
 The `-v` parameter bind mounts a local directory to a directory inside the container. It uses following convention: `local_dir : container_dir`. Don't forget to use abolute paths for this parameter! \
-The last two lines are the parameters which are getting passed to the program. The first one is the desired .csv file and the second is the required output layer. Note that the output layer parameter reads the WSI metadata and uses the resolution of the given layer to render a thumnail of the WSI at layer 0. This ensures that the right aspect ratio is being used.
+The last two lines are the parameters which are getting passed to the program. The first one is the desired .csv file and the second is the required output layer. Note that the output layer parameter reads the WSI metadata and uses the resolution of the given layer to render a thumnail of the WSI at layer 0. This ensures that the right aspect ratio is being used. 
 
 ## Usage
 To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed in the iMotions meeting must be present inside `data` directory.
