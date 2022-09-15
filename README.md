@@ -21,7 +21,10 @@ Then build the docker container.
 
 `docker build -t slide-heatmap .`
 
-This command will take some time to run, depending on your system. It downloads the latest Docker Python image, installs all dependencies and builds and installs pixman from source, since the prebuild version has a bug with openslide. Then it runs some tests and cleans up afterwards. Expect some more output while doing so.
+This command may take some time to run, depending on the system. It downloads the latest Docker Python image, installs all dependencies and builds and installs pixman from source. The prebuild version has a bug with openslide so this is necessary. Then it runs some tests and cleans up afterwards. Expect some more output while doing so.
+
+## Usage
+To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed in the iMotions meeting must be present inside `data` directory.
 
 Run a new container with following parameters:
 
@@ -39,35 +42,32 @@ If there is no desire for a container name, the `-name` parameter can also be om
 The `-v` parameter bind mounts a local directory to a directory inside the container. It uses following convention: `local_dir : container_dir`. Don't forget to use abolute paths for this parameter! \
 The last two lines are the parameters which are getting passed to the program. The first one is the desired .csv file and the second is the required output layer. Note that the output layer parameter reads the WSI metadata and uses the resolution of the given layer to render a thumnail of the WSI at layer 0. This ensures that the right aspect ratio is being used. 
 
-## Usage
-To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed in the iMotions meeting must be present inside `data` directory.
-
 ### Input parameters and their usage:
 | Option | Description |
 | ------ | ----------- |
 |   -c   | input CSV file |
-|   -r   | render resolution for WSI |
 |   -l   | specify extraction layer (extraction resolution will be read from WSI metadata) |
-|   -s   | (optional) svs file path |
+|   -r   | render resolution for WSI (only needed of no -l is given) |
 
-### Simple working example
-To get heatmap data rendered on all wsi files used in one iMotions meeting, use following line.
+### Minmal working example
+To get heatmap data rendered on all wsi files used in one iMotions meeting, use following line. This command works when running SlideHeatmap native, or inside an already running docker container.
 
 `
-python3 src/main.py -c data/testMeeting.csv -r 5478,4622
+python3 src/main.py -c data/testMeeting.csv -l 3
 `
 
 Important to know is that a resolution with the same width/height ratio as the original wsi files has to be chosen.
 Otherwise it is possible that only a part of the original wsi is being extracted.
 
-> Note: Inside `data` directory must be all .svs files stored which where used by this iMotions meeting!
+> Note: Inside `data` directory must be all .csv and .svs files stored which where used by this iMotions meeting!
 
-When the programm is done with all renderings, "done." will be printed and it wait's for some input to terminate.
+When the programm is has finished all renderings, "done." will be printed and it will wait for some input to terminate.
 
 ## Folder Structure
     .                           # Repository Root Folder
     ├── .vscode                 # VS Code settings (like run and debug settings)
     ├── src                     # Program Source Files
+    ├── docker                  # run script for the entrypoint
     ├── images                  # Sample output images
     ├── export                  # JPG's with rendered heatmaps are exported here
     └── data                    # Stores iMotions and Whole Slide Image files
