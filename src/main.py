@@ -250,15 +250,19 @@ def readCSV(file):
                         gazePointList.append(gazePoint)
 
         # also don't forget to save all pending eye tracking data to last fileName in ImageSectionsDict
-        ImageSectionList[-1].addTimestamps(imageSectionTimestamps)
-        ImageSectionList[-1].addEyeTracking(gazePointList)
+        if (len(ImageSectionList) >= 1):
+            ImageSectionList[-1].addTimestamps(imageSectionTimestamps)
+            ImageSectionList[-1].addEyeTracking(gazePointList)
 
-        ImageSectionsDict[oldFileName] = ImageSectionList.copy()
+            ImageSectionsDict[oldFileName] = ImageSectionList.copy()
 
-        imageSectionTimestamps.clear()
-        gazePointList.clear()
+            imageSectionTimestamps.clear()
+            gazePointList.clear()
 
-        return ImageSectionsDict.copy()
+            return ImageSectionsDict.copy()
+
+        else:
+            return None
 
 # checks if the user choosen input makes sense
 def verifyInput(arguments):
@@ -345,6 +349,13 @@ if __name__ == "__main__":
     # read csv and svs files
     print("loading csv...")
     imageSectionsDict = readCSV(arguments.c)
+
+    # check if meeting produced correct data
+    if (imageSectionsDict is None):
+        print("CSV File does not contain correct Image Section data!")
+        input()
+        exit()
+
     print("loading svs...")
     wsiFilesDict = loadSVSFiles(imageSectionsDict)
     

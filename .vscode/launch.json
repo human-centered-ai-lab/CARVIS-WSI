@@ -83,6 +83,19 @@
                 "3"
             ],
             "console": "externalTerminal"
+        },
+        {
+            "name": "WSI Data run with other csv",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/014_P016.csv",
+                "-l",
+                "3"
+            ],
+            "console": "externalTerminal"
         }
     ]
 }
