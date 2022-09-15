@@ -1,0 +1,10 @@
+.vscode/
+.gitignore
+.git/
+.dockerignore
+data/
+export/
+images/
+src/__pycache__/
+Dockerfile
+README.md
