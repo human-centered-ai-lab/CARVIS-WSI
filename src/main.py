@@ -353,7 +353,6 @@ if __name__ == "__main__":
     # check if meeting produced correct data
     if (imageSectionsDict is None):
         print("CSV File does not contain correct Image Section data!")
-        input()
         exit()
 
     print("loading svs...")
