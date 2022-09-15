@@ -19,9 +19,14 @@ Now create both a directory for input data and one for export data inside the re
 
 Then build the docker container.
 
-`docker build -t slide-heatmap .`
+```
+docker build -t slide-heatmap \
+    --build-arg USER_ID=$(id -u) \
+    --build-arg GROUP_ID=$(id -g) .
+```
 
-This command may take some time to run, depending on the system. It downloads the latest Docker Python image, installs all dependencies and builds and installs pixman from source. The prebuild version has a bug with openslide so this is necessary. Then it runs some tests and cleans up afterwards. Expect some more output while doing so.
+This command may take some time to run, depending on the system. It downloads the latest Docker Python image, installs all dependencies and builds and installs pixman from source. The prebuild version has a bug with openslide so this is necessary. Then it runs some tests and cleans up afterwards. Expect some more output while doing so. \
+For writing the exported files, there will be a user and user group with the same parameters added as your current user to avoid permission errors.
 
 ## Usage
 To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed in the iMotions meeting must be present inside `data` directory.
@@ -29,7 +34,7 @@ To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed i
 Run a new container with following parameters:
 
 ```
-docker run --name slide-heatmap \
+docker run --rm --name slide-heatmap \
     -v /absolute/path/to/data/:/data/ \
     -v /absolute/path/to/export/:/export/ \
     slide-heatmap \
@@ -40,6 +45,7 @@ docker run --name slide-heatmap \
 The `-d` (detached) option can be omitted if program output is desired.
 If there is no desire for a container name, the `-name` parameter can also be omitted. \
 The `-v` parameter bind mounts a local directory to a directory inside the container. It uses following convention: `local_dir : container_dir`. Don't forget to use abolute paths for this parameter! \
+Also make sure to have write permissions to the export directory! \
 The last two lines are the parameters which are getting passed to the program. The first one is the desired .csv file and the second is the required output layer. Note that the output layer parameter reads the WSI metadata and uses the resolution of the given layer to render a thumnail of the WSI at layer 0. This ensures that the right aspect ratio is being used. 
 
 ### Input parameters and their usage:
