@@ -407,11 +407,18 @@ if __name__ == "__main__":
 
             # update name and save
             baseName = fileName[: len(fileName) - 4]
+            pathologistName = file[6 : len(file) - 4]
+
             saveName = baseName
+            
+            baseName += "_base_"
+            baseName += pathologistName
+            
             saveName += "_heatmap_"
-            saveName += file[6 : len(file) - 4]
+            saveName += pathologistName
             saveName += ".jpg"
-            print(f'saving file: {saveName}')
+            
+            print(f'saving {baseName} for pathologist {pathologistName}')
 
             # now save save image
             heatmapImage.save(EXPORT_DIR + saveName)
