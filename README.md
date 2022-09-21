@@ -38,37 +38,34 @@ docker run --rm --name slide-heatmap \
     -v /absolute/path/to/data/:/data/ \
     -v /absolute/path/to/export/:/export/ \
     slide-heatmap \
-    008_P013.csv \
-    3
+    -l [EXPORT_LAYER]
 ```
 
-The `-d` (detached) option can be omitted if program output is desired.
-If there is no desire for a container name, the `-name` parameter can also be omitted. \
-The `-v` parameter bind mounts a local directory to a directory inside the container. It uses following convention: `local_dir : container_dir`. Don't forget to use abolute paths for this parameter! \
+The `-v` parameter bind mounts a local directory to a directory inside the container. It uses following convention: `local_dir : container_dir`. It is important to use abolute paths for this parameter! \
 Also make sure to have write permissions to the export directory! \
-The last two lines are the parameters which are getting passed to the program. The first one is the desired .csv file, which can be left away, and the second is the required output layer. If no desired .csv file is specifyed, all present csv files inside `/data/` will be parsed. \
-Note that the output layer parameter reads the WSI metadata and uses the resolution of the given layer to render a thumnail of the WSI at layer 0. This ensures that the right aspect ratio is being used. 
+The `-c` parameter can be left away if no specific CSV file is desired. The container will take automatically the mounted `/data/` directory as input. If you want to specify one file, assume you are already in the mounted directory. \
+All the other parameters are working like described in the table down below.
 
 ### Input parameters and their usage:
 | Option | Description |
 | ------ | ----------- |
 |   -c   | input CSV file or input file directory (CSV and SVS files need to be inside here) |
-|   -l   | specify extraction layer (extraction resolution will be read from WSI metadata) |
+|   -l   | (Recommended) specify extraction layer. the extraction resolution will be read from WSI metadata. |
 |   -r   | render resolution for WSI (only needed of no -l is given) |
+|   -t   | specify cell size. default is 50. cells are always square. |
 
-### Minmal working example
-To get heatmap data rendered on all wsi files used in one iMotions meeting, use following line. This command works when running SlideHeatmap native, or inside an already running docker container.
+### Minmal native working example
+To get heatmap data rendered on all wsi files used in one specific iMotions meeting and export all JPG's with their layer 3 resolution, use following line.
 
 `
 python3 src/main.py -c data/testMeeting.csv -l 3
 `
 
-Important to know is that a resolution with the same width/height ratio as the original wsi files has to be chosen.
-Otherwise it is possible that only a part of the original wsi is being extracted.
+Important to know is that a resolution with the same width/height ratio as the original wsi files has to be chosen if you specify a fixed resolution. Otherwise it is possible that only a part of the original wsi is being extracted.
 
 > Note: Inside `data` directory must be all .csv and .svs files stored which where used by this iMotions meeting!
 
-When the programm is has finished all renderings, "done." will be printed and it will wait for some input to terminate.
+When the programm is has finished all renderings, "done." will be printed.
 
 ## Folder Structure
     .                           # Repository Root Folder

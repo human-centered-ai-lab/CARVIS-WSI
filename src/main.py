@@ -306,6 +306,7 @@ def initArgumentParser():
     parser.add_argument("-c", nargs='?', type=str, help="input directory path or csv file path (relative to current path. needs to contain svs files too.)")
     parser.add_argument("-r", nargs='?', help="Tuple of resolution [x,y]. You may want to make sure to use the correct aspect ratio.")
     parser.add_argument("-l", nargs='?', help="[OPTIONAL] Specify extraction layer. Resolution of layer will be read from the wsi metadata for every image seperately. Needed when -r is not used.")
+    parser.add_argument("-t", nargs='?', help="[Optional] Specify cell size. How many pixels one side of the cell has (cells are always square). Default is 50.")
 
 # gets relsolution from input argument
 # returns [x, y] tuple
@@ -385,6 +386,7 @@ if __name__ == "__main__":
             # check if layer or resolution is given for export
             exportPixelX = 0
             exportPixelY = 0
+            cellSize = 50
 
             if (arguments.r):
                 exportPixelX, exportPixelY = getResolutionFromArgs(arguments)
@@ -392,7 +394,10 @@ if __name__ == "__main__":
             else:
                 exportPixelX, exportPixelY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
 
-            heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height)
+            if (arguments.t)    :
+                cellSize = int(arguments.t)
+
+            heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height, cellSize)
 
             # working with files and extract information
             print(f'rendering thumbnail for {fileName}...')

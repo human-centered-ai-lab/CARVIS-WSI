@@ -7,8 +7,8 @@ import math
 from PIL import Image, ImageDraw, ImageFont
 
 class HeatMapUtils():
-    CELL_SIZE_X = 100
-    CELL_SIZE_Y = 100
+    CELL_SIZE_X = 50
+    CELL_SIZE_Y = 50
     DISPLAY_X = 1920
     DISPLAY_Y = 1080
 
@@ -20,7 +20,7 @@ class HeatMapUtils():
     DOWNSAMPLE_40 = (51,102,255, 255)
     DOWNSAMPLE_X = (102,51,255, 255)
 
-    def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y):
+    def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y, cellSize=50):
         self._grid = 0
         self._exportWidth = int(pixelCountX)
         self._exportHeight = int(pixelCountY)
@@ -28,6 +28,8 @@ class HeatMapUtils():
         self._layer0Y = int(layer0Y)
         self._gridWidth = math.ceil(self._exportWidth/self.CELL_SIZE_X)
         self._gridHeight = math.ceil(self._exportHeight/self.CELL_SIZE_Y)
+        self.CELL_SIZE_X = int(cellSize)
+        self.CELL_SIZE_Y = int(cellSize)
 
         # create 2D grid array for mapping gaze points
         self._grid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
@@ -205,8 +207,8 @@ class HeatMapUtils():
                 # map the cell to an image pixel coordinate
                 pixelX = xCell * self.CELL_SIZE_X
                 pixelY = yCell * self.CELL_SIZE_Y
-                pixelXEnd = pixelX + 100
-                pixelYEnd = pixelY + 100
+                pixelXEnd = pixelX + self.CELL_SIZE_X
+                pixelYEnd = pixelY + self.CELL_SIZE_Y
 
                 if (pixelX > self._exportWidth or pixelXEnd > self._exportWidth):
                     continue
