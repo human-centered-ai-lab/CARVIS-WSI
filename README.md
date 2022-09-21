@@ -72,6 +72,7 @@ When the programm is has finished all renderings, "done." will be printed.
     ├── .vscode                 # VS Code settings (like run and debug settings)
     ├── src                     # Program Source Files
     ├── docker                  # run script for the entrypoint
+    ├── templates               # holds hatching design files
     ├── images                  # Sample output images
     ├── export                  # JPG's with rendered heatmaps are exported here
     └── data                    # Stores iMotions and Whole Slide Image files

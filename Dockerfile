@@ -24,9 +24,10 @@ ARG GROUP_ID
 
 RUN apt-get update && apt-get install -y \
     openslide-tools \
+    libvips \
     && rm -rf /var/lib/apt/lists/*
 
-RUN python3 -m pip install --no-cache-dir openslide-python pillow
+RUN python3 -m pip install --no-cache-dir openslide-python pillow pyvips
 
 # get pixman from build container
 COPY --from=pixman-builder /usr/include/pixman-1/ /usr/include/pixman-1/

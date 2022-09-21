@@ -4,6 +4,7 @@
 
 import sys
 import math
+import pyvips
 from PIL import Image, ImageDraw, ImageFont
 
 class HeatMapUtils():
@@ -59,6 +60,40 @@ class HeatMapUtils():
         draw.text((0, 600),"Downsample > 40",(0,0,0), font = font)
         
         return image
+
+    # draws hatching onto a given .jpg
+    # returns image with hatched cell tiles
+    def getHatchingHeatmap(self, baseImage, imageSections):
+        image = baseImage.copy()
+
+        # import hatching patterns
+        diagonalHatching = pyvips.Image.thumbnail("templates/1_1.svg", 200, height=self.CELL_SIZE_Y, size="both")
+        diagonalHatching.write_to_file("1_1.png")
+        diagonalHatching = Image.open("1_1.png")
+
+        # colorize/rotate/alter/ to make up for missing design files
+        # ...
+        
+        # see how much time someone has spent looking on one grid cell...
+        for imageSection in imageSections:
+            # time is in ms
+            timeSpent = imageSection._timestamps[-1] - imageSection._timestamps[0]
+            print(f'time spent: {timeSpent}')
+
+            for gazePoint in imageSection._eyeTracking:
+                # image section contains timestamp data
+                
+                # map timestamps to gazepoints
+                # get how much time is spent in one image section
+                # timeSpent
+                # then look how much points are in one cell
+                # getHeatmapData
+                # -> linear scale time for each cell to get amount of time spent
+                pass
+
+        # draw patterns on grid based on watching time
+        return image
+
 
     # normalizes timestamp data for one image
     # returns list of normalized values for timestamp between 0 and 1

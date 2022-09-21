@@ -386,7 +386,7 @@ if __name__ == "__main__":
             # check if layer or resolution is given for export
             exportPixelX = 0
             exportPixelY = 0
-            cellSize = 50
+            heatmapUtils = object
 
             if (arguments.r):
                 exportPixelX, exportPixelY = getResolutionFromArgs(arguments)
@@ -394,10 +394,11 @@ if __name__ == "__main__":
             else:
                 exportPixelX, exportPixelY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
 
-            if (arguments.t)    :
-                cellSize = int(arguments.t)
+            if (arguments.t):
+                heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height, arguments.t)
 
-            heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height, cellSize)
+            else:
+                heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height)
 
             # working with files and extract information
             print(f'rendering thumbnail for {fileName}...')
@@ -409,6 +410,10 @@ if __name__ == "__main__":
 
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
+
+            print("working on hatching...")
+            #hatchingImage = heatmapUtils.getHatchingHeatmap(roiImage, imageSectionsDict[fileName])
+            #hatchingImage.show()
 
             # update name and save
             baseName = fileName[: len(fileName) - 4]

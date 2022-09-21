@@ -1,0 +1,1359 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32px"
+   height="32px"
+   viewBox="0 0 32 32"
+   version="1.1"
+   id="SVGRoot"
+   sodipodi:docname="1_1.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <defs
+     id="defs3721">
+    <pattern
+       inkscape:collect="always"
+       xlink:href="#pattern9053"
+       id="pattern9131"
+       patternTransform="matrix(0.5640312,0,0,0.5640308,0.01562509,0.01562434)" />
+    <linearGradient
+       id="linearGradient9125"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop9123" />
+    </linearGradient>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath7618">
+      <rect
+         style="opacity:1;stroke:none;stroke-width:0.09999999;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
+         id="rect7620"
+         width="56.692898"
+         height="56.692936"
+         x="288.77954"
+         y="92.125969" />
+    </clipPath>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="5.010992937542464"
+       width="5.010992937542464"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 1.0 x 45°"
+       id="Hatch1.0x045">
+      <path
+         id="path6880"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6882"
+         d="M -3.5433070866141736,8.554300024156637 8.554300024156637,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6884"
+         d="M 1.4676858509282904,8.554300024156637 8.554300024156637,1.4676858509282904"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="5.010992937542464"
+       width="5.010992937542464"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 1.0 x -45°"
+       id="Hatch1.0x135">
+      <path
+         id="path6887"
+         d="M 1.4676858509282904,-3.5433070866141736 8.554300024156637,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6889"
+         d="M -3.5433070866141736,-3.5433070866141736 8.554300024156637,8.554300024156637"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6891"
+         d="M -3.5433070866141736,1.4676858509282904 3.5433070866141736,8.554300024156637"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="5.010992937542464"
+       width="5.010992937542464"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 1.0"
+       id="HatchCross1.0">
+      <path
+         id="path6894"
+         d="M -3.5433070866141736,8.554300024156637 8.554300024156637,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6896"
+         d="M -3.5433070866141736,-3.5433070866141736 8.554300024156637,8.554300024156637"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="5.959108454553884"
+       width="5.959108454553884"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 1.2 x 45°"
+       id="Hatch1.2x045">
+      <path
+         id="path6899"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6901"
+         d="M -3.5433070866141736,9.502415541168057 9.502415541168057,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6903"
+         d="M 2.4158013679397103,9.502415541168057 9.502415541168057,2.4158013679397103"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="5.959108454553884"
+       width="5.959108454553884"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 1.2 x -45°"
+       id="Hatch1.2x135">
+      <path
+         id="path6906"
+         d="M 2.4158013679397103,-3.5433070866141736 9.502415541168057,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6908"
+         d="M -3.5433070866141736,-3.5433070866141736 9.502415541168057,9.502415541168057"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6910"
+         d="M -3.5433070866141736,2.4158013679397103 3.5433070866141736,9.502415541168057"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="5.959108454553884"
+       width="5.959108454553884"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 1.2"
+       id="HatchCross1.2">
+      <path
+         id="path6913"
+         d="M -3.5433070866141736,9.502415541168057 9.502415541168057,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6915"
+         d="M -3.5433070866141736,-3.5433070866141736 9.502415541168057,9.502415541168057"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="7.086614173228349"
+       width="7.086614173228349"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 1.4 x 45°"
+       id="Hatch1.4x045">
+      <path
+         id="path6918"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6920"
+         d="M -3.5433070866141736,10.629921259842522 10.629921259842522,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6922"
+         d="M 3.5433070866141754,10.629921259842522 10.629921259842522,3.5433070866141754"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="7.086614173228349"
+       width="7.086614173228349"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 1.4 x -45°"
+       id="Hatch1.4x135">
+      <path
+         id="path6925"
+         d="M 3.5433070866141754,-3.5433070866141736 10.629921259842522,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6927"
+         d="M -3.5433070866141736,-3.5433070866141736 10.629921259842522,10.629921259842522"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6929"
+         d="M -3.5433070866141736,3.5433070866141754 3.5433070866141736,10.629921259842522"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="7.086614173228349"
+       width="7.086614173228349"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 1.4"
+       id="HatchCross1.4">
+      <path
+         id="path6932"
+         d="M -3.5433070866141736,10.629921259842522 10.629921259842522,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6934"
+         d="M -3.5433070866141736,-3.5433070866141736 10.629921259842522,10.629921259842522"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="8.427451996082276"
+       width="8.427451996082276"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 1.7 x 45°"
+       id="Hatch1.7x045">
+      <path
+         id="path6937"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6939"
+         d="M -3.5433070866141736,11.97075908269645 11.97075908269645,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6941"
+         d="M 4.884144909468102,11.97075908269645 11.97075908269645,4.884144909468102"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="8.427451996082276"
+       width="8.427451996082276"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 1.7 x -45°"
+       id="Hatch1.7x135">
+      <path
+         id="path6944"
+         d="M 4.884144909468102,-3.5433070866141736 11.97075908269645,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6946"
+         d="M -3.5433070866141736,-3.5433070866141736 11.97075908269645,11.97075908269645"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6948"
+         d="M -3.5433070866141736,4.884144909468102 3.5433070866141736,11.97075908269645"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="8.427451996082276"
+       width="8.427451996082276"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 1.7"
+       id="HatchCross1.7">
+      <path
+         id="path6951"
+         d="M -3.5433070866141736,11.97075908269645 11.97075908269645,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6953"
+         d="M -3.5433070866141736,-3.5433070866141736 11.97075908269645,11.97075908269645"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="10.021985875084928"
+       width="10.021985875084928"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 2.0 x 45°"
+       id="Hatch2.0x045">
+      <path
+         id="path6956"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6958"
+         d="M -3.5433070866141736,13.565292961699102 13.565292961699102,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6960"
+         d="M 6.478678788470754,13.565292961699102 13.565292961699102,6.478678788470754"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="10.021985875084928"
+       width="10.021985875084928"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 2.0 x -45°"
+       id="Hatch2.0x135">
+      <path
+         id="path6963"
+         d="M 6.478678788470754,-3.5433070866141736 13.565292961699102,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6965"
+         d="M -3.5433070866141736,-3.5433070866141736 13.565292961699102,13.565292961699102"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6967"
+         d="M -3.5433070866141736,6.478678788470754 3.5433070866141736,13.565292961699102"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="10.021985875084928"
+       width="10.021985875084928"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 2.0"
+       id="HatchCross2.0">
+      <path
+         id="path6970"
+         d="M -3.5433070866141736,13.565292961699102 13.565292961699102,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6972"
+         d="M -3.5433070866141736,-3.5433070866141736 13.565292961699102,13.565292961699102"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="11.918216909107768"
+       width="11.918216909107768"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 2.4 x 45°"
+       id="Hatch2.4x045">
+      <path
+         id="path6975"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6977"
+         d="M -3.5433070866141736,15.461523995721942 15.461523995721942,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6979"
+         d="M 8.374909822493594,15.461523995721942 15.461523995721942,8.374909822493594"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="11.918216909107768"
+       width="11.918216909107768"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 2.4 x -45°"
+       id="Hatch2.4x135">
+      <path
+         id="path6982"
+         d="M 8.374909822493594,-3.5433070866141736 15.461523995721942,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6984"
+         d="M -3.5433070866141736,-3.5433070866141736 15.461523995721942,15.461523995721942"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6986"
+         d="M -3.5433070866141736,8.374909822493594 3.5433070866141736,15.461523995721942"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="11.918216909107768"
+       width="11.918216909107768"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 2.4"
+       id="HatchCross2.4">
+      <path
+         id="path6989"
+         d="M -3.5433070866141736,15.461523995721942 15.461523995721942,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6991"
+         d="M -3.5433070866141736,-3.5433070866141736 15.461523995721942,15.461523995721942"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="14.173228346456698"
+       width="14.173228346456698"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 2.8 x 45°"
+       id="Hatch2.8x045">
+      <path
+         id="path6994"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6996"
+         d="M -3.5433070866141736,17.71653543307087 17.71653543307087,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path6998"
+         d="M 10.629921259842524,17.71653543307087 17.71653543307087,10.629921259842524"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="14.173228346456698"
+       width="14.173228346456698"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 2.8 x -45°"
+       id="Hatch2.8x135">
+      <path
+         id="path7001"
+         d="M 10.629921259842524,-3.5433070866141736 17.71653543307087,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7003"
+         d="M -3.5433070866141736,-3.5433070866141736 17.71653543307087,17.71653543307087"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7005"
+         d="M -3.5433070866141736,10.629921259842524 3.5433070866141736,17.71653543307087"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="14.173228346456698"
+       width="14.173228346456698"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 2.8"
+       id="HatchCross2.8">
+      <path
+         id="path7008"
+         d="M -3.5433070866141736,17.71653543307087 17.71653543307087,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7010"
+         d="M -3.5433070866141736,-3.5433070866141736 17.71653543307087,17.71653543307087"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="16.85490399216455"
+       width="16.85490399216455"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 3.4 x 45°"
+       id="Hatch3.4x045">
+      <path
+         id="path7013"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7015"
+         d="M -3.5433070866141736,20.398211078778726 20.398211078778726,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7017"
+         d="M 13.311596905550378,20.398211078778726 20.398211078778726,13.311596905550378"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="16.85490399216455"
+       width="16.85490399216455"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 3.4 x -45°"
+       id="Hatch3.4x135">
+      <path
+         id="path7020"
+         d="M 13.311596905550378,-3.5433070866141736 20.398211078778726,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7022"
+         d="M -3.5433070866141736,-3.5433070866141736 20.398211078778726,20.398211078778726"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7024"
+         d="M -3.5433070866141736,13.311596905550378 3.5433070866141736,20.398211078778726"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="16.85490399216455"
+       width="16.85490399216455"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 3.4"
+       id="HatchCross3.4">
+      <path
+         id="path7027"
+         d="M -3.5433070866141736,20.398211078778726 20.398211078778726,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7029"
+         d="M -3.5433070866141736,-3.5433070866141736 20.398211078778726,20.398211078778726"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="20.043971750169856"
+       width="20.043971750169856"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 4.0 x 45°"
+       id="Hatch4.0x045">
+      <path
+         id="path7032"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7034"
+         d="M -3.5433070866141736,23.58727883678403 23.58727883678403,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7036"
+         d="M 16.500664663555682,23.58727883678403 23.58727883678403,16.500664663555682"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="20.043971750169856"
+       width="20.043971750169856"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 4.0 x -45°"
+       id="Hatch4.0x135">
+      <path
+         id="path7039"
+         d="M 16.500664663555682,-3.5433070866141736 23.58727883678403,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7041"
+         d="M -3.5433070866141736,-3.5433070866141736 23.58727883678403,23.58727883678403"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7043"
+         d="M -3.5433070866141736,16.500664663555682 3.5433070866141736,23.58727883678403"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="20.043971750169856"
+       width="20.043971750169856"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 4.0"
+       id="HatchCross4.0">
+      <path
+         id="path7046"
+         d="M -3.5433070866141736,23.58727883678403 23.58727883678403,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7048"
+         d="M -3.5433070866141736,-3.5433070866141736 23.58727883678403,23.58727883678403"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="23.836433818215536"
+       width="23.836433818215536"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 4.8 x 45°"
+       id="Hatch4.8x045">
+      <path
+         id="path7051"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7053"
+         d="M -3.5433070866141736,27.37974090482971 27.37974090482971,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7055"
+         d="M 20.29312673160136,27.37974090482971 27.37974090482971,20.29312673160136"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="23.836433818215536"
+       width="23.836433818215536"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 4.8 x -45°"
+       id="Hatch4.8x135">
+      <path
+         id="path7058"
+         d="M 20.29312673160136,-3.5433070866141736 27.37974090482971,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7060"
+         d="M -3.5433070866141736,-3.5433070866141736 27.37974090482971,27.37974090482971"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7062"
+         d="M -3.5433070866141736,20.29312673160136 3.5433070866141736,27.37974090482971"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="23.836433818215536"
+       width="23.836433818215536"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 4.8"
+       id="HatchCross4.8">
+      <path
+         id="path7065"
+         d="M -3.5433070866141736,27.37974090482971 27.37974090482971,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7067"
+         d="M -3.5433070866141736,-3.5433070866141736 27.37974090482971,27.37974090482971"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="28.346456692913396"
+       width="28.346456692913396"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 5.7 x 45°"
+       id="Hatch5.7x045">
+      <path
+         id="path7070"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7072"
+         d="M -3.5433070866141736,31.88976377952757 31.88976377952757,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7074"
+         d="M 24.803149606299222,31.88976377952757 31.88976377952757,24.803149606299222"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="28.346456692913396"
+       width="28.346456692913396"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 5.7 x -45°"
+       id="Hatch5.7x135">
+      <path
+         id="path7077"
+         d="M 24.803149606299222,-3.5433070866141736 31.88976377952757,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7079"
+         d="M -3.5433070866141736,-3.5433070866141736 31.88976377952757,31.88976377952757"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7081"
+         d="M -3.5433070866141736,24.803149606299222 3.5433070866141736,31.88976377952757"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="28.346456692913396"
+       width="28.346456692913396"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 5.7"
+       id="HatchCross5.7">
+      <path
+         id="path7084"
+         d="M -3.5433070866141736,31.88976377952757 31.88976377952757,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7086"
+         d="M -3.5433070866141736,-3.5433070866141736 31.88976377952757,31.88976377952757"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="33.7098079843291"
+       width="33.7098079843291"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 6.7 x 45°"
+       id="Hatch6.7x045">
+      <path
+         id="path7089"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7091"
+         d="M -3.5433070866141736,37.253115070943274 37.253115070943274,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7093"
+         d="M 30.16650089771493,37.253115070943274 37.253115070943274,30.16650089771493"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="33.7098079843291"
+       width="33.7098079843291"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 6.7 x -45°"
+       id="Hatch6.7x135">
+      <path
+         id="path7096"
+         d="M 30.16650089771493,-3.5433070866141736 37.253115070943274,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7098"
+         d="M -3.5433070866141736,-3.5433070866141736 37.253115070943274,37.253115070943274"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7100"
+         d="M -3.5433070866141736,30.16650089771493 3.5433070866141736,37.253115070943274"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="33.7098079843291"
+       width="33.7098079843291"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 6.7"
+       id="HatchCross6.7">
+      <path
+         id="path7103"
+         d="M -3.5433070866141736,37.253115070943274 37.253115070943274,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7105"
+         d="M -3.5433070866141736,-3.5433070866141736 37.253115070943274,37.253115070943274"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="40.08794350033971"
+       width="40.08794350033971"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 8.0 x 45°"
+       id="Hatch8.0x045">
+      <path
+         id="path7108"
+         d="M -3.5433070866141736,3.5433070866141736 3.5433070866141736,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7110"
+         d="M -3.5433070866141736,43.63125058695388 43.63125058695388,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7112"
+         d="M 36.54463641372554,43.63125058695388 43.63125058695388,36.54463641372554"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="40.08794350033971"
+       width="40.08794350033971"
+       y="0"
+       x="0"
+       inkscape:stockid="Hatch 8.0 x -45°"
+       id="Hatch8.0x135">
+      <path
+         id="path7115"
+         d="M 36.54463641372554,-3.5433070866141736 43.63125058695388,3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7117"
+         d="M -3.5433070866141736,-3.5433070866141736 43.63125058695388,43.63125058695388"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7119"
+         d="M -3.5433070866141736,36.54463641372554 3.5433070866141736,43.63125058695388"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       height="40.08794350033971"
+       width="40.08794350033971"
+       y="0"
+       x="0"
+       inkscape:stockid="Cross hatch 8.0"
+       id="HatchCross8.0">
+      <path
+         id="path7122"
+         d="M -3.5433070866141736,43.63125058695388 43.63125058695388,-3.5433070866141736"
+         style="stroke:#000000;stroke-width:0.25mm" />
+      <path
+         id="path7124"
+         d="M -3.5433070866141736,-3.5433070866141736 43.63125058695388,43.63125058695388"
+         style="stroke:#000000;stroke-width:0.25mm" />
+    </pattern>
+    <pattern
+       patternUnits="userSpaceOnUse"
+       width="56.692898"
+       height="56.692936"
+       patternTransform="translate(-9.829089,-63.079671)"
+       id="pattern9053">
+      <g
+         clip-path="url(#clipPath7618)"
+         id="g7611"
+         transform="translate(-288.77954,-92.125969)">
+        <text
+           id="text7483"
+           y="14.173228"
+           x="33.661419"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7481"
+             y="14.173228"
+             x="33.661419">1.0</tspan>
+        </text>
+        <rect
+           id="rect7485"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="5.3149605"
+           style="fill:url(#Hatch1.0x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7487"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="5.3149605"
+           style="fill:url(#Hatch1.0x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7489"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="5.3149605"
+           style="fill:url(#HatchCross1.0);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7493"
+           y="14.173228"
+           x="104.52756"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7491"
+             y="14.173228"
+             x="104.52756">1.2</tspan>
+        </text>
+        <rect
+           id="rect7495"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="76.181099"
+           style="fill:url(#Hatch1.2x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7497"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="76.181099"
+           style="fill:url(#Hatch1.2x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7499"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="76.181099"
+           style="fill:url(#HatchCross1.2);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7503"
+           y="14.173228"
+           x="175.39371"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7501"
+             y="14.173228"
+             x="175.39371">1.4</tspan>
+        </text>
+        <rect
+           id="rect7505"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="147.04724"
+           style="fill:url(#Hatch1.4x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7507"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="147.04724"
+           style="fill:url(#Hatch1.4x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7509"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="147.04724"
+           style="fill:url(#HatchCross1.4);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7513"
+           y="14.173228"
+           x="246.25984"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7511"
+             y="14.173228"
+             x="246.25984">1.7</tspan>
+        </text>
+        <rect
+           id="rect7515"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="217.91339"
+           style="fill:url(#Hatch1.7x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7517"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="217.91339"
+           style="fill:url(#Hatch1.7x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7519"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="217.91339"
+           style="fill:url(#HatchCross1.7);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7523"
+           y="14.173228"
+           x="317.12598"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7521"
+             y="14.173228"
+             x="317.12598">2.0</tspan>
+        </text>
+        <rect
+           id="rect7525"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="288.77954"
+           style="fill:url(#Hatch2.0x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7527"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="288.77954"
+           style="fill:url(#Hatch2.0x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7529"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="288.77954"
+           style="fill:url(#HatchCross2.0);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7533"
+           y="14.173228"
+           x="387.99213"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7531"
+             y="14.173228"
+             x="387.99213">2.4</tspan>
+        </text>
+        <rect
+           id="rect7535"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="359.64566"
+           style="fill:url(#Hatch2.4x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7537"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="359.64566"
+           style="fill:url(#Hatch2.4x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7539"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="359.64566"
+           style="fill:url(#HatchCross2.4);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7543"
+           y="14.173228"
+           x="458.85828"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7541"
+             y="14.173228"
+             x="458.85828">2.8</tspan>
+        </text>
+        <rect
+           id="rect7545"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="430.51181"
+           style="fill:url(#Hatch2.8x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7547"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="430.51181"
+           style="fill:url(#Hatch2.8x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7549"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="430.51181"
+           style="fill:url(#HatchCross2.8);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7553"
+           y="14.173228"
+           x="529.72443"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7551"
+             y="14.173228"
+             x="529.72443">3.4</tspan>
+        </text>
+        <rect
+           id="rect7555"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="501.37796"
+           style="fill:url(#Hatch3.4x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7557"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="501.37796"
+           style="fill:url(#Hatch3.4x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7559"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="501.37796"
+           style="fill:url(#HatchCross3.4);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7563"
+           y="14.173228"
+           x="600.59058"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7561"
+             y="14.173228"
+             x="600.59058">4.0</tspan>
+        </text>
+        <rect
+           id="rect7565"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="572.24408"
+           style="fill:url(#Hatch4.0x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7567"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="572.24408"
+           style="fill:url(#Hatch4.0x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7569"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="572.24408"
+           style="fill:url(#HatchCross4.0);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7573"
+           y="14.173228"
+           x="671.45667"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7571"
+             y="14.173228"
+             x="671.45667">4.8</tspan>
+        </text>
+        <rect
+           id="rect7575"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="643.11023"
+           style="fill:url(#Hatch4.8x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7577"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="643.11023"
+           style="fill:url(#Hatch4.8x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7579"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="643.11023"
+           style="fill:url(#HatchCross4.8);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7583"
+           y="14.173228"
+           x="742.32281"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7581"
+             y="14.173228"
+             x="742.32281">5.7</tspan>
+        </text>
+        <rect
+           id="rect7585"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="713.97638"
+           style="fill:url(#Hatch5.7x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7587"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="713.97638"
+           style="fill:url(#Hatch5.7x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7589"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="713.97638"
+           style="fill:url(#HatchCross5.7);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7593"
+           y="14.173228"
+           x="813.18896"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7591"
+             y="14.173228"
+             x="813.18896">6.7</tspan>
+        </text>
+        <rect
+           id="rect7595"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="784.84253"
+           style="fill:url(#Hatch6.7x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7597"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="784.84253"
+           style="fill:url(#Hatch6.7x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7599"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="784.84253"
+           style="fill:url(#HatchCross6.7);stroke:#000000;stroke-width:0.50000001mm" />
+        <text
+           id="text7603"
+           y="14.173228"
+           x="884.05511"
+           style="font-size:18.66666603px;font-family:Calibri;text-align:center;text-anchor:middle;fill:#000000;stroke:none">
+          <tspan
+             id="tspan7601"
+             y="14.173228"
+             x="884.05511">8.0</tspan>
+        </text>
+        <rect
+           id="rect7605"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="21.259842"
+           x="855.70868"
+           style="fill:url(#Hatch8.0x045);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7607"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="92.125984"
+           x="855.70868"
+           style="fill:url(#Hatch8.0x135);stroke:#000000;stroke-width:0.50000001mm" />
+        <rect
+           id="rect7609"
+           ry="7.0866141"
+           rx="7.0866141"
+           height="56.692913"
+           width="56.692913"
+           y="162.99213"
+           x="855.70868"
+           style="fill:url(#HatchCross8.0);stroke:#000000;stroke-width:0.50000001mm" />
+      </g>
+    </pattern>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.313708"
+     inkscape:cx="9.8006976"
+     inkscape:cy="1.2122366"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1043"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:grid-bbox="true"
+     inkscape:pagecheckerboard="false"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true" />
+  <metadata
+     id="metadata3724">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:none;stroke:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="M 0.0078125,0.01562493 H 31.992188 V 31.992187 H 0.015625 V 0.01562493 Z"
+       id="path3830"
+       inkscape:connector-curvature="0" />
+    <rect
+       style="fill:url(#pattern9131);stroke:#000000;stroke-width:0.564031;stroke-opacity:0"
+       width="31.976562"
+       height="31.976562"
+       x="0.015625"
+       y="0.01562493"
+       id="rect9121" />
+  </g>
+</svg>
