@@ -400,7 +400,7 @@ if __name__ == "__main__":
             
             print("drawing roi...")
             roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
-            roiImage = heatmapUtils.drawLegend(roiImage)
+            #roiImage = heatmapUtils.drawLegend(roiImage) # not for now...
 
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])

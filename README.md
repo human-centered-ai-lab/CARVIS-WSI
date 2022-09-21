@@ -25,7 +25,7 @@ docker build -t slide-heatmap \
     --build-arg GROUP_ID=$(id -g) .
 ```
 
-This command may take some time to run, depending on the system. It downloads the latest Docker Python image, installs all dependencies and builds and installs pixman from source. The prebuild version has a bug with openslide so this is necessary. Then it runs some tests and cleans up afterwards. Expect some more output while doing so. \
+This command may take some time to run, depending on the system. It downloads the latest Docker Python image and installs all depenecies so this does not have to be done manually. \
 For writing the exported files, there will be a user and user group with the same parameters added as your current user to avoid permission errors.
 
 ## Usage
