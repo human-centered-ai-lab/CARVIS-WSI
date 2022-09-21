@@ -405,8 +405,9 @@ if __name__ == "__main__":
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
 
-            # remove .svs and turn filename into .jpg + add pthologist identifyer
-            saveName = fileName[: len(fileName) - 4]
+            # update name and save
+            baseName = fileName[: len(fileName) - 4]
+            saveName = baseName
             saveName += "_heatmap_"
             saveName += file[6 : len(file) - 4]
             saveName += ".jpg"
@@ -414,6 +415,7 @@ if __name__ == "__main__":
 
             # now save save image
             heatmapImage.save(EXPORT_DIR + saveName)
+            baseImage.save(EXPORT_DIR + baseName + ".jpg")
 
             # new line for every svs
             print(" ")
