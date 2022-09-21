@@ -117,7 +117,8 @@ class HeatMapUtils():
     # draws the Image Sections (ROI) on the extracted wsi layer
     # parts of this code is from Markus
     # returns wsi image with rectangle on it
-    def drawRoiOnImage(self, image, imageSections, filling=None, lineWidth=10):
+    def drawRoiOnImage(self, baseImage, imageSections, filling=None, lineWidth=10):
+        image = baseImage.copy()
         draw = ImageDraw.Draw(image, "RGBA")
 
         # get normalized timestamp data for all image sections
@@ -271,7 +272,8 @@ class HeatMapUtils():
     # uses GazePoints, which are mapped to export resolution
     # to draw a map on an image
     # returns colored, mostly transparent, cells rendered onto a .jpg
-    def getHeatmap(self, image, imageSections):
+    def getHeatmap(self, baseImage, imageSections):
+        image = baseImage.copy()
         for imageSection in imageSections:
             for gazePoints in imageSection._eyeTracking:
 
