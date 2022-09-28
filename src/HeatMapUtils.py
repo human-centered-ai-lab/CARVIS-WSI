@@ -66,7 +66,7 @@ class HeatMapUtils():
 
     # draws hatching onto a given .jpg
     # returns image with hatched cell tiles
-    def getHatchingHeatmap(self, baseImage, imageSections):
+    def getHatchingHeatmap(self, baseImage, imageSections, alpha):
         image = baseImage.copy()
         
         # see how much time someone has spent looking on one grid cell...
@@ -124,7 +124,7 @@ class HeatMapUtils():
 
         # draw patterns on grid based on watching time
         # also scale up or down templates based on cell size
-        image = self.drawHatching(image, self._gridTimestamps, gridSampleFactors)
+        image = self.drawHatching(image, self._gridTimestamps, gridSampleFactors, alpha)
         return image
 
     # normalizes timestamp data for one image
@@ -156,8 +156,8 @@ class HeatMapUtils():
         return normalizedList.copy()
 
     # returns image with drawn on hatching
-    def drawHatching(self, image, grid, gridMagnification):
-        hatching = Hatching()
+    def drawHatching(self, image, grid, gridMagnification, alpha):
+        hatching = Hatching(alpha)
         hatching.resizePattern(self.CELL_SIZE_X, self.CELL_SIZE_Y)
 
         for yCell in range(self._gridHeight):

@@ -72,7 +72,7 @@
             "console": "externalTerminal"
         },
         {
-            "name": "WSI Data with small layer extraction",
+            "name": "WSI Data with small layer extraction with hatching",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
@@ -80,10 +80,12 @@
                 "-c",
                 "data/008_P013.csv",
                 "-l",
-                "3"
+                "3",
+                "-s"
             ],
             "console": "externalTerminal"
         },
+
         {
             "name": "WSI Data run with directory input",
             "type": "python",

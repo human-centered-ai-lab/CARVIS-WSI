@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts "c:l:r:t:s" flag
+while getopts "c:l:r:t:s:" flag
 do
     case "${flag}" in
         c) CSV_FILE=${OPTARG};;
