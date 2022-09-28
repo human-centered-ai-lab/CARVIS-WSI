@@ -20,9 +20,7 @@ Now create both a directory for input data and one for export data inside the re
 Then build the docker container.
 
 ```
-docker build -t slide-heatmap \
-    --build-arg USER_ID=$(id -u) \
-    --build-arg GROUP_ID=$(id -g) .
+docker build -t slide-heatmap .
 ```
 
 This command may take some time to run, depending on the system. It downloads the latest Docker Python image and installs all depenecies so this does not have to be done manually. \
@@ -34,7 +32,9 @@ To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed i
 Run a new container with following parameters:
 
 ```
-docker run --rm --name slide-heatmap \
+docker run --rm \
+    -u $(id -u) \
+    --name slide-heatmap \
     -v /absolute/path/to/data/:/data/ \
     -v /absolute/path/to/export/:/export/ \
     slide-heatmap \
@@ -45,6 +45,9 @@ The `-v` parameter bind mounts a local directory to a directory inside the conta
 Also make sure to have write permissions to the export directory! \
 The `-c` parameter can be left away if no specific CSV file is desired. The container will take automatically the mounted `/data/` directory as input. If you want to specify one file, assume you are already in the mounted directory. \
 All the other parameters are working like described in the table down below.
+
+With the `-u` flag a user or user id can be specifyed. This solves permission issues with the exported files by running the process inside the container with this specifyed user. \
+If you don't have a special need for this you can leave it like it is and don't have to worry about it.
 
 ### Input parameters and their usage:
 | Option | Description |

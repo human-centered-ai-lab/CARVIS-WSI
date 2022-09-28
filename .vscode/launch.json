@@ -12,8 +12,6 @@
             "args": [
                 "-c",
                 "data/008_P013.csv",
-                "-s",
-                "data/MUGGRZ-PATH-SCAN-SS7533-1113757.svs",
                 "-r",
                 "5478,4622"
             ],
@@ -81,7 +79,8 @@
                 "data/008_P013.csv",
                 "-l",
                 "3",
-                "-s"
+                "-s",
+                "170"
             ],
             "console": "externalTerminal"
         },
