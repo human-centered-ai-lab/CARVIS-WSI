@@ -413,13 +413,14 @@ if __name__ == "__main__":
 
             print("working on hatching...")
             hatchingImage = heatmapUtils.getHatchingHeatmap(baseImage, imageSectionsDict[fileName])
-            hatchingImage.show()
+            #hatchingImage.show()
 
             # update name and save
             baseName = fileName[: len(fileName) - 4]
             pathologistName = file[6 : len(file) - 4]
 
             saveName = baseName
+            hatchingName = baseName
             
             baseName += "_base_"
             baseName += pathologistName
@@ -427,12 +428,17 @@ if __name__ == "__main__":
             saveName += "_heatmap_"
             saveName += pathologistName
             saveName += ".jpg"
+
+            hatchingName += "_hatching_"
+            hatchingName += pathologistName
+            hatchingName += ".jpg"
             
             print(f'saving {baseName} for pathologist {pathologistName}')
 
             # now save save image
-            heatmapImage.save(EXPORT_DIR + saveName)
             baseImage.save(EXPORT_DIR + baseName + ".jpg")
+            heatmapImage.save(EXPORT_DIR + saveName)
+            hatchingImage.save(EXPORT_DIR + hatchingName)
 
             # new line for every svs
             print(" ")

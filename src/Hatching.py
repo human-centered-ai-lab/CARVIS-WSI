@@ -21,7 +21,7 @@ class Hatching():
         print(f'cell size: {cellSizeX, cellSizeY}')
         for key, image in self._hatchingDict.items():
             self._hatchingDict[key] = image.resize((cellSizeX, cellSizeY))
-            self._hatchingDict[key].putalpha(50)
+            #self._hatchingDict[key].putalpha(255)
 
 
     # returns hatching image for cell
