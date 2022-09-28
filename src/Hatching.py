@@ -26,6 +26,9 @@ class Hatching():
 
     # returns hatching image for cell
     def getHatching(self, duration, magnification):
+        # dont forget to translate time from x to s!
+        duration = duration / 1000
+        
         if (duration < 1.0):
             if (magnification < 2.0):
                 return self._hatchingDict['s1_m2']

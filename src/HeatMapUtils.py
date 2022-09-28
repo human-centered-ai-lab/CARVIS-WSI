@@ -36,7 +36,7 @@ class HeatMapUtils():
         self._grid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
         # crete 2d grid array for mapping timestamp data
-        self._gridTimestamps = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+        self._gridTimestamps = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
     # code is from Markus
     # draws a legend on lefty upper corner for the sample rate
@@ -72,13 +72,15 @@ class HeatMapUtils():
         # see how much time someone has spent looking on one grid cell...
         for imageSection in imageSections:
             # time is in ms
-            timeSpent = imageSection._timestamps[-1] - imageSection._timestamps[0]
+            timeSpent = 0.0
+            if (len(imageSection._timestamps) >= 1):
+                timeSpent = imageSection._timestamps[-1] - imageSection._timestamps[0]
 
             # create a grid for every image section...
             imageSectionTimestamps = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
             
             # additionally grid to save highest sample factor on grid
-            gridSampleFactors = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+            gridSampleFactors = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
             for gazePoint in imageSection._eyeTracking:
                 # if incomplete data -> drop gazepoint
@@ -134,16 +136,15 @@ class HeatMapUtils():
                 for x in range(self._gridWidth):
                     self._gridTimestamps[y][x] += gridTimeValues[y][x]
 
-            # also maybe create a hatching data class
-            # for holding hatching pattern and image section values?
-
-            # -> get sampleFactor inside hatching data!
-
         # draw patterns on grid based on watching time
         # also scale up or down templates based on cell size
         image = self.drawHatching(image, self._gridTimestamps, gridSampleFactors)
-        return image
 
+        for y in range(self._gridHeight):
+                for x in range(self._gridWidth):
+                    print(f'time value[{y}][{x}]: {self._gridTimestamps[y][x]}')
+
+        return image
 
     # normalizes timestamp data for one image
     # returns grid of normalized values for timestamp between 0 and 1
@@ -184,9 +185,6 @@ class HeatMapUtils():
                 cellCenterX = xCell * self.CELL_SIZE_X
                 cellCenterY = yCell * self.CELL_SIZE_Y
 
-                #cellCenterX += int(self.CELL_SIZE_X / 2)
-                #cellCenterY += int(self.CELL_SIZE_Y / 2)
-
                 if (cellCenterX > self._exportWidth):
                     continue
 
@@ -202,10 +200,10 @@ class HeatMapUtils():
     # returns grid of time values relative to given imageSection
     # time values represent time spent looking onto cell
     def mapImageSectionTimesToGrid(self, grid, timeSpent):
-        timeGrid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+        timeGrid = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
         for y in range(self._gridHeight):
             for x in range(self._gridWidth):
-                timeGrid[y][x] = timeGrid[y][x] * timeSpent
+                timeGrid[y][x] = grid[y][x] * timeSpent
         
         return timeGrid
 
