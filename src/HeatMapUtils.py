@@ -139,11 +139,6 @@ class HeatMapUtils():
         # draw patterns on grid based on watching time
         # also scale up or down templates based on cell size
         image = self.drawHatching(image, self._gridTimestamps, gridSampleFactors)
-
-        for y in range(self._gridHeight):
-                for x in range(self._gridWidth):
-                    print(f'time value[{y}][{x}]: {self._gridTimestamps[y][x]}')
-
         return image
 
     # normalizes timestamp data for one image

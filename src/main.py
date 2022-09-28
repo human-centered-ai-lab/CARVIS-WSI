@@ -306,7 +306,8 @@ def initArgumentParser():
     parser.add_argument("-c", nargs='?', type=str, help="input directory path or csv file path (relative to current path. needs to contain svs files too.)")
     parser.add_argument("-r", nargs='?', help="Tuple of resolution [x,y]. You may want to make sure to use the correct aspect ratio.")
     parser.add_argument("-l", nargs='?', help="[OPTIONAL] Specify extraction layer. Resolution of layer will be read from the wsi metadata for every image seperately. Needed when -r is not used.")
-    parser.add_argument("-t", nargs='?', help="[Optional] Specify cell size. How many pixels one side of the cell has (cells are always square). Default is 50.")
+    parser.add_argument("-t", nargs='?', help="[OPTIONAL] Specify cell size. How many pixels one side of the cell has (cells are always square). Default is 50.")
+    parser.add_argument("-s", action='store_true', help="[OPTIONAL] Exports a hatched heatmap.")
 
 # gets relsolution from input argument
 # returns [x, y] tuple
@@ -411,9 +412,10 @@ if __name__ == "__main__":
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
 
-            print("working on hatching...")
-            hatchingImage = heatmapUtils.getHatchingHeatmap(baseImage, imageSectionsDict[fileName])
-            #hatchingImage.show()
+            if (arguments.s):
+                print("working on hatching...")
+                hatchingImage = heatmapUtils.getHatchingHeatmap(baseImage, imageSectionsDict[fileName])
+                #hatchingImage.show()
 
             # update name and save
             baseName = fileName[: len(fileName) - 4]
@@ -438,7 +440,9 @@ if __name__ == "__main__":
             # now save save image
             baseImage.save(EXPORT_DIR + baseName + ".jpg")
             heatmapImage.save(EXPORT_DIR + saveName)
-            hatchingImage.save(EXPORT_DIR + hatchingName)
+
+            if (arguments.s):
+                hatchingImage.save(EXPORT_DIR + hatchingName)
 
             # new line for every svs
             print(" ")

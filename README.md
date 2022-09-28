@@ -53,6 +53,7 @@ All the other parameters are working like described in the table down below.
 |   -l   | (Recommended) specify extraction layer. the extraction resolution will be read from WSI metadata. |
 |   -r   | render resolution for WSI (only needed of no -l is given) |
 |   -t   | specify cell size. default is 50. cells are always square. |
+|   -s   | output hatched heatmap. it is recommended to use a bigger cell size (~100) in combination with this option. |
 
 ### Minmal native working example
 To get heatmap data rendered on all wsi files used in one specific iMotions meeting and export all JPG's with their layer 3 resolution, use following line.
