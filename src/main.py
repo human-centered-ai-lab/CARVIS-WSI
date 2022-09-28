@@ -412,8 +412,8 @@ if __name__ == "__main__":
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
 
             print("working on hatching...")
-            #hatchingImage = heatmapUtils.getHatchingHeatmap(roiImage, imageSectionsDict[fileName])
-            #hatchingImage.show()
+            hatchingImage = heatmapUtils.getHatchingHeatmap(roiImage, imageSectionsDict[fileName])
+            hatchingImage.show()
 
             # update name and save
             baseName = fileName[: len(fileName) - 4]

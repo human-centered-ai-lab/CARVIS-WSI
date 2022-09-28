@@ -4,8 +4,8 @@
 
 import sys
 import math
-import pyvips
 from PIL import Image, ImageDraw, ImageFont
+from Hatching import Hatching
 
 class HeatMapUtils():
     CELL_SIZE_X = 50
@@ -34,6 +34,9 @@ class HeatMapUtils():
 
         # create 2D grid array for mapping gaze points
         self._grid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+
+        # crete 2d grid array for mapping timestamp data
+        self._gridTimestamps = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
     # code is from Markus
     # draws a legend on lefty upper corner for the sample rate
@@ -65,38 +68,91 @@ class HeatMapUtils():
     # returns image with hatched cell tiles
     def getHatchingHeatmap(self, baseImage, imageSections):
         image = baseImage.copy()
-
-        # import hatching patterns
-        diagonalHatching = pyvips.Image.thumbnail("templates/1_1.svg", 200, height=self.CELL_SIZE_Y, size="both")
-        diagonalHatching.write_to_file("1_1.png")
-        diagonalHatching = Image.open("1_1.png")
-
-        # colorize/rotate/alter/ to make up for missing design files
-        # ...
         
         # see how much time someone has spent looking on one grid cell...
         for imageSection in imageSections:
             # time is in ms
             timeSpent = imageSection._timestamps[-1] - imageSection._timestamps[0]
-            print(f'time spent: {timeSpent}')
+            #print(f'time spent: {timeSpent}')
+
+            # create a grid for every image section...
+            imageSectionTimestamps = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+            
+            # additionally grid to save highest sample factor on grid
+            gridSampleFactors = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
             for gazePoint in imageSection._eyeTracking:
-                # image section contains timestamp data
-                
-                # map timestamps to gazepoints
-                # get how much time is spent in one image section
-                # timeSpent
-                # then look how much points are in one cell
-                # getHeatmapData
-                # -> linear scale time for each cell to get amount of time spent
+                #print(f'eye time: {gazePoint._timeSignal}')
+
+                # if incomplete data -> drop gazepoint
+                if (gazePoint._leftX < 0
+                  or gazePoint._rightX < 0
+                  or gazePoint._leftY < 0
+                  or gazePoint._rightY < 0):
+                    continue
+
+                # map eye data to gaze point on output resolution image
+                gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoint)
+
+                # check if gaze point is inside image section frame
+                if (gazePointX > imageSection._bottomRightX or gazePointX < 0):
+                    # when not drop it
+                    continue
+                if (gazePointY > imageSection._bottomLeftY or gazePointY < 0):
+                    # when not drop it
+                    continue
+
+                # map gazepoints to export resolution
+                gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoint)
+
+                # map to grid
+                xCell, yCell = self.mapToCell(gazePointX, gazePointY)
+
+                # edge case protection
+                # it is not known why xCell and yCell sometimes exceed the limits
+                if (yCell >= self._gridHeight):
+                    yCell = self._gridHeight - 1
+                if (yCell < 0):
+                    yCell = 0
+                if (xCell >= self._gridWidth):
+                    xCell = self._gridWidth - 1
+                if (xCell < 0):
+                    xCell = 0
+
+                # grid must be image section dependent
+                imageSectionTimestamps[yCell][xCell] += 1
+
+                # now save sampleFactor
+                if (imageSection._downsampleFactor > gridSampleFactors[yCell][xCell]):
+                    gridSampleFactors[yCell][xCell] = imageSection._downsampleFactor
                 pass
 
+            #print(f'{len(imageSectionTimestamps)}, {len(imageSectionTimestamps[0])}')
+
+            # after all eye data inside a imageSection normalize hitmap grid
+            normalizedTimeData = self.normalizeGridData(imageSectionTimestamps)
+
+            # now calculate time for each cell and add time to _gridTimestamps
+            gridTimeValues = self.mapImageSectionTimesToGrid(normalizedTimeData, timeSpent)
+
+            # add time values to grid
+            for y in range(self._gridHeight):
+                for x in range(self._gridWidth):
+                    self._gridTimestamps[y][x] += gridTimeValues[y][x]
+
+            # also maybe create a hatching data class
+            # for holding hatching pattern and image section values?
+
+            # -> get sampleFactor inside hatching data!
+
         # draw patterns on grid based on watching time
+        # also scale up or down templates based on cell size
+        image = self.drawHatching(image, self._gridTimestamps, gridSampleFactors)
         return image
 
 
     # normalizes timestamp data for one image
-    # returns list of normalized values for timestamp between 0 and 1
+    # returns grid of normalized values for timestamp between 0 and 1
     def normalizeTimestampData(self, imageSections):
         normalizedList = [ ]
         minValue = sys.maxsize
@@ -123,24 +179,59 @@ class HeatMapUtils():
 
         return normalizedList.copy()
 
+    # returns image with drawn on hatching
+    def drawHatching(self, image, grid, gridMagnification):
+        hatching = Hatching()
+
+        for yCell in range(self._gridHeight):
+            for xCell in range(self._gridWidth):
+                # map the cell to an image pixel coordinate
+                cellCenterX = xCell * self.CELL_SIZE_X
+                cellCenterY = yCell * self.CELL_SIZE_Y
+
+                cellCenterX += int(self.CELL_SIZE_X / 2)
+                cellCenterY += int(self.CELL_SIZE_Y / 2)
+
+                if (cellCenterX > self._exportWidth):
+                    continue
+
+                if (cellCenterY > self._exportHeight):
+                    continue
+                
+                # drawing part
+                hatchingPattern = hatching.getHatching(grid[yCell][xCell], gridMagnification[yCell][xCell])
+                image.paste(hatchingPattern, (cellCenterX, cellCenterY), hatchingPattern)
+
+        return image
+
+    # returns grid of time values relative to given imageSection
+    # time values represent time spent looking onto cell
+    def mapImageSectionTimesToGrid(self, grid, timeSpent):
+        timeGrid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+        for y in range(self._gridHeight):
+            for x in range(self._gridWidth):
+                timeGrid[y][x] = timeGrid[y][x] * timeSpent
+        
+        return timeGrid
+
     # normalizes grid data for heatmap
     # returns new grid in size as old one with values
     # between 0 and 1
-    def normalizeGridData(self):
+    def normalizeGridData(self, grid):
         normalizedGrid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
         minValue = sys.maxsize
         maxValue = 0
 
         for y in range(self._gridHeight):
             for x in range(self._gridWidth):
-                if (self._grid[y][x] > maxValue):
-                    maxValue = self._grid[y][x]
-                if (self._grid[y][x] < minValue):
-                    minValue = self._grid[y][x]
+                if (grid[y][x] > maxValue):
+                    maxValue = grid[y][x]
+                if (grid[y][x] < minValue):
+                    minValue = grid[y][x]
 
         for y in range(self._gridHeight):
             for x in range(self._gridWidth):
-                value = self._grid[y][x]
+                value = grid[y][x]
 
                 # catch edge case
                 if (value == 0 and minValue == 0 and maxValue == 0):
@@ -349,7 +440,7 @@ class HeatMapUtils():
                 self._grid[yCell][xCell] += 1
         
         # normalize grid data
-        normalizedGridData = self.normalizeGridData()
+        normalizedGridData = self.normalizeGridData(self._grid)
         
         # draw grid values on image and return
         return self.drawGridValues(image, normalizedGridData)
