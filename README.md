@@ -33,7 +33,7 @@ Run a new container with following parameters:
 
 ```
 docker run --rm \
-    -u $(id -u) \
+    -u $(id -u):$(id -g) \
     --name slide-heatmap \
     -v /absolute/path/to/data/:/data/ \
     -v /absolute/path/to/export/:/export/ \
@@ -47,7 +47,7 @@ Also make sure to have write permissions to the export directory!
 The `-c` parameter can be left away if no specific CSV file is desired. The container will take automatically the mounted `/data/` directory as input. If you want to specify one file, assume you are already in the mounted directory. \
 All the other parameters are working like described in the table down below.
 
-With the `-u` flag a user or user id can be specifyed. This solves permission issues with the exported files by running the process inside the container with this specifyed user. \
+With the `-u` flag a user or user and group id can be specifyed [`id -u` is for user, `id -u` is for group]. This solves permission issues with the exported files by running the process inside the container with this specifyed user. \
 If you don't have a special need for this you can leave it like it is and don't have to worry about it.
 
 ### Input parameters and their usage:

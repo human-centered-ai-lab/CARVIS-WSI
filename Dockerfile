@@ -15,13 +15,13 @@ RUN wget https://www.cairographics.org/releases/pixman-0.40.0.tar.gz \
     && ninja install    
 
 
-FROM python:latest
+FROM python:3.10.7-slim-bullseye
 
 LABEL maintainer="stefan.baumann@medunigraz.at"
 ENV PIP_ROOT_USER_ACTION=ignore
 
 RUN apt-get update && apt-get install -y \
-    openslide-tools \
+    openslide-tools gcc \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip install --no-cache-dir openslide-python pillow pyvips
