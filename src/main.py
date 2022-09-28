@@ -306,7 +306,8 @@ def initArgumentParser():
     parser.add_argument("-c", nargs='?', type=str, help="input directory path or csv file path (relative to current path. needs to contain svs files too.)")
     parser.add_argument("-r", nargs='?', help="Tuple of resolution [x,y]. You may want to make sure to use the correct aspect ratio.")
     parser.add_argument("-l", nargs='?', help="[OPTIONAL] Specify extraction layer. Resolution of layer will be read from the wsi metadata for every image seperately. Needed when -r is not used.")
-    parser.add_argument("-t", nargs='?', help="[Optional] Specify cell size. How many pixels one side of the cell has (cells are always square). Default is 50.")
+    parser.add_argument("-t", nargs='?', help="[OPTIONAL] Specify cell size. How many pixels one side of the cell has (cells are always square). Default is 50.")
+    parser.add_argument("-s", nargs='?', help="[OPTIONAL] Exports a hatched heatmap. Specify alpha value of hatching [0 - 255]. Default value is 170.")
 
 # gets relsolution from input argument
 # returns [x, y] tuple
@@ -386,7 +387,7 @@ if __name__ == "__main__":
             # check if layer or resolution is given for export
             exportPixelX = 0
             exportPixelY = 0
-            cellSize = 50
+            heatmapUtils = object
 
             if (arguments.r):
                 exportPixelX, exportPixelY = getResolutionFromArgs(arguments)
@@ -394,10 +395,11 @@ if __name__ == "__main__":
             else:
                 exportPixelX, exportPixelY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
 
-            if (arguments.t)    :
-                cellSize = int(arguments.t)
+            if (arguments.t):
+                heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height, arguments.t)
 
-            heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height, cellSize)
+            else:
+                heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height)
 
             # working with files and extract information
             print(f'rendering thumbnail for {fileName}...')
@@ -410,11 +412,18 @@ if __name__ == "__main__":
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
 
+            if (arguments.s):
+                print("working on hatching...")
+                alpha = int(arguments.s)
+                hatchingImage = heatmapUtils.getHatchingHeatmap(baseImage, imageSectionsDict[fileName], alpha)
+                #hatchingImage.show()
+
             # update name and save
             baseName = fileName[: len(fileName) - 4]
             pathologistName = file[6 : len(file) - 4]
 
             saveName = baseName
+            hatchingName = baseName
             
             baseName += "_base_"
             baseName += pathologistName
@@ -422,12 +431,19 @@ if __name__ == "__main__":
             saveName += "_heatmap_"
             saveName += pathologistName
             saveName += ".jpg"
+
+            hatchingName += "_hatching_"
+            hatchingName += pathologistName
+            hatchingName += ".jpg"
             
             print(f'saving {baseName} for pathologist {pathologistName}')
 
             # now save save image
-            heatmapImage.save(EXPORT_DIR + saveName)
             baseImage.save(EXPORT_DIR + baseName + ".jpg")
+            heatmapImage.save(EXPORT_DIR + saveName)
+
+            if (arguments.s):
+                hatchingImage.save(EXPORT_DIR + hatchingName)
 
             # new line for every svs
             print(" ")

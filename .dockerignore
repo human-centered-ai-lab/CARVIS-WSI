@@ -8,3 +8,4 @@ images/
 src/__pycache__/
 Dockerfile
 README.md
+templates/GimpFiles/

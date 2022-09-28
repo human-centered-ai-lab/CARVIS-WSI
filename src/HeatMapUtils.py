@@ -5,6 +5,7 @@
 import sys
 import math
 from PIL import Image, ImageDraw, ImageFont
+from Hatching import Hatching
 
 class HeatMapUtils():
     CELL_SIZE_X = 50
@@ -34,6 +35,9 @@ class HeatMapUtils():
         # create 2D grid array for mapping gaze points
         self._grid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
+        # crete 2d grid array for mapping timestamp data
+        self._gridTimestamps = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+
     # code is from Markus
     # draws a legend on lefty upper corner for the sample rate
     # returns image with drawn on legend
@@ -60,8 +64,71 @@ class HeatMapUtils():
         
         return image
 
+    # draws hatching onto a given .jpg
+    # returns image with hatched cell tiles
+    def getHatchingHeatmap(self, baseImage, imageSections, alpha):
+        image = baseImage.copy()
+        
+        # see how much time someone has spent looking on one grid cell...
+        for imageSection in imageSections:
+            # time is in ms
+            timeSpent = 0.0
+            if (len(imageSection._timestamps) >= 1):
+                timeSpent = imageSection._timestamps[-1] - imageSection._timestamps[0]
+
+            # create a grid for every image section...
+            imageSectionTimestamps = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+            
+            # additionally grid to save highest sample factor on grid
+            gridSampleFactors = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+
+            for gazePoint in imageSection._eyeTracking:
+                # if incomplete data -> drop gazepoint
+                if (self.incompleteGazeData(gazePoint)):
+                    continue
+
+                # map eye data to gaze point on output resolution image
+                gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoint)
+
+                # check if gaze point is inside image section frame
+                if (self.outsideImageSectionFrame(imageSection, gazePointX, gazePointY)):
+                    continue
+
+                # map gazepoints to export resolution
+                gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoint)
+
+                # map to grid
+                xCell, yCell = self.mapToCell(gazePointX, gazePointY)
+
+                # edge case protection
+                # it is not known why xCell and yCell sometimes exceed the limits
+                xCell, yCell = self.cellEdgeCaseProtection(xCell, yCell)
+
+                # grid must be image section dependent
+                imageSectionTimestamps[yCell][xCell] += 1
+
+                # now save sampleFactor
+                if (imageSection._downsampleFactor > gridSampleFactors[yCell][xCell]):
+                    gridSampleFactors[yCell][xCell] = imageSection._downsampleFactor
+
+            # after all eye data inside a imageSection normalize hitmap grid
+            normalizedTimeData = self.normalizeGridData(imageSectionTimestamps)
+
+            # now calculate time for each cell and add time to _gridTimestamps
+            gridTimeValues = self.mapImageSectionTimesToGrid(normalizedTimeData, timeSpent)
+
+            # add time values to grid
+            for y in range(self._gridHeight):
+                for x in range(self._gridWidth):
+                    self._gridTimestamps[y][x] += gridTimeValues[y][x]
+
+        # draw patterns on grid based on watching time
+        # also scale up or down templates based on cell size
+        image = self.drawHatching(image, self._gridTimestamps, gridSampleFactors, alpha)
+        return image
+
     # normalizes timestamp data for one image
-    # returns list of normalized values for timestamp between 0 and 1
+    # returns grid of normalized values for timestamp between 0 and 1
     def normalizeTimestampData(self, imageSections):
         normalizedList = [ ]
         minValue = sys.maxsize
@@ -88,24 +155,57 @@ class HeatMapUtils():
 
         return normalizedList.copy()
 
+    # returns image with drawn on hatching
+    def drawHatching(self, image, grid, gridMagnification, alpha):
+        hatching = Hatching(alpha)
+        hatching.resizePattern(self.CELL_SIZE_X, self.CELL_SIZE_Y)
+
+        for yCell in range(self._gridHeight):
+            for xCell in range(self._gridWidth):
+                # map the cell to an image pixel coordinate
+                cellCenterX = xCell * self.CELL_SIZE_X
+                cellCenterY = yCell * self.CELL_SIZE_Y
+
+                if (cellCenterX > self._exportWidth):
+                    continue
+
+                if (cellCenterY > self._exportHeight):
+                    continue
+                
+                # drawing part
+                hatchingPattern = hatching.getHatching(grid[yCell][xCell], gridMagnification[yCell][xCell])
+                image.paste(hatchingPattern, (cellCenterX, cellCenterY), hatchingPattern)
+
+        return image
+
+    # returns grid of time values relative to given imageSection
+    # time values represent time spent looking onto cell
+    def mapImageSectionTimesToGrid(self, grid, timeSpent):
+        timeGrid = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+        for y in range(self._gridHeight):
+            for x in range(self._gridWidth):
+                timeGrid[y][x] = grid[y][x] * timeSpent
+        
+        return timeGrid
+
     # normalizes grid data for heatmap
     # returns new grid in size as old one with values
     # between 0 and 1
-    def normalizeGridData(self):
+    def normalizeGridData(self, grid):
         normalizedGrid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
         minValue = sys.maxsize
         maxValue = 0
 
         for y in range(self._gridHeight):
             for x in range(self._gridWidth):
-                if (self._grid[y][x] > maxValue):
-                    maxValue = self._grid[y][x]
-                if (self._grid[y][x] < minValue):
-                    minValue = self._grid[y][x]
+                if (grid[y][x] > maxValue):
+                    maxValue = grid[y][x]
+                if (grid[y][x] < minValue):
+                    minValue = grid[y][x]
 
         for y in range(self._gridHeight):
             for x in range(self._gridWidth):
-                value = self._grid[y][x]
+                value = grid[y][x]
 
                 # catch edge case
                 if (value == 0 and minValue == 0 and maxValue == 0):
@@ -270,6 +370,43 @@ class HeatMapUtils():
 
         return (xCell, yCell)
 
+    # protects cell mapping from edge cases
+    # returns [x, y] cell coordinate
+    def cellEdgeCaseProtection(self, xCell, yCell):
+        if (yCell >= self._gridHeight):
+            yCell = self._gridHeight - 1
+        if (yCell < 0):
+            yCell = 0
+        if (xCell >= self._gridWidth):
+            xCell = self._gridWidth - 1
+        if (xCell < 0):
+            xCell = 0
+        
+        return xCell, yCell
+
+    # check if gaze point is inside image section frame
+    # returns true if point is outside the frame
+    def outsideImageSectionFrame(self, imageSection, gazePointX, gazePointY):
+        if (gazePointX > imageSection._bottomRightX or gazePointX < 0):
+            # when not drop it
+            return True
+        if (gazePointY > imageSection._bottomLeftY or gazePointY < 0):
+            # when not drop it
+            return True
+
+        return False
+
+    # checks if given gaze point has complete data
+    # returns true if data is incomplete
+    def incompleteGazeData(self, gazePoint):
+        if (gazePoint._leftX < 0
+            or gazePoint._rightX < 0
+            or gazePoint._leftY < 0
+            or gazePoint._rightY < 0):
+            return True
+        
+        return False
+
     # calculates heat of grid cells
     # uses GazePoints, which are mapped to export resolution
     # to draw a map on an image
@@ -280,41 +417,27 @@ class HeatMapUtils():
             for gazePoints in imageSection._eyeTracking:
 
                 # if incomplete data -> drop gazepoint
-                if (gazePoints._leftX < 0
-                  or gazePoints._rightX < 0
-                  or gazePoints._leftY < 0
-                  or gazePoints._rightY < 0):
+                if (self.incompleteGazeData(gazePoints)):
                     continue
 
                 # map eye data to gaze point on output resolution image
                 gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoints)
 
-                # check if gaze point is inside image section frame
-                if (gazePointX > imageSection._bottomRightX or gazePointX < 0):
-                    # when not drop it
-                    continue
-                if (gazePointY > imageSection._bottomLeftY or gazePointY < 0):
-                    # when not drop it
-                    continue
+                # check if mapped point is inside image section frame
+                if (self.outsideImageSectionFrame(imageSection, gazePointX, gazePointY)):
+                    continue                
 
                 # map gaze point to cell in grid and increase hit counter
                 xCell, yCell = self.mapToCell(gazePointX, gazePointY)
 
                 # edge case protection
                 # it is not known why xCell and yCell sometimes exceed the limits
-                if (yCell >= self._gridHeight):
-                    yCell = self._gridHeight - 1
-                if (yCell < 0):
-                    yCell = 0
-                if (xCell >= self._gridWidth):
-                    xCell = self._gridWidth - 1
-                if (xCell < 0):
-                    xCell = 0
+                xCell, yCell = self.cellEdgeCaseProtection(xCell, yCell)
                 
                 self._grid[yCell][xCell] += 1
         
         # normalize grid data
-        normalizedGridData = self.normalizeGridData()
+        normalizedGridData = self.normalizeGridData(self._grid)
         
         # draw grid values on image and return
         return self.drawGridValues(image, normalizedGridData)
