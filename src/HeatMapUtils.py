@@ -84,21 +84,14 @@ class HeatMapUtils():
 
             for gazePoint in imageSection._eyeTracking:
                 # if incomplete data -> drop gazepoint
-                if (gazePoint._leftX < 0
-                  or gazePoint._rightX < 0
-                  or gazePoint._leftY < 0
-                  or gazePoint._rightY < 0):
+                if (self.incompleteGazeData(gazePoint)):
                     continue
 
                 # map eye data to gaze point on output resolution image
                 gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoint)
 
                 # check if gaze point is inside image section frame
-                if (gazePointX > imageSection._bottomRightX or gazePointX < 0):
-                    # when not drop it
-                    continue
-                if (gazePointY > imageSection._bottomLeftY or gazePointY < 0):
-                    # when not drop it
+                if (self.outsideImageSectionFrame(imageSection, gazePointX, gazePointY)):
                     continue
 
                 # map gazepoints to export resolution
@@ -109,14 +102,7 @@ class HeatMapUtils():
 
                 # edge case protection
                 # it is not known why xCell and yCell sometimes exceed the limits
-                if (yCell >= self._gridHeight):
-                    yCell = self._gridHeight - 1
-                if (yCell < 0):
-                    yCell = 0
-                if (xCell >= self._gridWidth):
-                    xCell = self._gridWidth - 1
-                if (xCell < 0):
-                    xCell = 0
+                xCell, yCell = self.cellEdgeCaseProtection(xCell, yCell)
 
                 # grid must be image section dependent
                 imageSectionTimestamps[yCell][xCell] += 1
@@ -384,6 +370,43 @@ class HeatMapUtils():
 
         return (xCell, yCell)
 
+    # protects cell mapping from edge cases
+    # returns [x, y] cell coordinate
+    def cellEdgeCaseProtection(self, xCell, yCell):
+        if (yCell >= self._gridHeight):
+            yCell = self._gridHeight - 1
+        if (yCell < 0):
+            yCell = 0
+        if (xCell >= self._gridWidth):
+            xCell = self._gridWidth - 1
+        if (xCell < 0):
+            xCell = 0
+        
+        return xCell, yCell
+
+    # check if gaze point is inside image section frame
+    # returns true if point is outside the frame
+    def outsideImageSectionFrame(self, imageSection, gazePointX, gazePointY):
+        if (gazePointX > imageSection._bottomRightX or gazePointX < 0):
+            # when not drop it
+            return True
+        if (gazePointY > imageSection._bottomLeftY or gazePointY < 0):
+            # when not drop it
+            return True
+
+        return False
+
+    # checks if given gaze point has complete data
+    # returns true if data is incomplete
+    def incompleteGazeData(self, gazePoint):
+        if (gazePoint._leftX < 0
+            or gazePoint._rightX < 0
+            or gazePoint._leftY < 0
+            or gazePoint._rightY < 0):
+            return True
+        
+        return False
+
     # calculates heat of grid cells
     # uses GazePoints, which are mapped to export resolution
     # to draw a map on an image
@@ -394,36 +417,22 @@ class HeatMapUtils():
             for gazePoints in imageSection._eyeTracking:
 
                 # if incomplete data -> drop gazepoint
-                if (gazePoints._leftX < 0
-                  or gazePoints._rightX < 0
-                  or gazePoints._leftY < 0
-                  or gazePoints._rightY < 0):
+                if (self.incompleteGazeData(gazePoints)):
                     continue
 
                 # map eye data to gaze point on output resolution image
                 gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoints)
 
-                # check if gaze point is inside image section frame
-                if (gazePointX > imageSection._bottomRightX or gazePointX < 0):
-                    # when not drop it
-                    continue
-                if (gazePointY > imageSection._bottomLeftY or gazePointY < 0):
-                    # when not drop it
-                    continue
+                # check if mapped point is inside image section frame
+                if (self.outsideImageSectionFrame(imageSection, gazePointX, gazePointY)):
+                    continue                
 
                 # map gaze point to cell in grid and increase hit counter
                 xCell, yCell = self.mapToCell(gazePointX, gazePointY)
 
                 # edge case protection
                 # it is not known why xCell and yCell sometimes exceed the limits
-                if (yCell >= self._gridHeight):
-                    yCell = self._gridHeight - 1
-                if (yCell < 0):
-                    yCell = 0
-                if (xCell >= self._gridWidth):
-                    xCell = self._gridWidth - 1
-                if (xCell < 0):
-                    xCell = 0
+                xCell, yCell = self.cellEdgeCaseProtection(xCell, yCell)
                 
                 self._grid[yCell][xCell] += 1
         
