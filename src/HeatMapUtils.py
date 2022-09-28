@@ -73,7 +73,6 @@ class HeatMapUtils():
         for imageSection in imageSections:
             # time is in ms
             timeSpent = imageSection._timestamps[-1] - imageSection._timestamps[0]
-            #print(f'time spent: {timeSpent}')
 
             # create a grid for every image section...
             imageSectionTimestamps = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
@@ -82,8 +81,6 @@ class HeatMapUtils():
             gridSampleFactors = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
             for gazePoint in imageSection._eyeTracking:
-                #print(f'eye time: {gazePoint._timeSignal}')
-
                 # if incomplete data -> drop gazepoint
                 if (gazePoint._leftX < 0
                   or gazePoint._rightX < 0
@@ -125,9 +122,6 @@ class HeatMapUtils():
                 # now save sampleFactor
                 if (imageSection._downsampleFactor > gridSampleFactors[yCell][xCell]):
                     gridSampleFactors[yCell][xCell] = imageSection._downsampleFactor
-                pass
-
-            #print(f'{len(imageSectionTimestamps)}, {len(imageSectionTimestamps[0])}')
 
             # after all eye data inside a imageSection normalize hitmap grid
             normalizedTimeData = self.normalizeGridData(imageSectionTimestamps)
@@ -182,6 +176,7 @@ class HeatMapUtils():
     # returns image with drawn on hatching
     def drawHatching(self, image, grid, gridMagnification):
         hatching = Hatching()
+        hatching.resizePattern(self.CELL_SIZE_X, self.CELL_SIZE_Y)
 
         for yCell in range(self._gridHeight):
             for xCell in range(self._gridWidth):
@@ -189,8 +184,8 @@ class HeatMapUtils():
                 cellCenterX = xCell * self.CELL_SIZE_X
                 cellCenterY = yCell * self.CELL_SIZE_Y
 
-                cellCenterX += int(self.CELL_SIZE_X / 2)
-                cellCenterY += int(self.CELL_SIZE_Y / 2)
+                #cellCenterX += int(self.CELL_SIZE_X / 2)
+                #cellCenterY += int(self.CELL_SIZE_Y / 2)
 
                 if (cellCenterX > self._exportWidth):
                     continue
