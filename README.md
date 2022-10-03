@@ -6,6 +6,7 @@ This Project aims to render heatmap data onto an extracted WSI using eye trackin
 <br><img src="/images/sample_1.png"></br>
 <br><img src="/images/sample_2.png"></br>
 <br><img src="/images/sample_3.png"></br>
+<br><img src="/images/sample_4.png"></br>
 </details>
 
 ## Installation
