@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Testrun with csv and svs",
+            "name": "Testrun with one csv and specific resolution",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
@@ -18,7 +18,7 @@
             "console": "externalTerminal"
         },
         {
-            "name": "Test Layer output",
+            "name": "Test Layer output with one csv",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
@@ -31,33 +31,7 @@
             "console": "externalTerminal"
         },
         {
-            "name": "Testrun person wsi data",
-            "type": "python",
-            "request": "launch",
-            "program": "src/main.py",
-            "args": [
-                "-c",
-                "data/008_P013.csv",
-                "-r",
-                "16433,13864"
-            ],
-            "console": "externalTerminal"
-        },
-        {
-            "name": "Testrun person wsi data, small resolution",
-            "type": "python",
-            "request": "launch",
-            "program": "src/main.py",
-            "args": [
-                "-c",
-                "data/008_P013.csv",
-                "-r",
-                "5478,4622"
-            ],
-            "console": "externalTerminal"
-        },
-        {
-            "name": "WSI Data with big layer extraction",
+            "name": "WSI Data with big layer export",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
@@ -70,7 +44,7 @@
             "console": "externalTerminal"
         },
         {
-            "name": "WSI Data with small layer extraction with hatching",
+            "name": "WSI Data layer export with hatching heatmap and ",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
@@ -84,9 +58,8 @@
             ],
             "console": "externalTerminal"
         },
-
         {
-            "name": "WSI Data run with directory input",
+            "name": "WSI Data run with directory input and layer export",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
@@ -95,6 +68,49 @@
                 "data/",
                 "-l",
                 "3"
+            ],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "WSI Data run with one csv, layer export, specifyed big cell size and hatching",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/008_P013.csv",
+                "-l",
+                "3",
+                "-s",
+                "170",
+                "-t",
+                "200"
+            ],
+            "console": "externalTerminal"
+        },
+        { // WIP
+            "name": "dockerized run with every option and directory input",
+            "type": "python",
+            "request": "launch",
+            "program": "docker",
+            "args": [
+                "run",
+                "-u",
+                "$(id -u):$(id -q)",
+                "--rm",
+                "--name",
+                "slide-heatmap",
+                "-v",
+                "/home/mupadmin/Documents/SlideHeatmap/data/:/data/",
+                "-v",
+                "/home/mupadmin/Documents/SlideHeatmap/export/:/export/",
+                "slide-heatmap",
+                "-l",
+                "3",
+                "-t",
+                "100",
+                "-s",
+                "170"
             ],
             "console": "externalTerminal"
         }
