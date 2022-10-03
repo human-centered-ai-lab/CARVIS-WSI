@@ -40,7 +40,7 @@ class HeatMapUtils():
 
     # draws view path with data from the eye tracker
     # returns base image with drawn on path
-    def drawViewPath(self, baseImage, imageSections, pathStrength=2, pathColor=(3, 252, 102), pointRadius=9, pointColor=(3, 252, 161)): # pointColor=(252, 161, 3)
+    def drawViewPath(self, baseImage, imageSections, pathStrength=2, pathColor=(3, 252, 102), pointRadius=9, pointColor=(3, 252, 161)):
         image = baseImage.copy()
         imageDraw = ImageDraw.Draw(image)
         lastPoint = None

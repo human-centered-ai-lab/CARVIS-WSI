@@ -309,6 +309,10 @@ def initArgumentParser():
     parser.add_argument("-t", nargs='?', help="[OPTIONAL] Specify cell size. How many pixels one side of the cell has (cells are always square). Default is 50.")
     parser.add_argument("-s", nargs='?', help="[OPTIONAL] Exports a hatched heatmap. Specify alpha value of hatching [0 - 255]. Default value is 170.")
     parser.add_argument("-v", action='store_true', help="[OPTIONAL] Exports base image with a drawn view path.")
+    parser.add_argument("-p", nargs='?', help="[OPTIONAL] Specify path strength. Default value is 2.")
+    parser.add_argument("-i", nargs='?', help="[OPTIONAL] Specify path RGB color. Default is (3, 252, 102).")
+    parser.add_argument("-u", nargs='?', help="[OPTIONAL] Specify point radius. Default value is 9.")
+    parser.add_argument("-o", nargs='?', help="[OPTIONAL] Specify point RGB color. Default is (3, 252, 161).")
 
 # gets relsolution from input argument
 # returns [x, y] tuple
@@ -320,6 +324,22 @@ def getResolutionFromArgs(arguments):
     y = int(arguments.r[comma :])
 
     return (x, y)
+
+# gets rgb values from input argument
+# returns [R, G, B] integer 'tuple'
+def getRGBFromArgs(argument):
+    arg = argument.split(',')
+    
+    r = int(arg[0])
+    g = int(arg[1])
+    b = int(arg[2])
+
+    return (r, g, b)
+
+# gets single integer value from input argument
+# returns int argument
+def getINTFromArg(argument):
+    return int(argument)
 
 # prints certain information about the csv file
 def debugCSV(csvData):
@@ -422,8 +442,33 @@ if __name__ == "__main__":
             # draw view path
             if (arguments.v):
                 print("drawing view path...")
-                viewPathImage = heatmapUtils.drawViewPath(baseImage, imageSectionsDict[fileName])
-                viewPathImage.show()
+
+                # get all optional parameters for viewpath drawing
+                pathStrength = 2
+                if (arguments.p):
+                    pathStrength = getINTFromArg(arguments.p)
+
+                pathColor = (3, 252, 102)
+                if (arguments.i):
+                    pathColor = getRGBFromArgs(arguments.i)
+
+                pointRadius = 9
+                if (arguments.u):
+                    pointRadius = getINTFromArg(arguments.u)
+
+                pointColor = (3, 252, 161)
+                if (arguments.o):
+                    pointColor = getRGBFromArgs(arguments.o)
+
+                viewPathImage = heatmapUtils.drawViewPath(
+                  baseImage,
+                  imageSectionsDict[fileName],
+                  pathStrength,
+                  pathColor,
+                  pointRadius,
+                  pointColor)
+                
+                #viewPathImage.show()
 
             # update name and save
             baseName = fileName[: len(fileName) - 4]
