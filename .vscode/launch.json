@@ -88,6 +88,20 @@
             ],
             "console": "externalTerminal"
         },
+        {
+            "name": "WSI Data run with one csv, layer export with view path",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/008_P013.csv",
+                "-l",
+                "3",
+                "-v"
+            ],
+            "console": "externalTerminal"
+        },
         { // WIP
             "name": "dockerized run with every option and directory input",
             "type": "python",
