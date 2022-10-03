@@ -58,6 +58,7 @@ If you don't have a special need for this you can leave it like it is and don't 
 |   -r   | render resolution for WSI (only needed of no -l is given) |
 |   -t   | specify cell size. default is 50. cells are always square. |
 |   -s   | output hatched heatmap. it is recommended to use a bigger cell size (~100) in combination with this option. |
+|   -v   | enables viewpath drawing. |
 
 ### Minmal native working example
 To get heatmap data rendered on all wsi files used in one specific iMotions meeting and export all JPG's with their layer 3 resolution, use following line.
