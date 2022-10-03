@@ -1,9 +1,10 @@
-FROM ubuntu:latest AS pixman-builder
+#FROM ubuntu:latest AS pixman-builder
+FROM python:3.10-slim-bullseye AS pixman-builder
 
 LABEL maintainer="stefan.baumann@medunigraz.at"
 
 RUN apt-get update -y && apt-get upgrade -y \ 
-    && apt-get install meson ninja-build wget -y
+    && apt-get install gcc cmake meson ninja-build wget -y
 
 RUN wget https://www.cairographics.org/releases/pixman-0.40.0.tar.gz \
     && tar -xf pixman-0.40.0.tar.gz \
@@ -12,8 +13,7 @@ RUN wget https://www.cairographics.org/releases/pixman-0.40.0.tar.gz \
     && meson --prefix=/usr --buildtype=release \
     && ninja \
     && ninja test \
-    && ninja install    
-
+    && ninja install
 
 FROM python:3.10.7-slim-bullseye
 
