@@ -53,12 +53,16 @@ If you don't have a special need for this you can leave it like it is and don't 
 ### Input parameters and their usage:
 | Option | Description |
 | ------ | ----------- |
-|   -c   | input CSV file or input file directory (CSV and SVS files need to be inside here) |
+|   -c   | input CSV file or input file directory (CSV and SVS files need to be inside here). |
 |   -l   | (Recommended) specify extraction layer. the extraction resolution will be read from WSI metadata. |
-|   -r   | render resolution for WSI (only needed of no -l is given) |
+|   -r   | render resolution for WSI (only needed of no -l is given). |
 |   -t   | specify cell size. default is 50. cells are always square. |
 |   -s   | output hatched heatmap. it is recommended to use a bigger cell size (~100) in combination with this option. |
-|   -v   | enables viewpath drawing. |
+|   -v   | enables viewpath drawing. the following parameters can be specifyed if -v is used. |
+|   -p   | specify path strength. default value is 2. |
+|   -i   | specify path RGB color. default is (3, 252, 102). |
+|   -u   | specify point radius. default value is 9. |
+|   -o   | specify point RGB color. default is (3, 252, 161). |
 
 ### Minmal native working example
 To get heatmap data rendered on all wsi files used in one specific iMotions meeting and export all JPG's with their layer 3 resolution, use following line.
