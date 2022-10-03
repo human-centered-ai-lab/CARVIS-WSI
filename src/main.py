@@ -308,6 +308,7 @@ def initArgumentParser():
     parser.add_argument("-l", nargs='?', help="[OPTIONAL] Specify extraction layer. Resolution of layer will be read from the wsi metadata for every image seperately. Needed when -r is not used.")
     parser.add_argument("-t", nargs='?', help="[OPTIONAL] Specify cell size. How many pixels one side of the cell has (cells are always square). Default is 50.")
     parser.add_argument("-s", nargs='?', help="[OPTIONAL] Exports a hatched heatmap. Specify alpha value of hatching [0 - 255]. Default value is 170.")
+    parser.add_argument("-v", action='store_true', help="[OPTIONAL] Exports base image with a drawn view path.")
 
 # gets relsolution from input argument
 # returns [x, y] tuple
@@ -412,11 +413,17 @@ if __name__ == "__main__":
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
 
+            # draw hatched heatmap
             if (arguments.s):
                 print("working on hatching...")
                 alpha = int(arguments.s)
                 hatchingImage = heatmapUtils.getHatchingHeatmap(baseImage, imageSectionsDict[fileName], alpha)
-                #hatchingImage.show()
+
+            # draw view path
+            if (arguments.v):
+                print("drawing view path...")
+                viewPathImage = heatmapUtils.drawViewPath(baseImage, imageSectionsDict[fileName])
+                viewPathImage.show()
 
             # update name and save
             baseName = fileName[: len(fileName) - 4]
@@ -424,6 +431,7 @@ if __name__ == "__main__":
 
             saveName = baseName
             hatchingName = baseName
+            viewPathName = baseName
             
             baseName += "_base_"
             baseName += pathologistName
@@ -435,6 +443,10 @@ if __name__ == "__main__":
             hatchingName += "_hatching_"
             hatchingName += pathologistName
             hatchingName += ".jpg"
+
+            viewPathName += "_viewpath_"
+            viewPathName += pathologistName
+            viewPathName += ".jpg"
             
             print(f'saving {baseName} for pathologist {pathologistName}')
 
@@ -444,6 +456,9 @@ if __name__ == "__main__":
 
             if (arguments.s):
                 hatchingImage.save(EXPORT_DIR + hatchingName)
+
+            if (arguments.v):
+                viewPathImage.save(EXPORT_DIR + viewPathName)
 
             # new line for every svs
             print(" ")

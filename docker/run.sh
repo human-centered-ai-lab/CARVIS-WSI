@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts "c:l:r:t:s:" flag
+while getopts "c:l:r:t:s:v" flag
 do
     case "${flag}" in
         c) CSV_FILE=${OPTARG};;
@@ -8,6 +8,7 @@ do
         r) EXPORT_RESOLUTION=${OPTARG};;
         t) CELL_SIZE=${OPTARG};;
         s) HATCHED=${OPTARG};;
+        v) VIEW_PATH=${OPTARG};;
     esac
 done
 
@@ -33,6 +34,10 @@ fi
 
 if [ ! -z $CELL_SIZE ]; then
     PARAMETERS+=" -s $HATCHED"
+fi
+
+if [ ! -z $VIEW_PATH ]; then
+    PARAMETERS+=" -v $HATCHED"
 fi
 
 eval $PARAMETERS
