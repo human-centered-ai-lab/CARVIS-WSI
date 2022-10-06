@@ -433,11 +433,13 @@ if __name__ == "__main__":
             # do this only once
             if (not exists(EXPORT_DIR + ROI_LEGEND_FILE)):
                 print(f'No roi legend found. Saved roi legend under: {EXPORT_DIR + ROI_LEGEND_FILE}.')
-                roiLegendImg = heatmapUtils.exportROILegend()
+                roiLegendImg = heatmapUtils.getROILegend()
                 roiLegendImg.save(EXPORT_DIR + ROI_LEGEND_FILE)                
 
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
+            heatmapLegend = heatmapUtils.getHeatmapColorLegend(heatmapImage)
+            heatmapLegend.show()
 
             # draw hatched heatmap
             if (arguments.s):

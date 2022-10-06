@@ -4,6 +4,7 @@
 
 import sys
 import math
+from os.path import exists
 from PIL import Image, ImageDraw, ImageFont
 import PIL
 from Hatching import Hatching
@@ -17,6 +18,8 @@ class HeatMapUtils():
     PATH_COLOR = (3, 252, 102)
     POINT_RADIUS = 9
     POINT_COLOR = (3, 252, 161)
+
+    FONT_FILE = "templates/arial.ttf"
 
     DOWNSAMPLE_1 = (204,255,51, 255)
     DOWNSAMPLE_4 = (102,255,51, 255)
@@ -36,6 +39,17 @@ class HeatMapUtils():
         self._gridHeight = math.ceil(self._exportHeight/self.CELL_SIZE_Y)
         self.CELL_SIZE_X = int(cellSize)
         self.CELL_SIZE_Y = int(cellSize)
+
+        # get font file
+        if (not exists(self.FONT_FILE)):
+            print("")
+            print("#####################################################")
+            print(f'# ERROR: no font file found at: {self.FONT_FILE} #')
+            print("#####################################################")
+            print("")
+            exit()
+        
+        self._font = ImageFont.truetype(self.FONT_FILE, 100)
 
         # create 2D grid array for mapping gaze points
         self._grid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
@@ -93,29 +107,77 @@ class HeatMapUtils():
 
     # code is from Markus
     # returns img legend of roi drawing
-    def exportROILegend(self):
+    def getROILegend(self):
         # 800 x 700
         image = Image.new('RGBA', (800, 700), (0, 0, 0, 0))
         draw = ImageDraw.Draw(image, "RGBA")
 
         # draw samplerates and colors
-        font = ImageFont.truetype("templates/arial.ttf", 100)
         draw.rectangle((0, 0, 800, 100), fill=self.DOWNSAMPLE_1, width=25)
-        draw.text((0, 0),"Downsample < 1",(0,0,0), font = font)
+        draw.text((0, 0),"Downsample < 1",(0,0,0), font = self._font)
         draw.rectangle((0, 100, 800, 200), fill=self.DOWNSAMPLE_4, width=25)
-        draw.text((0, 100),"Downsample < 4",(0,0,0), font = font)
+        draw.text((0, 100),"Downsample < 4",(0,0,0), font = self._font)
         draw.rectangle((0, 200, 800, 300), fill=self.DOWNSAMPLE_10, width=25)
-        draw.text((0, 200),"Downsample < 10",(0,0,0), font = font)
+        draw.text((0, 200),"Downsample < 10",(0,0,0), font = self._font)
         draw.rectangle((0, 300, 800, 400), fill=self.DOWNSAMPLE_20, width=25)
-        draw.text((0, 300),"Downsample < 20",(0,0,0), font = font)
+        draw.text((0, 300),"Downsample < 20",(0,0,0), font = self._font)
         draw.rectangle((0, 400, 800, 500), fill=self.DOWNSAMPLE_30, width=25)
-        draw.text((0, 400),"Downsample < 30",(0,0,0), font = font)
+        draw.text((0, 400),"Downsample < 30",(0,0,0), font = self._font)
         draw.rectangle((0, 500, 800, 600), fill=self.DOWNSAMPLE_40, width=25)
-        draw.text((0, 500),"Downsample < 40",(0,0,0), font = font)
+        draw.text((0, 500),"Downsample < 40",(0,0,0), font = self._font)
         draw.rectangle((0, 600, 800, 700), fill=self.DOWNSAMPLE_X, width=25)
-        draw.text((0, 600),"Downsample > 40",(0,0,0), font = font)
+        draw.text((0, 600),"Downsample > 40",(0,0,0), font = self._font)
 
         return image
+
+    # returns legend drawing on bottom of heatmap
+    def getHeatmapColorLegend(self, image):
+        textWidth = 123
+        legendSteps = 10
+
+        # draw legend, not high but as wide as image
+        # merge both together. heatmap on top, legend on bottom
+        width = image.size[0]
+        height = int(image.size[1] * 0.1)
+
+        legend = Image.new('RGB', (width, height), (255, 255, 255))
+        draw = ImageDraw.Draw(legend, 'RGBA')
+        
+        # draw 0.0 on left side
+        # make x offset 5% of width and drawHeight 30% of height
+        offsetX = int(width * 0.05)
+        drawHeight = int(height * 0.3)
+        draw.text((offsetX, drawHeight), "0.0", font=self._font, fill=(0, 0, 0))
+
+        # draw 1.0 on right side
+        textCenterOffset = int(textWidth / 2)
+        draw.text((width - offsetX - textCenterOffset, drawHeight), "1.0", font=self._font, fill=(0, 0, 0))
+
+        # make color gradient from left to right
+        # maybe as straight line, with just the alpha value scaled to draw width
+        # like done in color heatmap
+        lineWidth = int(height * 0.7)
+
+        # do this for every x pixel
+        # and calculate color for each pixel in x direction
+        lineHeight = int(height / 2)
+        startX = (2 * offsetX) + textWidth
+        endX = width - startX
+
+        for pixelX in range(startX, endX + 1, legendSteps):
+            stepEnd = pixelX + legendSteps
+
+            # create color gradient
+            colorX = (pixelX - startX) / (endX - startX)
+
+            A = (int(255 * colorX))
+            B = 205
+            G = 244
+            R = 50
+
+            draw.line(((pixelX, lineHeight), (stepEnd, lineHeight)), fill=(A, R, G, B), width=lineWidth)
+
+        return legend
 
     # draws hatching onto a given .jpg
     # returns image with hatched cell tiles
