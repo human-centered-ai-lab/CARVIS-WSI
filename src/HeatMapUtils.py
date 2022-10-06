@@ -165,7 +165,7 @@ class HeatMapUtils():
         endX = width - startX
 
         for pixelX in range(startX, endX + 1, legendSteps):
-            stepEnd = pixelX + legendSteps
+            stepEnd = pixelX + legendSteps - 1
 
             # create color gradient
             colorX = (pixelX - startX) / (endX - startX)
@@ -175,7 +175,7 @@ class HeatMapUtils():
             G = 244
             R = 50
 
-            draw.line(((pixelX, lineHeight), (stepEnd, lineHeight)), fill=(A, R, G, B), width=lineWidth)
+            draw.line(((pixelX, lineHeight), (stepEnd, lineHeight)), fill=(R, G, B, A), width=lineWidth)
 
         return legend
 
