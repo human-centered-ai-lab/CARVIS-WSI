@@ -88,6 +88,42 @@
             ],
             "console": "externalTerminal"
         },
+        {
+            "name": "WSI Data run with one csv, layer export with view path",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/008_P013.csv",
+                "-l",
+                "3",
+                "-v"
+            ],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "Run layer export with all viewpath parameters",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/008_P013.csv",
+                "-l",
+                "3",
+                "-v",
+                "-p",
+                "2",
+                "-i",
+                "3,252,102",
+                "-u",
+                "9",
+                "-o",
+                "3,252,161"
+            ],
+            "console": "externalTerminal"
+        },
         { // WIP
             "name": "dockerized run with every option and directory input",
             "type": "python",

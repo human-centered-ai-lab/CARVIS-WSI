@@ -12,6 +12,10 @@ class HeatMapUtils():
     CELL_SIZE_Y = 50
     DISPLAY_X = 1920
     DISPLAY_Y = 1080
+    PATH_STRENGTH = 2
+    PATH_COLOR = (3, 252, 102)
+    POINT_RADIUS = 9
+    POINT_COLOR = (3, 252, 161)
 
     DOWNSAMPLE_1 = (204,255,51, 255)
     DOWNSAMPLE_4 = (102,255,51, 255)
@@ -37,6 +41,54 @@ class HeatMapUtils():
 
         # crete 2d grid array for mapping timestamp data
         self._gridTimestamps = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+
+    # draws view path with data from the eye tracker
+    # returns base image with drawn on path
+    def drawViewPath(self, baseImage, imageSections, pathStrength=PATH_STRENGTH,
+      pathColor=PATH_COLOR, pointRadius=POINT_RADIUS, pointColor=POINT_COLOR):
+        image = baseImage.copy()
+        imageDraw = ImageDraw.Draw(image)
+        lastPoint = None
+
+        pointOffset = int(pointRadius / 2)
+
+        for imageSection in imageSections:
+            for gazePoints in imageSection._eyeTracking:
+
+                # drop incomplete points
+                if (self.incompleteGazeData(gazePoints)):
+                    continue
+
+                # map eye data to gaze point on output resolution image
+                gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoints)
+
+                # check if mapped point is inside image section frame
+                if (self.outsideImageSectionFrame(imageSection, gazePointX, gazePointY)):
+                    continue
+
+                # draw point
+                imageDraw.ellipse(
+                  [
+                    (gazePointX - pointOffset,
+                    gazePointY - pointOffset),
+                    (gazePointX + pointOffset,
+                    gazePointY + pointOffset)
+                  ], 
+                  fill=pointColor, 
+                  outline=None, 
+                  width=pointRadius)
+
+                # if it is the first 
+                if (lastPoint is not None):
+                    imageDraw.line([
+                      (lastPoint[0], lastPoint[1]), (gazePointX, gazePointY)],
+                      fill=pathColor,
+                      width=pathStrength,
+                      joint=None)
+
+                lastPoint = (gazePointX, gazePointY)
+
+        return image
 
     # code is from Markus
     # draws a legend on lefty upper corner for the sample rate
