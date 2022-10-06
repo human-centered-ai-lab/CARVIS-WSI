@@ -467,8 +467,6 @@ if __name__ == "__main__":
                   pathColor,
                   pointRadius,
                   pointColor)
-                
-                #viewPathImage.show()
 
             # update name and save
             baseName = fileName[: len(fileName) - 4]
