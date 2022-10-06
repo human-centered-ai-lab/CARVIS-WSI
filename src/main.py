@@ -16,6 +16,7 @@ from HeatMapUtils import HeatMapUtils
 from openslide import open_slide
 
 EXPORT_DIR = "export/"
+ROI_LEGEND_FILE = "ROI_LEGEND.png"
 ROI_CHANGE_SIGNAL = "%7b%22"
 
 wsiLevel = 0
@@ -428,7 +429,12 @@ if __name__ == "__main__":
             
             print("drawing roi...")
             roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
-            #roiImage = heatmapUtils.drawLegend(roiImage) # not for now...
+
+            # do this only once
+            if (not exists(EXPORT_DIR + ROI_LEGEND_FILE)):
+                print(f'No roi legend found. Saved roi legend under: {EXPORT_DIR + ROI_LEGEND_FILE}.')
+                roiLegendImg = heatmapUtils.exportROILegend()
+                roiLegendImg.save(EXPORT_DIR + ROI_LEGEND_FILE)                
 
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])

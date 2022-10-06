@@ -5,6 +5,7 @@
 import sys
 import math
 from PIL import Image, ImageDraw, ImageFont
+import PIL
 from Hatching import Hatching
 
 class HeatMapUtils():
@@ -91,14 +92,14 @@ class HeatMapUtils():
         return image
 
     # code is from Markus
-    # draws a legend on lefty upper corner for the sample rate
-    # returns image with drawn on legend
-    def drawLegend(self, image):
+    # returns img legend of roi drawing
+    def exportROILegend(self):
+        # 800 x 700
+        image = Image.new('RGBA', (800, 700), (0, 0, 0, 0))
         draw = ImageDraw.Draw(image, "RGBA")
 
         # draw samplerates and colors
-        font = ImageFont.truetype("arial.ttf", 100)
-        #font = None
+        font = ImageFont.truetype("templates/arial.ttf", 100)
         draw.rectangle((0, 0, 800, 100), fill=self.DOWNSAMPLE_1, width=25)
         draw.text((0, 0),"Downsample < 1",(0,0,0), font = font)
         draw.rectangle((0, 100, 800, 200), fill=self.DOWNSAMPLE_4, width=25)
@@ -113,7 +114,7 @@ class HeatMapUtils():
         draw.text((0, 500),"Downsample < 40",(0,0,0), font = font)
         draw.rectangle((0, 600, 800, 700), fill=self.DOWNSAMPLE_X, width=25)
         draw.text((0, 600),"Downsample > 40",(0,0,0), font = font)
-        
+
         return image
 
     # draws hatching onto a given .jpg
