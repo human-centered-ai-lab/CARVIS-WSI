@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts "c:l:r:t:s:v p:i:u:o:" flag
+while getopts 'c:l:r:t:s:vp:i:u:o:' flag;
 do
     case "${flag}" in
         c) CSV_FILE=${OPTARG};;
@@ -8,7 +8,7 @@ do
         r) EXPORT_RESOLUTION=${OPTARG};;
         t) CELL_SIZE=${OPTARG};;
         s) HATCHED=${OPTARG};;
-        v) VIEW_PATH=${OPTARG};;
+        v) VIEW_PATH=true;;
         p) PATH_STRENGTH=${OPTARG};;
         i) PATH_COLOR=${OPTARG};;
         u) POINT_RADIUS=${OPTARG};;
@@ -41,7 +41,7 @@ if [ ! -z $CELL_SIZE ]; then
 fi
 
 if [ ! -z $VIEW_PATH ]; then
-    PARAMETERS+=" -v" #$VIEW_PATH"
+    PARAMETERS+=" -v"
 fi
 
 if [ ! -z $PATH_STRENGTH ]; then
