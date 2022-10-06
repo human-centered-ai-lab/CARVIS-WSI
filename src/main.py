@@ -444,19 +444,19 @@ if __name__ == "__main__":
                 print("drawing view path...")
 
                 # get all optional parameters for viewpath drawing
-                pathStrength = 2
+                pathStrength = heatmapUtils.PATH_STRENGTH
                 if (arguments.p):
                     pathStrength = getINTFromArg(arguments.p)
 
-                pathColor = (3, 252, 102)
+                pathColor = heatmapUtils.PATH_COLOR
                 if (arguments.i):
                     pathColor = getRGBFromArgs(arguments.i)
 
-                pointRadius = 9
+                pointRadius = heatmapUtils.POINT_RADIUS
                 if (arguments.u):
                     pointRadius = getINTFromArg(arguments.u)
 
-                pointColor = (3, 252, 161)
+                pointColor = heatmapUtils.POINT_COLOR
                 if (arguments.o):
                     pointColor = getRGBFromArgs(arguments.o)
 

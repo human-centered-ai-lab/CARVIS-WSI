@@ -12,6 +12,10 @@ class HeatMapUtils():
     CELL_SIZE_Y = 50
     DISPLAY_X = 1920
     DISPLAY_Y = 1080
+    PATH_STRENGTH = 2
+    PATH_COLOR = (3, 252, 102)
+    POINT_RADIUS = 9
+    POINT_COLOR = (3, 252, 161)
 
     DOWNSAMPLE_1 = (204,255,51, 255)
     DOWNSAMPLE_4 = (102,255,51, 255)
@@ -40,7 +44,8 @@ class HeatMapUtils():
 
     # draws view path with data from the eye tracker
     # returns base image with drawn on path
-    def drawViewPath(self, baseImage, imageSections, pathStrength=2, pathColor=(3, 252, 102), pointRadius=9, pointColor=(3, 252, 161)):
+    def drawViewPath(self, baseImage, imageSections, pathStrength=PATH_STRENGTH,
+      pathColor=PATH_COLOR, pointRadius=POINT_RADIUS, pointColor=POINT_COLOR):
         image = baseImage.copy()
         imageDraw = ImageDraw.Draw(image)
         lastPoint = None
