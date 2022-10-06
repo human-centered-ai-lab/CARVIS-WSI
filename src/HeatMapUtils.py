@@ -133,36 +133,36 @@ class HeatMapUtils():
     # returns legend drawing on bottom of heatmap
     def getHeatmapColorLegend(self, image):
         textWidth = 123
-        legendSteps = 10
+        legendSteps = 50
 
         # draw legend, not high but as wide as image
         # merge both together. heatmap on top, legend on bottom
-        width = image.size[0]
-        height = int(image.size[1] * 0.1)
+        heatmapWidth = image.size[0]
+        legendHeight = int(image.size[1] * 0.1)
 
-        legend = Image.new('RGB', (width, height), (255, 255, 255))
+        legend = Image.new('RGB', (heatmapWidth, legendHeight), (255, 255, 255))
         draw = ImageDraw.Draw(legend, 'RGBA')
         
         # draw 0.0 on left side
         # make x offset 5% of width and drawHeight 30% of height
-        offsetX = int(width * 0.05)
-        drawHeight = int(height * 0.3)
+        offsetX = int(heatmapWidth * 0.05)
+        drawHeight = int(legendHeight * 0.3)
         draw.text((offsetX, drawHeight), "0.0", font=self._font, fill=(0, 0, 0))
 
         # draw 1.0 on right side
         textCenterOffset = int(textWidth / 2)
-        draw.text((width - offsetX - textCenterOffset, drawHeight), "1.0", font=self._font, fill=(0, 0, 0))
+        draw.text((heatmapWidth - offsetX - textCenterOffset, drawHeight), "1.0", font=self._font, fill=(0, 0, 0))
 
         # make color gradient from left to right
         # maybe as straight line, with just the alpha value scaled to draw width
         # like done in color heatmap
-        lineWidth = int(height * 0.7)
+        lineWidth = int(legendHeight * 0.7)
 
         # do this for every x pixel
         # and calculate color for each pixel in x direction
-        lineHeight = int(height / 2)
+        lineHeight = int(legendHeight / 2)
         startX = (2 * offsetX) + textWidth
-        endX = width - startX
+        endX = heatmapWidth - startX
 
         for pixelX in range(startX, endX + 1, legendSteps):
             stepEnd = pixelX + legendSteps - 1
@@ -177,7 +177,14 @@ class HeatMapUtils():
 
             draw.line(((pixelX, lineHeight), (stepEnd, lineHeight)), fill=(R, G, B, A), width=lineWidth)
 
-        return legend
+        # now merge both
+        totalHeight = image.size[1] + legendHeight
+        heatmapLegend = Image.new('RGB', (heatmapWidth, totalHeight))
+
+        heatmapLegend.paste(image, (0, 0))
+        heatmapLegend.paste(legend, (0, (image.size[1] + 1)))
+
+        return heatmapLegend
 
     # draws hatching onto a given .jpg
     # returns image with hatched cell tiles
