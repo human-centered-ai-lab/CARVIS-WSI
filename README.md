@@ -84,4 +84,21 @@ When the programm is has finished all renderings, "done." will be printed.
 
 <br />
 
+## iMotions Data
+
+| Parameter | Description | Used For | Relative To |
+|-----------|-------------|----------|-------------|
+| CurrentCenterX/Y | Center of displayed image section. |  | Relative to WSI on Layer 0. |
+| CurrentDownsampleFactor | Basically a inverted zoom factor. |  | Higher number is the more "zoomed in" the displayed image section is. |
+| width | Width of displayed image section. |  | Absolute pixels on display's left upper corner. |
+| height | Height of displayed image section. |  | Absolute pixels on display's left upper corner. |
+| Top/BottomLeft/RightX/Y | Corner point coordinates of displayed image section. |  | Coordinates are on Layer 0 of WSI. |
+| CenterX/Y | Center of displayed image section. |  | Coordinates are on Layer 0 of WSI. |
+| ET_GazeLeft/RightX/Y | Pixel on wich eye is looking. | ? | Coordinates on record Display. |
+| ET_PupilLeft/Right | Pupil size. | - | - |
+| ET_DistanceLeft/Right | Distance between Left/Right eye and eye tracker. | - | - |
+| ET_CameraLeft/RightX/Y | X/Y coordinate of Left/Right eye gaze Point.  | ? | Absolute pixels on display's left upper corner. |
+
+
+
 > **_NOTE:_** This Project is currently WIP! When features are implemented they get merged into master branch.
