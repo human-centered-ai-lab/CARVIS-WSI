@@ -108,8 +108,7 @@ class HeatMapUtils():
 
         return image
 
-    # adds roi legend at the bottom of the given image
-    # returns img with added legend at the bottom
+    # returns roi legend drawn on bottom of roi image
     def addRoiColorLegend(self, image):
         heatmapWidth = image.size[0]
         cellNumber = 7
