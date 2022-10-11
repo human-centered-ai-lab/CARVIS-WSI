@@ -147,14 +147,15 @@ class HeatMapUtils():
         # make x offset 5% of width and drawHeight 30% of height
         offsetX = int(heatmapWidth * 0.05)
         drawHeight = int(legendHeight * 0.5)
+        drawLine = int(drawHeight / 2)
 
         # need to load again to change size
         sizedFont = ImageFont.truetype(self.FONT_FILE, size=drawHeight)
-        draw.text((offsetX, int(drawHeight / 2)), "0.0", font=sizedFont, fill=(0, 0, 0))
+        draw.text((offsetX, drawLine), "0.0", font=sizedFont, fill=(0, 0, 0))
 
         # draw 1.0 on right side
         textCenterOffset = int(textWidth / 2)
-        draw.text((heatmapWidth - offsetX - textCenterOffset, int(drawHeight / 2)), "1.0", font=sizedFont, fill=(0, 0, 0))
+        draw.text((heatmapWidth - offsetX - textCenterOffset, drawLine), "1.0", font=sizedFont, fill=(0, 0, 0))
 
         # make color gradient from left to right
         # maybe as straight line, with just the alpha value scaled to draw width
