@@ -27,6 +27,15 @@ docker build -t slide-heatmap .
 This command may take some time to run, depending on the system. It downloads the latest Docker Python image and installs all depenecies so this does not have to be done manually. \
 For writing the exported files, there will be a user and user group with the same parameters added as your current user to avoid permission errors.
 
+-----
+
+If you want to run this program outside of docker you neede to install the following dependencies by pip, your package manager or by source:
+- [pixman-0.40.0](https://www.linuxfromscratch.org/blfs/view/cvs/general/pixman.html)
+- [openslide-python 1.2.0](https://openslide.org/api/python/)
+- [OpenSlide 3.4.1](https://openslide.org/)
+- [Pillow 9.2.0](https://pillow.readthedocs.io/en/stable/)
+- [pyvips 2.21](https://pypi.org/project/pyvips/)
+
 ## Usage
 To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed in the iMotions meeting must be present inside `data` directory.
 
@@ -58,7 +67,7 @@ If you don't have a special need for this you can leave it like it is and don't 
 |   -l   | (Recommended) specify extraction layer. the extraction resolution will be read from WSI metadata. |
 |   -r   | render resolution for WSI (only needed of no -l is given). |
 |   -t   | specify cell size. default is 50. cells are always square. |
-|   -s   | output hatched heatmap. it is recommended to use a bigger cell size (~100) in combination with this option. |
+|   -s   | output hatched heatmap and specify alpha value of pattern. it is recommended to use a bigger cell size (~100) in combination with this option. |
 |   -v   | enables viewpath drawing. the following parameters can be specifyed if -v is used. |
 |   -p   | specify path strength. default value is 2. |
 |   -i   | specify path RGB color. default is (3, 252, 102). |
@@ -66,7 +75,6 @@ If you don't have a special need for this you can leave it like it is and don't 
 |   -o   | specify point RGB color. default is (3, 252, 161). |
 |   -a   | enable cell labeling to be rendered onto exported image. |
 |   -b   | enable roi labeling to be rendered onto exported image. |
-|   -d   | enable hatching labeling to be rendered onto exported image. |
 
 ### Minmal native working example
 To get heatmap data rendered on all wsi files used in one specific iMotions meeting and export all JPG's with their layer 3 resolution, use following line.
