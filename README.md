@@ -64,6 +64,9 @@ If you don't have a special need for this you can leave it like it is and don't 
 |   -i   | specify path RGB color. default is (3, 252, 102). |
 |   -u   | specify point radius. default value is 9. |
 |   -o   | specify point RGB color. default is (3, 252, 161). |
+|   -a   | enable cell labeling to be rendered onto exported image. |
+|   -b   | enable roi labeling to be rendered onto exported image. |
+|   -d   | enable hatching labeling to be rendered onto exported image. |
 
 ### Minmal native working example
 To get heatmap data rendered on all wsi files used in one specific iMotions meeting and export all JPG's with their layer 3 resolution, use following line.
@@ -76,7 +79,27 @@ Important to know is that a resolution with the same width/height ratio as the o
 
 > Note: Inside `data` directory must be all .csv and .svs files stored which where used by this iMotions meeting!
 
-When the programm is has finished all renderings, "done." will be printed.
+When the programm is has finished all renderings, `done.` will be printed.
+
+## Output Interpretation
+The exported images ...
+
+### Region Of Interes
+Uses line strength (not width!) to visualize what areas of the WSI an Pathologist has viewed the most. The line strength resemples the time spent observing at the area, relative to the total time spent looking at this WSI. Stronger lines resemble longer time spent, weaker lines resemble less time spent on a particular area.
+
+The Color of outlineing resemples the downsample factor to which the area has been zoomed in. The more a Pathologist has zoomed in to an specific area the smaller the downsample factor number gets. \
+A rule of thumb is that, bigger areas result in higher downsample factors and smaller image sections result in smaller downsample factors.
+
+### Color Heatmap
+The Color Heatmap only draws one color, but in different strenghts. \
+The drawn color strength on each cell is relative to the total time spent observing at this WSI. Stronger cells have been observed longer than weaker colored ones.
+
+### Hatching Heatmap
+The Hatching Heatmap uses pattern to visualize the observation duration and magnification of cells. \
+The following pattern is being used.
+
+<br><img src="/images/Hatching_Pattern.png"></br>
+
 
 ## Folder Structure
     .                           # Repository Root Folder
