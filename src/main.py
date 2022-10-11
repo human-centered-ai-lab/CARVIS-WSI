@@ -428,13 +428,7 @@ if __name__ == "__main__":
             baseImage = heatmapUtils.extractJPG(wsiFilesDict[fileName])
             
             print("drawing roi...")
-            roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
-
-            # do this only once
-            if (not exists(EXPORT_DIR + ROI_LEGEND_FILE)):
-                print(f'No roi legend found. Saved roi legend under: {EXPORT_DIR + ROI_LEGEND_FILE}.')
-                roiLegendImg = heatmapUtils.getROILegend()
-                roiLegendImg.save(EXPORT_DIR + ROI_LEGEND_FILE)                
+            roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])          
 
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])

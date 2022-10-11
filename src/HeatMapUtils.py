@@ -108,31 +108,6 @@ class HeatMapUtils():
 
         return image
 
-    # code is from Markus
-    # returns img legend of roi drawing
-    def getROILegend(self):
-        # 800 x 700
-        image = Image.new('RGBA', (800, 700), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(image, "RGBA")
-
-        # draw samplerates and colors
-        draw.rectangle((0, 0, 800, 100), fill=self.DOWNSAMPLE_1, width=25)
-        draw.text((0, 0),"Downsample < 1",(0,0,0), font = self._font)
-        draw.rectangle((0, 100, 800, 200), fill=self.DOWNSAMPLE_4, width=25)
-        draw.text((0, 100),"Downsample < 4",(0,0,0), font = self._font)
-        draw.rectangle((0, 200, 800, 300), fill=self.DOWNSAMPLE_10, width=25)
-        draw.text((0, 200),"Downsample < 10",(0,0,0), font = self._font)
-        draw.rectangle((0, 300, 800, 400), fill=self.DOWNSAMPLE_20, width=25)
-        draw.text((0, 300),"Downsample < 20",(0,0,0), font = self._font)
-        draw.rectangle((0, 400, 800, 500), fill=self.DOWNSAMPLE_30, width=25)
-        draw.text((0, 400),"Downsample < 30",(0,0,0), font = self._font)
-        draw.rectangle((0, 500, 800, 600), fill=self.DOWNSAMPLE_40, width=25)
-        draw.text((0, 500),"Downsample < 40",(0,0,0), font = self._font)
-        draw.rectangle((0, 600, 800, 700), fill=self.DOWNSAMPLE_X, width=25)
-        draw.text((0, 600),"Downsample > 40",(0,0,0), font = self._font)
-
-        return image
-
     # adds roi legend at the bottom of the given image
     # returns img with added legend at the bottom
     def addRoiColorLegend(self, image):
