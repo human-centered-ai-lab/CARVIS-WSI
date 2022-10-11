@@ -29,6 +29,9 @@ class HeatMapUtils():
     DOWNSAMPLE_40 = (51,102,255, 255)
     DOWNSAMPLE_X = (102,51,255, 255)
 
+    ROI_COLORS = [DOWNSAMPLE_1, DOWNSAMPLE_4, DOWNSAMPLE_10, DOWNSAMPLE_20, DOWNSAMPLE_30, DOWNSAMPLE_40, DOWNSAMPLE_X]
+    ROI_LABELS = ["< 1", "< 4", "< 10", "< 20", "< 30", "< 40", "> 40"]
+
     def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y, cellSize=50):
         self._grid = 0
         self._exportWidth = int(pixelCountX)
@@ -130,8 +133,45 @@ class HeatMapUtils():
 
         return image
 
+    # adds roi legend at the bottom of the given image
+    # returns img with added legend at the bottom
+    def addRoiColorLegend(self, image):
+        heatmapWidth = image.size[0]
+        cellNumber = 7
+        cellSizeHalf = 50   # make this scalable with heatmap size!
+        legendHeight = int(image.size[1] * 0.1) + (2*cellSizeHalf)
+
+        legend = Image.new('RGB', (heatmapWidth, legendHeight), color=(255, 255, 255))
+        draw = ImageDraw.Draw(legend, 'RGBA')
+
+        # draw one "cell" with color and underneath the "zoom" rating
+        offsetX = int(heatmapWidth / (cellNumber + 1))
+        drawHeight = int(legendHeight * 0.3)
+
+        # need to load again to change size
+        sizedFont = ImageFont.truetype(self.FONT_FILE, size=drawHeight)
+
+        for i in range(0, cellNumber):
+            startX = offsetX * (i + 1)
+            draw.rectangle(
+              (startX - cellSizeHalf, drawHeight - cellSizeHalf, startX + cellSizeHalf, drawHeight + cellSizeHalf),
+              fill=None,
+              outline=self.ROI_COLORS[i],
+              width=10)
+            
+            fontWidth, _ = draw.textsize(self.ROI_LABELS[i], sizedFont)
+            fontWidthOffset = startX - int(fontWidth / 2)
+
+            draw.text((fontWidthOffset, drawHeight + 70), self.ROI_LABELS[i], font=sizedFont, fill=(0, 0, 0))
+
+        totalHeight = image.size[1] + legendHeight
+        heatmapLegend = Image.new('RGB', (heatmapWidth, totalHeight))
+        heatmapLegend.paste(image, (0, 0))
+        heatmapLegend.paste(legend, (0, (image.size[1] + 1)))
+        return heatmapLegend
+
     # returns legend drawing on bottom of heatmap
-    def getHeatmapColorLegend(self, image):
+    def addHeatmapColorLegend(self, image):
         textWidth = 123
         legendSteps = 50
 

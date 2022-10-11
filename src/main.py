@@ -438,7 +438,10 @@ if __name__ == "__main__":
 
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
-            heatmapImage = heatmapUtils.getHeatmapColorLegend(heatmapImage)
+            heatmapImage = heatmapUtils.addHeatmapColorLegend(heatmapImage)
+
+            # testing
+            heatmapImage = heatmapUtils.addRoiColorLegend(heatmapImage)
 
             # draw hatched heatmap
             if (arguments.s):
