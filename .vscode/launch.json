@@ -103,6 +103,21 @@
             "console": "externalTerminal"
         },
         {
+            "name": "Run layer export with dir input + all legends enabled",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/",
+                "-l",
+                "3",
+                "-a",
+                "-b"
+            ],
+            "console": "externalTerminal"
+        },
+        {
             "name": "Run layer export with one csv all viewpath parameters",
             "type": "python",
             "request": "launch",
