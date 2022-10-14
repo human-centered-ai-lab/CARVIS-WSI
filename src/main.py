@@ -402,25 +402,33 @@ if __name__ == "__main__":
 
     # ToDo: after now only parallel is allowed
 
-    # load all wsi files only once in the wsiDict
-
-    # get all data read so it can be spread through all worker processes
-
     wsiDict = { }
     csvImageSectionDict = { }
+
+    # get csv data into a dict with wsi filename as keys
     for csvFileName in csvFileList:
         csvImageSectionDict = readCSV(csvFileName)
-        
     
+    # get wsi into dict with wsi filename as key
     for wsiFileName in csvImageSectionDict:
-
         if wsiFileName == "None":
             print(f'skip {wsiFileName}')
             continue
-
         wsiDict[wsiFileName] = readSVS(wsiFileName)
+    
+    # render all wsi thumbnails in parallel
+    # and store them into a dict with ther wsi filename as keys
+    wsiBaseImage = { }
+    renderṔrocessList = [ ]
+    wsiNameIndex = wsiDict.keys()
 
-    print(wsiDict)
+    for i in range(multiprocessing.cpu_count - 1):
+        layer0Widht, layer0Height = wsiDict[wsiNameIndex[i]].level_dimensions[0]
+
+        # here are already the worker args needed...
+
+        heatmapUtils = HeatMapUtils()
+        renderṔrocessList.append( Process(target=) )
 
     print("done.")
     
