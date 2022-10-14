@@ -10,6 +10,7 @@ import sys
 import csv
 import argparse
 from os.path import exists
+from multiprocessing import Process, Lock
 from ImageSection import ImageSection
 from GazePoint import GazePoint
 from HeatMapUtils import HeatMapUtils
@@ -175,7 +176,7 @@ def getRoiParameters(row):
         bottomRightX,
         bottomRightY)
 
-# reds csv and returns a nested list
+# reds csv and returns a nested dict
 # drops all GazePoints until first filename is found as ImageSection
 def readCSV(file):
     ImageSectionsDict = { } # holds all image sections as list with filename as key
@@ -351,16 +352,24 @@ def debugCSV(csvData):
 
 # loads all svs files found inside the csv file into a dictionary
 # returns dict where filename is key and an wsi as the value
-def loadSVSFiles(imageSectionDict):
+def loadSVSFilesToDict(imageSectionDict):
     wsiFiles = { }
     for fileName in imageSectionDict.keys():
-        if (fileName == "None"):
+        if (fileName == "None" or fileName in wsiFiles.keys()):
             continue
 
         wsiFiles[fileName] = readSVS(fileName)
         print(f'got: {fileName}')
 
-    return wsiFiles.copy()
+    return wsiFiles.copy() 
+
+# parallel worker thread
+# does all the work for one csv file
+# it is meant to run parallelized
+def worker(csvFile, baseWsiImages):
+    # do the work here
+    pass
+
 
 if __name__ == "__main__":
     initArgumentParser()
@@ -390,132 +399,21 @@ if __name__ == "__main__":
     else:
         csvFileList.append(arguments.c)        
 
-    # now do this for every csv file
-    for file in csvFileList:
-        # read csv and svs files
-        print(f'parsing {file}...')
-        imageSectionsDict = readCSV(file)
+    # ToDo: after now only parallel is allowed
 
-        # check if meeting produced correct data
-        if (imageSectionsDict is None):
-            print("CSV File does not contain correct Image Section data!")
-            print("-------------")
-            continue
+    # load all wsi files only once in the wsiDict
 
-        print("loading svs...")
-        wsiFilesDict = loadSVSFiles(imageSectionsDict)
-        
-        for fileName in wsiFilesDict:
-            layer0Width, layer0Height = wsiFilesDict[fileName].level_dimensions[0]
-            
-            # check if layer or resolution is given for export
-            exportPixelX = 0
-            exportPixelY = 0
-            heatmapUtils = object
+    # get all data read so it can be spread through all worker processes
+    csvDict = { }
+    wsiDict = { }
+    for csvFile in csvFileList:
+        csvDict[csvFile] = readCSV(csvFile)
+    
+    # get all wsi loaded
+    wsiDict = loadSVSFilesToDict(csvDict)
+    
 
-            if (arguments.r):
-                exportPixelX, exportPixelY = getResolutionFromArgs(arguments)
-            
-            else:
-                exportPixelX, exportPixelY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
-
-            if (arguments.t):
-                heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height, arguments.t)
-
-            else:
-                heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height)
-
-            # working with files and extract information
-            print(f'rendering thumbnail for {fileName}...')
-            baseImage = heatmapUtils.extractJPG(wsiFilesDict[fileName])
-            
-            print("drawing roi...")
-            roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
-
-            if (arguments.b):
-                roiImage = heatmapUtils.addRoiColorLegend(roiImage)
-
-            print("working on heatmap...")
-            heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
-
-            if (arguments.a):
-                heatmapImage = heatmapUtils.addHeatmapColorLegend(heatmapImage)
-
-            # draw hatched heatmap
-            if (arguments.s):
-                print("working on hatching...")
-                alpha = int(arguments.s)
-                hatchingImage = heatmapUtils.getHatchingHeatmap(baseImage, imageSectionsDict[fileName], alpha)
-
-            # draw view path
-            if (arguments.v):
-                print("drawing view path...")
-
-                # get all optional parameters for viewpath drawing
-                pathStrength = heatmapUtils.PATH_STRENGTH
-                if (arguments.p):
-                    pathStrength = getINTFromArg(arguments.p)
-
-                pathColor = heatmapUtils.PATH_COLOR
-                if (arguments.i):
-                    pathColor = getRGBFromArgs(arguments.i)
-
-                pointRadius = heatmapUtils.POINT_RADIUS
-                if (arguments.u):
-                    pointRadius = getINTFromArg(arguments.u)
-
-                pointColor = heatmapUtils.POINT_COLOR
-                if (arguments.o):
-                    pointColor = getRGBFromArgs(arguments.o)
-
-                viewPathImage = heatmapUtils.drawViewPath(
-                  baseImage,
-                  imageSectionsDict[fileName],
-                  pathStrength,
-                  pathColor,
-                  pointRadius,
-                  pointColor)
-
-            # update name and save
-            baseName = fileName[: len(fileName) - 4]
-            pathologistName = file[6 : len(file) - 4]
-
-            saveName = baseName
-            hatchingName = baseName
-            viewPathName = baseName
-            
-            baseName += "_base_"
-            baseName += pathologistName
-            
-            saveName += "_heatmap_"
-            saveName += pathologistName
-            saveName += ".jpg"
-
-            hatchingName += "_hatching_"
-            hatchingName += pathologistName
-            hatchingName += ".jpg"
-
-            viewPathName += "_viewpath_"
-            viewPathName += pathologistName
-            viewPathName += ".jpg"
-            
-            print(f'saving {baseName} for pathologist {pathologistName}')
-
-            # now save save image
-            baseImage.save(EXPORT_DIR + baseName + ".jpg")
-            heatmapImage.save(EXPORT_DIR + saveName)
-
-            if (arguments.s):
-                hatchingImage.save(EXPORT_DIR + hatchingName)
-
-            if (arguments.v):
-                viewPathImage.save(EXPORT_DIR + viewPathName)
-
-            # new line for every svs
-            print(" ")
-
-        # split off output for every csv file
-        print("-------------")
+    
 
     print("done.")
     
