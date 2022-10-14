@@ -103,13 +103,50 @@
             "console": "externalTerminal"
         },
         {
-            "name": "Run layer export with all viewpath parameters",
+            "name": "Run layer export with dir input + all legends enabled",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/",
+                "-l",
+                "3",
+                "-a",
+                "-b"
+            ],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "Run layer export with one csv all viewpath parameters",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
             "args": [
                 "-c",
                 "data/008_P013.csv",
+                "-l",
+                "3",
+                "-v",
+                "-p",
+                "2",
+                "-i",
+                "3,252,102",
+                "-u",
+                "9",
+                "-o",
+                "3,252,161"
+            ],
+            "console": "externalTerminal"
+        },
+        {
+            "name": "Run layer export with dir input + all viewpath parameters",
+            "type": "python",
+            "request": "launch",
+            "program": "src/main.py",
+            "args": [
+                "-c",
+                "data/",
                 "-l",
                 "3",
                 "-v",

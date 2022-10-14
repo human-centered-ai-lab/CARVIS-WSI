@@ -4,7 +4,9 @@
 
 import sys
 import math
+from os.path import exists
 from PIL import Image, ImageDraw, ImageFont
+import PIL
 from Hatching import Hatching
 
 class HeatMapUtils():
@@ -17,6 +19,8 @@ class HeatMapUtils():
     POINT_RADIUS = 9
     POINT_COLOR = (3, 252, 161)
 
+    FONT_FILE = "templates/arial.ttf"
+
     DOWNSAMPLE_1 = (204,255,51, 255)
     DOWNSAMPLE_4 = (102,255,51, 255)
     DOWNSAMPLE_10 = (51,255,102, 255)
@@ -24,6 +28,9 @@ class HeatMapUtils():
     DOWNSAMPLE_30 = (51,204,255, 255)
     DOWNSAMPLE_40 = (51,102,255, 255)
     DOWNSAMPLE_X = (102,51,255, 255)
+
+    ROI_COLORS = [DOWNSAMPLE_1, DOWNSAMPLE_4, DOWNSAMPLE_10, DOWNSAMPLE_20, DOWNSAMPLE_30, DOWNSAMPLE_40, DOWNSAMPLE_X]
+    ROI_LABELS = ["< 1", "< 4", "< 10", "< 20", "< 30", "< 40", "> 40"]
 
     def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y, cellSize=50):
         self._grid = 0
@@ -35,6 +42,17 @@ class HeatMapUtils():
         self._gridHeight = math.ceil(self._exportHeight/self.CELL_SIZE_Y)
         self.CELL_SIZE_X = int(cellSize)
         self.CELL_SIZE_Y = int(cellSize)
+
+        # get font file
+        if (not exists(self.FONT_FILE)):
+            print("")
+            print("#####################################################")
+            print(f'# ERROR: no font file found at: {self.FONT_FILE} #')
+            print("#####################################################")
+            print("")
+            exit()
+        
+        self._font = ImageFont.truetype(self.FONT_FILE, 100)
 
         # create 2D grid array for mapping gaze points
         self._grid = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
@@ -90,31 +108,101 @@ class HeatMapUtils():
 
         return image
 
-    # code is from Markus
-    # draws a legend on lefty upper corner for the sample rate
-    # returns image with drawn on legend
-    def drawLegend(self, image):
-        draw = ImageDraw.Draw(image, "RGBA")
+    # returns roi legend drawn on bottom of roi image
+    def addRoiColorLegend(self, image):
+        heatmapWidth = image.size[0]
+        cellNumber = 7
+        cellSizeHalf = 50   # make this scalable with heatmap size!
+        legendHeight = int(image.size[1] * 0.1) + (2*cellSizeHalf)
 
-        # draw samplerates and colors
-        font = ImageFont.truetype("arial.ttf", 100)
-        #font = None
-        draw.rectangle((0, 0, 800, 100), fill=self.DOWNSAMPLE_1, width=25)
-        draw.text((0, 0),"Downsample < 1",(0,0,0), font = font)
-        draw.rectangle((0, 100, 800, 200), fill=self.DOWNSAMPLE_4, width=25)
-        draw.text((0, 100),"Downsample < 4",(0,0,0), font = font)
-        draw.rectangle((0, 200, 800, 300), fill=self.DOWNSAMPLE_10, width=25)
-        draw.text((0, 200),"Downsample < 10",(0,0,0), font = font)
-        draw.rectangle((0, 300, 800, 400), fill=self.DOWNSAMPLE_20, width=25)
-        draw.text((0, 300),"Downsample < 20",(0,0,0), font = font)
-        draw.rectangle((0, 400, 800, 500), fill=self.DOWNSAMPLE_30, width=25)
-        draw.text((0, 400),"Downsample < 30",(0,0,0), font = font)
-        draw.rectangle((0, 500, 800, 600), fill=self.DOWNSAMPLE_40, width=25)
-        draw.text((0, 500),"Downsample < 40",(0,0,0), font = font)
-        draw.rectangle((0, 600, 800, 700), fill=self.DOWNSAMPLE_X, width=25)
-        draw.text((0, 600),"Downsample > 40",(0,0,0), font = font)
+        legend = Image.new('RGB', (heatmapWidth, legendHeight), color=(255, 255, 255))
+        draw = ImageDraw.Draw(legend, 'RGBA')
+
+        # draw one "cell" with color and underneath the "zoom" rating
+        offsetX = int(heatmapWidth / (cellNumber + 1))
+        drawHeight = int(legendHeight * 0.3)
+
+        # need to load again to change size
+        sizedFont = ImageFont.truetype(self.FONT_FILE, size=drawHeight)
+
+        for i in range(0, cellNumber):
+            startX = offsetX * (i + 1)
+            draw.rectangle(
+              (startX - cellSizeHalf, drawHeight - cellSizeHalf, startX + cellSizeHalf, drawHeight + cellSizeHalf),
+              fill=None,
+              outline=self.ROI_COLORS[i],
+              width=10)
+            
+            fontWidth, _ = draw.textsize(self.ROI_LABELS[i], sizedFont)
+            fontWidthOffset = startX - int(fontWidth / 2)
+
+            draw.text((fontWidthOffset, drawHeight + 70), self.ROI_LABELS[i], font=sizedFont, fill=(0, 0, 0))
+
+        totalHeight = image.size[1] + legendHeight
+        heatmapLegend = Image.new('RGB', (heatmapWidth, totalHeight))
+        heatmapLegend.paste(image, (0, 0))
+        heatmapLegend.paste(legend, (0, (image.size[1] + 1)))
+        return heatmapLegend
+
+    # returns legend drawing on bottom of heatmap
+    def addHeatmapColorLegend(self, image):
+        textWidth = 123
+        legendSteps = 50
+
+        # draw legend, not high but as wide as image
+        # merge both together. heatmap on top, legend on bottom
+        heatmapWidth = image.size[0]
+        legendHeight = int(image.size[1] * 0.1)
+
+        legend = Image.new('RGB', (heatmapWidth, legendHeight), (255, 255, 255))
+        draw = ImageDraw.Draw(legend, 'RGBA')
         
-        return image
+        # draw 0.0 on left side
+        # make x offset 5% of width and drawHeight 30% of height
+        offsetX = int(heatmapWidth * 0.05)
+        drawHeight = int(legendHeight * 0.5)
+        drawLine = int(drawHeight / 2)
+
+        # need to load again to change size
+        sizedFont = ImageFont.truetype(self.FONT_FILE, size=drawHeight)
+        draw.text((offsetX, drawLine), "0.0", font=sizedFont, fill=(0, 0, 0))
+
+        # draw 1.0 on right side
+        textCenterOffset = int(textWidth / 2)
+        draw.text((heatmapWidth - offsetX - textCenterOffset, drawLine), "1.0", font=sizedFont, fill=(0, 0, 0))
+
+        # make color gradient from left to right
+        # maybe as straight line, with just the alpha value scaled to draw width
+        # like done in color heatmap
+        lineWidth = int(legendHeight * 0.7)
+
+        # do this for every x pixel
+        # and calculate color for each pixel in x direction
+        lineHeight = int(legendHeight / 2)
+        startX = (2 * offsetX) + textWidth
+        endX = heatmapWidth - startX
+
+        for pixelX in range(startX, endX + 1, legendSteps):
+            stepEnd = pixelX + legendSteps - 1
+
+            # create color gradient
+            colorX = (pixelX - startX) / (endX - startX)
+
+            A = (int(255 * colorX))
+            B = 205
+            G = 244
+            R = 50
+
+            draw.line(((pixelX, lineHeight), (stepEnd, lineHeight)), fill=(R, G, B, A), width=lineWidth)
+
+        # now merge both
+        totalHeight = image.size[1] + legendHeight
+        heatmapLegend = Image.new('RGB', (heatmapWidth, totalHeight))
+
+        heatmapLegend.paste(image, (0, 0))
+        heatmapLegend.paste(legend, (0, (image.size[1] + 1)))
+
+        return heatmapLegend
 
     # draws hatching onto a given .jpg
     # returns image with hatched cell tiles

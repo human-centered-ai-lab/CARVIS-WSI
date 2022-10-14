@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts 'c:l:r:t:s:vp:i:u:o:' flag;
+while getopts 'c:l:r:t:s:vp:i:u:o:ab' flag;
 do
     case "${flag}" in
         c) CSV_FILE=${OPTARG};;
@@ -13,6 +13,8 @@ do
         i) PATH_COLOR=${OPTARG};;
         u) POINT_RADIUS=${OPTARG};;
         o) POINT_COLOR=${OPTARG};;
+        a) CELL_HEATMAP_LABEL=true;;
+        b) ROI_HEATMAP_LABEL=true;;
     esac
 done
 
@@ -36,7 +38,7 @@ if [ ! -z $CELL_SIZE ]; then
     PARAMETERS+=" -t $CELL_SIZE"
 fi
 
-if [ ! -z $CELL_SIZE ]; then
+if [ ! -z $HATCHED ]; then
     PARAMETERS+=" -s $HATCHED"
 fi
 
@@ -60,4 +62,14 @@ if [ ! -z $POINT_COLOR ]; then
     PARAMETERS+=" -o $POINT_COLOR"
 fi
 
+if [ ! -z $CELL_HEATMAP_LABEL ]; then
+    PARAMETERS+=" -a"
+fi
+
+if [ ! -z $ROI_HEATMAP_LABEL ]; then
+    PARAMETERS+=" -b"
+fi
+
+echo $PARAMETERS
+echo ""
 eval $PARAMETERS

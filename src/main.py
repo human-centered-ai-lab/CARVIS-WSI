@@ -16,6 +16,7 @@ from HeatMapUtils import HeatMapUtils
 from openslide import open_slide
 
 EXPORT_DIR = "export/"
+ROI_LEGEND_FILE = "ROI_LEGEND.png"
 ROI_CHANGE_SIGNAL = "%7b%22"
 
 wsiLevel = 0
@@ -313,6 +314,8 @@ def initArgumentParser():
     parser.add_argument("-i", nargs='?', help="[OPTIONAL] Specify path RGB color. Default is (3, 252, 102).")
     parser.add_argument("-u", nargs='?', help="[OPTIONAL] Specify point radius. Default value is 9.")
     parser.add_argument("-o", nargs='?', help="[OPTIONAL] Specify point RGB color. Default is (3, 252, 161).")
+    parser.add_argument("-a", action='store_true', help="[OPTIONAL] enable cell labeling to be rendered onto exported image.")
+    parser.add_argument("-b", action='store_true', help="[OPTIONAL] enable roi labeling to be rendered onto exported image.")
 
 # gets relsolution from input argument
 # returns [x, y] tuple
@@ -428,10 +431,15 @@ if __name__ == "__main__":
             
             print("drawing roi...")
             roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
-            #roiImage = heatmapUtils.drawLegend(roiImage) # not for now...
+
+            if (arguments.b):
+                roiImage = heatmapUtils.addRoiColorLegend(roiImage)
 
             print("working on heatmap...")
             heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
+
+            if (arguments.a):
+                heatmapImage = heatmapUtils.addHeatmapColorLegend(heatmapImage)
 
             # draw hatched heatmap
             if (arguments.s):
