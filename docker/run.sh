@@ -70,6 +70,4 @@ if [ ! -z $ROI_HEATMAP_LABEL ]; then
     PARAMETERS+=" -b"
 fi
 
-echo $PARAMETERS
-echo ""
 eval $PARAMETERS
