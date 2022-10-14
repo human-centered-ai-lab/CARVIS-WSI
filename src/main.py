@@ -17,6 +17,8 @@ from GazePoint import GazePoint
 from HeatMapUtils import HeatMapUtils
 from openslide import open_slide
 
+from WorkerArgs import WorkerArgs
+
 EXPORT_DIR = "export/"
 ROI_LEGEND_FILE = "ROI_LEGEND.png"
 ROI_CHANGE_SIGNAL = "%7b%22"
@@ -371,11 +373,57 @@ def worker(csvFile, baseWsiImages):
     # do the work here
     pass
 
+# returns object of type WorkerArgs for easier use of input parameters
+def getWorkerArgs(arguments):
+    csvFile = arguments.c
+    exportLayer = arguments.l
+    exportResolution = (0, 0)
+    cellSize = 0
+    viewPathStrength = 0
+    viewPathColor = 0
+    viewPathPointSize = 0
+    viewPathPointColor = 0
+    hatchedFlag = False
+    viewPathFlag = False
+    cellLabelFlag = False
+    roiLabelFlag = False
+
+
+    if (arguments.r):
+        exportResolution = getResolutionFromArgs(arguments.r)
+    
+    if (arguments.t):
+        cellSize = int(arguments.t)
+
+    if (arguments.p):
+        viewPathStrength = int(arguments.p)
+    
+    if (arguments.i):
+        viewPathColor = 
+    
+
+    workerArgs = WorkerArgs(
+      csvFile,
+      exportLayer,
+      exportResolution,
+      cellSize,
+      viewPathStrength,
+      viewPathColor,
+      viewPathPointSize,
+      viewPathPointColor,
+      hatchedFlag,
+      viewPathFlag,
+      cellLabelFlag,
+      roiLabelFlag)
+
+    return workerArgs
 
 if __name__ == "__main__":
     initArgumentParser()
     arguments = parser.parse_args()
     verifyInput(arguments)
+
+    workerArgs = 
 
     csvFileList = []
 
@@ -411,7 +459,7 @@ if __name__ == "__main__":
     
     # get wsi into dict with wsi filename as key
     for wsiFileName in csvImageSectionDict:
-        if wsiFileName == "None":
+        if (wsiFileName == "None"):
             print(f'skip {wsiFileName}')
             continue
         wsiDict[wsiFileName] = readSVS(wsiFileName)
@@ -428,7 +476,8 @@ if __name__ == "__main__":
         # here are already the worker args needed...
 
         heatmapUtils = HeatMapUtils()
-        renderṔrocessList.append( Process(target=) )
+        renderṔrocessList.append(
+          Process(target=heatmapUtils.extractJPG(), args=(wsiDict[wsiNameIndex[i]])).start())
 
     print("done.")
     
