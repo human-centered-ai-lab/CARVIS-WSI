@@ -10,6 +10,7 @@ import sys
 import csv
 import argparse
 from os.path import exists
+import multiprocessing
 from multiprocessing import Process, Lock
 from ImageSection import ImageSection
 from GazePoint import GazePoint
@@ -176,7 +177,7 @@ def getRoiParameters(row):
         bottomRightX,
         bottomRightY)
 
-# reds csv and returns a nested dict
+# reads csv file and returns a nested dict
 # drops all GazePoints until first filename is found as ImageSection
 def readCSV(file):
     ImageSectionsDict = { } # holds all image sections as list with filename as key
@@ -404,16 +405,22 @@ if __name__ == "__main__":
     # load all wsi files only once in the wsiDict
 
     # get all data read so it can be spread through all worker processes
-    csvDict = { }
-    wsiDict = { }
-    for csvFile in csvFileList:
-        csvDict[csvFile] = readCSV(csvFile)
-    
-    # get all wsi loaded
-    wsiDict = loadSVSFilesToDict(csvDict)
-    
 
+    wsiDict = { }
+    csvImageSectionDict = { }
+    for csvFileName in csvFileList:
+        csvImageSectionDict = readCSV(csvFileName)
+        
     
+    for wsiFileName in csvImageSectionDict:
+
+        if wsiFileName == "None":
+            print(f'skip {wsiFileName}')
+            continue
+
+        wsiDict[wsiFileName] = readSVS(wsiFileName)
+
+    print(wsiDict)
 
     print("done.")
     
