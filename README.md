@@ -90,12 +90,11 @@ Important to know is that a resolution with the same width/height ratio as the o
 When the programm is has finished all renderings, `done.` will be printed.
 
 ## Output Interpretation
-The exported images ...
 
 ### Region Of Interes
 Uses line strength (not width!) to visualize what areas of the WSI an Pathologist has viewed the most. The line strength resemples the time spent observing at the area, relative to the total time spent looking at this WSI. Stronger lines resemble longer time spent, weaker lines resemble less time spent on a particular area.
 
-The Color of outlineing resemples the downsample factor to which the area has been zoomed in. The more a Pathologist has zoomed in to an specific area the smaller the downsample factor number gets. \
+The Color of outlineing resemples the downsample factor to which the area has been zoomed in. The more a Pathologist has zoomed in to an specific area, the smaller the downsample factor number gets. \
 A rule of thumb is that, bigger areas result in higher downsample factors and smaller image sections result in smaller downsample factors.
 
 ### Color Heatmap
@@ -103,7 +102,7 @@ The Color Heatmap only draws one color, but in different strenghts. \
 The drawn color strength on each cell is relative to the total time spent observing at this WSI. Stronger cells have been observed longer than weaker colored ones.
 
 ### Hatching Heatmap
-The Hatching Heatmap uses pattern to visualize the observation duration and magnification of cells. \
+The Hatching Heatmap uses different pattern to visualize the observation duration and magnification of cells. \
 The following pattern is being used.
 
 <br><img src="/images/Hatching_Pattern.png"></br>
@@ -126,7 +125,7 @@ The following pattern is being used.
 | Parameter | Description | Used For | Relative To |
 |-----------|-------------|----------|-------------|
 | CurrentCenterX/Y | Center of displayed image section. | - | Relative to WSI on Layer 0. |
-| CurrentDownsampleFactor | Basically a inverted zoom factor. | Draw image sectoins. | Higher number is the more "zoomed in" the displayed image section is. |
+| CurrentDownsampleFactor | Basically a inverted zoom factor. | Draw image sectoins. | Lower numbers means more "zoomed in" the displayed image section is. |
 | width/heght | Width/Height of displayed image section. | Calculate dead part on recording monitor, which is the iMotions window. | Absolute pixels on display's left upper corner. |
 | Top/BottomLeft/RightX/Y | Corner point coordinates of displayed image section. | Draw image sectoins. | Coordinates are on Layer 0 of WSI. |
 | CenterX/Y | Center of displayed image section. | - | Coordinates are on Layer 0 of WSI. |
