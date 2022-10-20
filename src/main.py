@@ -181,10 +181,10 @@ def getRoiParameters(row):
         bottomRightX,
         bottomRightY)
 
-# reads csv file and returns a nested dict
+# reads csv file and returns a nested dict [csvFileName][wsiFileName]
 # drops all GazePoints until first filename is found as ImageSection
 def readCSV(file):
-    ImageSectionsDict = { } # holds all image sections as list with filename as key
+    ImageSectionsDict = { } # holds all image sections as list with wsi filename as key
     ImageSectionList = [ ]  # holds all image sections with eye data and timestamps per image section
     imageSectionTimestamps = [ ] # holds all timestamps 
     gazePointList = [ ]   # all eye data
@@ -356,23 +356,45 @@ def debugCSV(csvData):
         print(f'fileName: {imageSection._fileName}')
 
 # loads all svs files found inside the csv file into a dictionary
-# returns dict where filename is key and an wsi as the value
+# returns dict where wsi filename is key and an wsi as the value
 def loadSVSFilesToDict(imageSectionDict):
     wsiFiles = { }
     for fileName in imageSectionDict.keys():
-        if (fileName == "None" or fileName in wsiFiles.keys()):
+        if (fileName == "None"):
             continue
 
         wsiFiles[fileName] = readSVS(fileName)
         print(f'got: {fileName}')
 
-    return wsiFiles.copy() 
+    print("")
+    return wsiFiles.copy()
 
 # serialized worker function
-# goes through one csv file data and exports heatmaps
-def worker(csvFile, baseWsiImages, wokerArgs):
-    # do the work here
-    pass
+# gets one csv file and does all the heatmap rendering for this csv file
+# needs to get all rendered base wsi images (already as jpg and in the export resolution)
+# also needs the worker arguments to check what the user wants
+def worker(csvFileName, csvImageSectionsDict, wsiBaseImageDict, workerArgs):
+    for imageSection in csvImageSectionsDict:
+        print(imageSection)
+
+
+    
+    """ base image
+    baseImage = baseWsiImagesDict[wsiFileName].copy()
+    layer0PixelX, layer0PixelY = baseImage.level_dimensions[0]
+    exportPixelX, exportPixelY = getExportPixel(baseImage, workerArgs)
+    cellSize = workerArgs._cellSize
+    heatMapUtils = object
+    
+    if (cellSize > 0):
+        heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0PixelX, layer0PixelY, cellSize)
+    else:
+        heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0PixelX, layer0PixelY)
+
+    roiImage = heatMapUtils.drawRoiOnImage(baseImage, )
+    #  """
+    return
+
 
 # returns object of type WorkerArgs for easier use of input parameters for worker threads
 def getWorkerArgs(arguments):
@@ -450,12 +472,20 @@ def getWorkerArgs(arguments):
 
     return workerArgs
 
+# returns export resolution
+# in seperate mehtod since this will be used more often
+def getExportPixel(wsi, workerArgs):
+    if (workerArgs._exportLayer > 0):
+        return wsi.level_dimensions[workerArgs._exportLayer]
+    else:
+        return wsi._exportResolution
+
 if __name__ == "__main__":
     initArgumentParser()
     arguments = parser.parse_args()
     verifyInput(arguments)
 
-    csvFileList = []
+    csvFileList = [ ]
 
     # check if export directory exists. if not create it
     if (not os.path.exists(EXPORT_DIR)):
@@ -476,33 +506,30 @@ if __name__ == "__main__":
                 print(f'found: {file}')
         print(" ")
     else:
-        csvFileList.append(arguments.c)        
+        csvFileList.append(arguments.c)
+    
+    print(f'csvFileList: {csvFileList}')
 
-    # ToDo: after now only parallel is allowed
+    # ToDo: after now only parallel is allowed!
+    manager = mp.Manager()
     wsiDict = { }
-    csvImageSectionDict = { }
+    csvImageSectionDict = manager.dict()
     workerArgs = getWorkerArgs(arguments)
-    #sharedMemManager.start()
 
-    # get csv data into a dict with wsi filename as keys
+    # get csv data into a dict with csv filename as keys
+    # make nested dict[wsiFileName]
     for csvFileName in csvFileList:
         csvImageSectionDict = readCSV(csvFileName)
-    
+
     # get wsi into dict with wsi filename as key
-    for wsiFileName in csvImageSectionDict:
-        if (wsiFileName == "None"):
-            print(f'skip {wsiFileName}')
-            continue
-        wsiDict[wsiFileName] = readSVS(wsiFileName)
+    wsiDict = loadSVSFilesToDict(csvImageSectionDict)
     
     # render all wsi thumbnails in parallel
     # and store them into a dict with ther wsi filename as keys
-    manager = mp.Manager()
-    wsiBaseImage = manager.dict()
+    wsiBaseImageDict = manager.dict()
 
     renderProcessList = [ ]
     wsiNameIndex = wsiDict.keys()
-    workerNumber = mp.cpu_count() - 1
     heatMapUtils = object
 
     print("rendering wsi base images...", end=' ')
@@ -513,26 +540,48 @@ if __name__ == "__main__":
 
         wsiLayer0X, wsiLayer0Y = wsiDict[wsiKey].level_dimensions[0]
 
-        if (workerArgs._exportLayer > 0):
-            exportPixelX, exportPixelY = wsiDict[wsiKey].level_dimensions[workerArgs._exportLayer]
-        else:
-            exportPixelX, exportPixelY = workerArgs._exportResolution
+        # check what export resolution specifyer to use
+        exportPixelX, exportPixelY = getExportPixel(wsiDict[wsiKey], workerArgs)
         
+        # check if cell size was specifyed
         if (workerArgs._cellSize != 0):
             heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, wsiLayer0X, wsiLayer0Y, workerArgs._cellSize)
         else:
             heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, wsiLayer0X, wsiLayer0Y)
 
         renderProcessList.append(
-           Process(target=heatmapUtils.extractJPG, args=(wsiDict[wsiKey], wsiKey, wsiBaseImage))
+           Process(target=heatmapUtils.exportJPG, args=(wsiDict[wsiKey], wsiKey, wsiBaseImageDict))
         )
 
         renderProcessList[-1].start()
 
-    for p in renderProcessList:
-        returnValue = p.join()
+    for renderProcess in renderProcessList:
+        returnValue = renderProcess.join()
     
-    print("done!")
-
     print("done.")
+
+    print("\nTest wsiBaseImageDict")
+    # test wsiBaseImageDict
+    for smth in wsiBaseImageDict:
+        print(wsiBaseImageDict[smth])
+
+    print("working on heatmaps...", end=' ')
+    heatmapProcessList = [ ]
+
+    for csvFile in csvFileList:
+        if (csvFile == None):
+            continue
+
+        heatmapProcessList.append(
+            Process(target=worker, args=(csvFile, csvImageSectionDict, wsiBaseImageDict, workerArgs))
+        )
+        heatmapProcessList[-1].start()
+
+    for heatmapProcess in heatmapProcessList:
+        returnValue = heatmapProcess.join()
+
+    
+    #print("saving all data...", end=' ')
+
+    #print("done.")
     
