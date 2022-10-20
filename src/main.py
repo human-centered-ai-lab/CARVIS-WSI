@@ -474,7 +474,10 @@ if __name__ == "__main__":
                 print(f'found: {file}')
         print(" ")
     else:
-        csvFileList.append(arguments.c) 
+        csvFileList.append(arguments.c)
+
+    # if input is okey, load it in an workerArg object
+    workerArgs = getWorkerArgs(arguments)
 
 
     # now sorting all data to be used in a seperate process
@@ -486,6 +489,47 @@ if __name__ == "__main__":
     # first thing to do is to export thumbnails of all wsi files which are mentioned inside
     # the given csv file(s). do this in seperate processes.
     # so first get the csv file(s)!
+
+    # to get return values use shared memory
+    sharedMemoryManager = mp.Manager()
+
+    # this will hold all thumbnails and wsi name will be key
+    baseWsiDict = sharedMemoryManager.dict()
+
+    # this will hold all image sections and the csv name will be key
+    csvImageSections = { } # dont need to be on shared memory
+
+    # this will hold raw wsi from drive and be given to 
+    # wsi name will be key for later use
+    rawWsiDict = { }
+
+    wsiFileList = [ ]
+
+    for csvFile in csvFileList:
+        csvFileDict = readCSV(csvFile)
+
+        # check if meeting produced correct data or if it was exported correctly
+        if (csvFileDict is None):
+            print(f'CSV File {csvFile} does not contain the right data!')
+            continue
+
+        # save for later use in different processes    
+        csvImageSections[csvFile] = csvFileDict.copy()
+
+        # add wsi files to list to later sort out multiples
+        for wsiName in csvImageSections[csvFile].keys():
+            wsiFileList.append(wsiName)
+
+    # remove multiples from wsiFilesList
+    # then load all the wsi's into rawWsiDict and use wsifileName as key
+    wsiFileList = sorted(set(wsiFileList))
+    print(f'sorted wsi list contains: {len(wsiFileList)} wsi files.')
+    for wsiFile in wsiFileList:
+        if (wsiFile == "None"):
+            continue
+        rawWsiDict[wsiFile] = readSVS(wsiFile)
+
+    # now start the parallised base image export
 
     print("done.")
     
