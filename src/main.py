@@ -388,7 +388,6 @@ def getWorkerArgs(arguments):
     cellLabelFlag = False
     roiLabelFlag = False
 
-
     if (arguments.r):
         exportResolution = getResolutionFromArgs(arguments.r)
     
@@ -399,7 +398,8 @@ def getWorkerArgs(arguments):
         viewPathStrength = int(arguments.p)
     
     if (arguments.i):
-        viewPathColor = 
+        pass
+        #viewPathColor = 
     
 
     workerArgs = WorkerArgs(
