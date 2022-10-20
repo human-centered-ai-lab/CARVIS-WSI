@@ -9,10 +9,12 @@ import os
 import sys
 import csv
 import argparse
+import multiprocessing as mp
 from os.path import exists
 from ImageSection import ImageSection
 from GazePoint import GazePoint
 from HeatMapUtils import HeatMapUtils
+from WorkerArgs import WorkerArgs
 from openslide import open_slide
 
 EXPORT_DIR = "export/"
@@ -265,7 +267,7 @@ def readCSV(file):
         else:
             return None
 
-# checks if the user choosen input makes sense
+# checks if the user choosen input makes sens>e
 def verifyInput(arguments):
     if (len(sys.argv) < 1):
         terminate()
@@ -378,7 +380,7 @@ if __name__ == "__main__":
         print("No file specifyed, looking for a directory...")
         if (not os.path.isdir(arguments.c)):
             print("Need to specify at least input directory!")
-            terminate()        
+            terminate()
 
         # search for csv files inside given data directory
         for file in os.listdir(arguments.c):
@@ -388,7 +390,14 @@ if __name__ == "__main__":
                 print(f'found: {file}')
         print(" ")
     else:
-        csvFileList.append(arguments.c)        
+        csvFileList.append(arguments.c) 
+
+
+    # now sorting all data to be used in a process
+    # the idea is to sort the data by csv file. so a worker can get the csv file
+    # and gets shared memory to the csvImageSectionDict and wsiBaseImageDict and can
+    # use the csvfileName as base for the work like:
+    # wsiBaseImage  = wsiBaseImageDict[csvImageSectionDict[fileName]._fileName]
 
     # now do this for every csv file
     for file in csvFileList:
