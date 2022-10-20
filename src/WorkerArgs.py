@@ -6,6 +6,7 @@
 # @param exportLayer layer of wsi to be exported
 # @param exportResolution used instead of export layer to directly specify resolution
 # @param cellsize set cell size of heatmap
+# @param hatchingAlpha set alpha value of hatching pattern
 # @param hatchedFlag if set the worker renders the hatching heatmap
 # @param viewPathFlag if set the worker renders the viewpath on a base image
 # @param viewPathStrength to change default strength of the viewpath line
@@ -17,7 +18,6 @@
 
 class WorkerArgs():
     def __init__(self,
-      csvFile,
       exportLayer,
       exportResolution,
       cellSize,
@@ -32,7 +32,6 @@ class WorkerArgs():
       roiLabelFlag=False
       ):
 
-        self._csvFile = csvFile
         self._exportLayer = exportLayer
         self._exportResolution = exportResolution
         self._cellSize = cellSize

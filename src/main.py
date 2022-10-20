@@ -368,25 +368,18 @@ def loadSVSFilesToDict(imageSectionDict):
 
     return wsiFiles.copy() 
 
-# parallel worker thread
-# does all the work for one csv file
-# it is meant to run parallelized
-def worker(csvFile, baseWsiImages):
+# serialized worker function
+# goes through one csv file data and exports heatmaps
+def worker(csvFile, baseWsiImages, wokerArgs):
     # do the work here
     pass
 
-# returns object of type WorkerArgs for easier use of input parameters
+# returns object of type WorkerArgs for easier use of input parameters for worker threads
 def getWorkerArgs(arguments):
-
-    if (not arguments.c):
-        print("No CSV file or input directory given!")
-        terminate()
-    
     if (not arguments.l and not arguments.r):
         print("No export layer or resolution given!")
         terminate()
 
-    csvFile = arguments.c
     exportLayer = 0
     exportResolution = (0, 0)
     cellSize = 0
@@ -401,38 +394,35 @@ def getWorkerArgs(arguments):
     roiLabelFlag = False
 
     if (arguments.l):
-        exportLayer = int(arguments.l)
+        exportLayer = getINTFromArg(arguments.l)
 
     if (arguments.r):
-        exportResolution = getResolutionFromArgs(arguments.r)
+        exportResolution = getResolutionFromArgs(arguments)
     
     if (arguments.t):
-        cellSize = int(arguments.t)
+        cellSize = getINTFromArg(arguments.t)
 
     if (arguments.p):
-        viewPathStrength = int(arguments.p)
-
-    if (arguments.r):
-        exportResolution = getResolutionFromArgs(arguments.r)
+        viewPathStrength = getINTFromArg(arguments.p)
     
     if (arguments.t):
-        cellSize = int(arguments.t)
+        cellSize = getINTFromArg(arguments.t)
 
     if (arguments.s):
         hatchedFlag = True
-        hatchingAlpha = int(arguments.s)
+        hatchingAlpha = getINTFromArg(arguments.s)
     
     if (arguments.v):
         viewPathFlag = True
 
         if (arguments.p):
-            viewPathStrength = int(arguments.p)
+            viewPathStrength = getINTFromArg(arguments.p)
         
         if (arguments.i):
             viewPathColor = getRGBFromArgs(arguments.i)
         
         if (arguments.u):
-            viewPathPointSize = int(arguments.u)
+            viewPathPointSize = getINTFromArg(arguments.u)
         
         if (arguments.o):
             viewPathPointColor = getRGBFromArgs(arguments.o)
@@ -445,10 +435,10 @@ def getWorkerArgs(arguments):
     
 
     workerArgs = WorkerArgs(
-      csvFile,
       exportLayer,
       exportResolution,
       cellSize,
+      hatchingAlpha,
       viewPathStrength,
       viewPathColor,
       viewPathPointSize,
@@ -464,8 +454,6 @@ if __name__ == "__main__":
     initArgumentParser()
     arguments = parser.parse_args()
     verifyInput(arguments)
-
-    workerArgs = 
 
     csvFileList = []
 
@@ -494,6 +482,7 @@ if __name__ == "__main__":
 
     wsiDict = { }
     csvImageSectionDict = { }
+    workerArgs = getWorkerArgs(arguments)
 
     # get csv data into a dict with wsi filename as keys
     for csvFileName in csvFileList:
@@ -511,15 +500,42 @@ if __name__ == "__main__":
     wsiBaseImage = { }
     renderṔrocessList = [ ]
     wsiNameIndex = wsiDict.keys()
+    workerNumber = multiprocessing.cpu_count() - 1
+    heatmapUtils = object
+    
+    for wsiKey in wsiDict.keys():
+        exportPixelX = 0
+        exportPixelY = 0
 
-    for i in range(multiprocessing.cpu_count - 1):
-        layer0Widht, layer0Height = wsiDict[wsiNameIndex[i]].level_dimensions[0]
+        wsiLayer0X, wsiLayer0Y = wsiDict[wsiKey].level_dimensions[0]
 
-        # here are already the worker args needed...
+        if (workerArgs._exportLayer > 0):
+            exportPixelX, exportPixelY = wsiDict[wsiKey].level_dimensions[workerArgs._exportLayer]
+        else:
+            exportPixelX, exportPixelY = workerArgs._exportResolution
 
-        heatmapUtils = HeatMapUtils()
-        renderṔrocessList.append(
-          Process(target=heatmapUtils.extractJPG(), args=(wsiDict[wsiNameIndex[i]])).start())
+        if (workerArgs._cellSize != 0):
+            heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, wsiLayer0X, wsiLayer0Y, workerArgs._cellSize)
+            print(f'heatmap utils: {type(heatmapUtils)}')
+        else:
+            heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, wsiLayer0X, wsiLayer0Y),
+        
+        print(type(heatmapUtils))
+        
+        #renderṔrocessList.append(
+        #    Process(target=heatmapUtils.extractJPG(wsiDict[wsiKey]))
+        #)
+
+
+
+    # for i in range(workerNumber):
+    #     layer0Widht, layer0Height = wsiDict[wsiNameIndex[i]].level_dimensions[0]
+
+    #     # here are already the worker args needed...
+
+    #     heatmapUtils = HeatMapUtils()
+    #     renderṔrocessList.append(
+    #       Process(target=heatmapUtils.extractJPG(), args=(wsiDict[wsiNameIndex[i]])).start())
 
     print("done.")
     
