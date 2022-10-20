@@ -6,7 +6,6 @@ import sys
 import math
 from os.path import exists
 from PIL import Image, ImageDraw, ImageFont
-import PIL
 from Hatching import Hatching
 
 class HeatMapUtils():
@@ -420,9 +419,9 @@ class HeatMapUtils():
         return image
 
     # extracts a "level" (only resolution) of the whole slide image and converts it to a jpg
-    # returns the level on success or None on failure
-    def extractJPG(self, slide):
-        return slide.get_thumbnail((self._exportWidth, self._exportHeight))
+    # saves thumbnail in shared memeory dictionary
+    def extractJPG(self, slide, wsiName, wsiBaseImage):
+        wsiBaseImage[wsiName] = slide.get_thumbnail((self._exportWidth, self._exportHeight))
 
     # turns grid values into cell colors and draws them on given image
     # grid values need to be normalized first!

@@ -10,7 +10,7 @@ import sys
 import csv
 import argparse
 from os.path import exists
-import multiprocessing
+import multiprocessing as mp
 from multiprocessing import Process, Lock
 
 from click import argument
@@ -479,10 +479,10 @@ if __name__ == "__main__":
         csvFileList.append(arguments.c)        
 
     # ToDo: after now only parallel is allowed
-
     wsiDict = { }
     csvImageSectionDict = { }
     workerArgs = getWorkerArgs(arguments)
+    #sharedMemManager.start()
 
     # get csv data into a dict with wsi filename as keys
     for csvFileName in csvFileList:
@@ -497,11 +497,15 @@ if __name__ == "__main__":
     
     # render all wsi thumbnails in parallel
     # and store them into a dict with ther wsi filename as keys
-    wsiBaseImage = { }
-    renderṔrocessList = [ ]
+    manager = mp.Manager()
+    wsiBaseImage = manager.dict()
+
+    renderProcessList = [ ]
     wsiNameIndex = wsiDict.keys()
-    workerNumber = multiprocessing.cpu_count() - 1
-    heatmapUtils = object
+    workerNumber = mp.cpu_count() - 1
+    heatMapUtils = object
+
+    print("rendering wsi base images...", end=' ')
     
     for wsiKey in wsiDict.keys():
         exportPixelX = 0
@@ -513,29 +517,22 @@ if __name__ == "__main__":
             exportPixelX, exportPixelY = wsiDict[wsiKey].level_dimensions[workerArgs._exportLayer]
         else:
             exportPixelX, exportPixelY = workerArgs._exportResolution
-
+        
         if (workerArgs._cellSize != 0):
             heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, wsiLayer0X, wsiLayer0Y, workerArgs._cellSize)
-            print(f'heatmap utils: {type(heatmapUtils)}')
         else:
-            heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, wsiLayer0X, wsiLayer0Y),
-        
-        print(type(heatmapUtils))
-        
-        #renderṔrocessList.append(
-        #    Process(target=heatmapUtils.extractJPG(wsiDict[wsiKey]))
-        #)
+            heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, wsiLayer0X, wsiLayer0Y)
 
+        renderProcessList.append(
+           Process(target=heatmapUtils.extractJPG, args=(wsiDict[wsiKey], wsiKey, wsiBaseImage))
+        )
 
+        renderProcessList[-1].start()
 
-    # for i in range(workerNumber):
-    #     layer0Widht, layer0Height = wsiDict[wsiNameIndex[i]].level_dimensions[0]
-
-    #     # here are already the worker args needed...
-
-    #     heatmapUtils = HeatMapUtils()
-    #     renderṔrocessList.append(
-    #       Process(target=heatmapUtils.extractJPG(), args=(wsiDict[wsiNameIndex[i]])).start())
+    for p in renderProcessList:
+        returnValue = p.join()
+    
+    print("done!")
 
     print("done.")
     
