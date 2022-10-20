@@ -364,6 +364,90 @@ def loadSVSFiles(imageSectionDict):
 
     return wsiFiles.copy()
 
+# returns object of type WorkerArgs for easier use of input parameters for worker threads
+def getWorkerArgs(arguments):
+    if (not arguments.l and not arguments.r):
+        print("No export layer or resolution given!")
+        terminate()
+
+    exportLayer = 0
+    exportResolution = (0, 0)
+    cellSize = 0
+    hatchingAlpha = 0
+    viewPathStrength = 0
+    viewPathColor = 0
+    viewPathPointSize = 0
+    viewPathPointColor = 0
+    hatchedFlag = False
+    viewPathFlag = False
+    cellLabelFlag = False
+    roiLabelFlag = False
+
+    if (arguments.l):
+        exportLayer = getINTFromArg(arguments.l)
+
+    if (arguments.r):
+        exportResolution = getResolutionFromArgs(arguments)
+    
+    if (arguments.t):
+        cellSize = getINTFromArg(arguments.t)
+
+    if (arguments.p):
+        viewPathStrength = getINTFromArg(arguments.p)
+    
+    if (arguments.t):
+        cellSize = getINTFromArg(arguments.t)
+
+    if (arguments.s):
+        hatchedFlag = True
+        hatchingAlpha = getINTFromArg(arguments.s)
+    
+    if (arguments.v):
+        viewPathFlag = True
+
+        if (arguments.p):
+            viewPathStrength = getINTFromArg(arguments.p)
+        
+        if (arguments.i):
+            viewPathColor = getRGBFromArgs(arguments.i)
+        
+        if (arguments.u):
+            viewPathPointSize = getINTFromArg(arguments.u)
+        
+        if (arguments.o):
+            viewPathPointColor = getRGBFromArgs(arguments.o)
+        
+    if (arguments.a):
+        cellLabelFlag = True
+    
+    if (arguments.b):
+        roiLabelFlag = True
+    
+
+    workerArgs = WorkerArgs(
+      exportLayer,
+      exportResolution,
+      cellSize,
+      hatchingAlpha,
+      viewPathStrength,
+      viewPathColor,
+      viewPathPointSize,
+      viewPathPointColor,
+      hatchedFlag,
+      viewPathFlag,
+      cellLabelFlag,
+      roiLabelFlag)
+
+    return workerArgs
+
+# returns export resolution
+# in seperate mehtod since this will be used more often
+def getExportPixel(wsi, workerArgs):
+    if (workerArgs._exportLayer > 0):
+        return wsi.level_dimensions[workerArgs._exportLayer]
+    else:
+        return workerArgs._exportResolution
+
 if __name__ == "__main__":
     initArgumentParser()
     arguments = parser.parse_args()
