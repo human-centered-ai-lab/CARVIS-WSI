@@ -453,7 +453,7 @@ if __name__ == "__main__":
     arguments = parser.parse_args()
     verifyInput(arguments)
 
-    csvFileList = []
+    csvFileList = [ ]
 
     # check if export directory exists. if not create it
     if (not os.path.exists(EXPORT_DIR)):
@@ -477,138 +477,15 @@ if __name__ == "__main__":
         csvFileList.append(arguments.c) 
 
 
-    # now sorting all data to be used in a process
-    # the idea is to sort the data by csv file. so a worker can get the csv file
+    # now sorting all data to be used in a seperate process
+    # the idea is to sort the data by csv file. so a worker can get its csv file name
     # and gets shared memory to the csvImageSectionDict and wsiBaseImageDict and can
     # use the csvfileName as base for the work like:
     # wsiBaseImage  = wsiBaseImageDict[csvImageSectionDict[fileName]._fileName]
 
-    # now do this for every csv file
-    for file in csvFileList:
-        # read csv and svs files
-        print(f'parsing {file}...')
-        imageSectionsDict = readCSV(file)
-
-        # check if meeting produced correct data
-        if (imageSectionsDict is None):
-            print("CSV File does not contain correct Image Section data!")
-            print("-------------")
-            continue
-
-        print("loading svs...")
-        wsiFilesDict = loadSVSFiles(imageSectionsDict)
-        
-        for fileName in wsiFilesDict:
-            layer0Width, layer0Height = wsiFilesDict[fileName].level_dimensions[0]
-            
-            # check if layer or resolution is given for export
-            exportPixelX = 0
-            exportPixelY = 0
-            heatmapUtils = object
-
-            if (arguments.r):
-                exportPixelX, exportPixelY = getResolutionFromArgs(arguments)
-            
-            else:
-                exportPixelX, exportPixelY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
-
-            if (arguments.t):
-                heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height, arguments.t)
-
-            else:
-                heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height)
-
-            # working with files and extract information
-            print(f'rendering thumbnail for {fileName}...')
-            baseImage = heatmapUtils.extractJPG(wsiFilesDict[fileName])
-            
-            print("drawing roi...")
-            roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
-
-            if (arguments.b):
-                roiImage = heatmapUtils.addRoiColorLegend(roiImage)
-
-            print("working on heatmap...")
-            heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
-
-            if (arguments.a):
-                heatmapImage = heatmapUtils.addHeatmapColorLegend(heatmapImage)
-
-            # draw hatched heatmap
-            if (arguments.s):
-                print("working on hatching...")
-                alpha = int(arguments.s)
-                hatchingImage = heatmapUtils.getHatchingHeatmap(baseImage, imageSectionsDict[fileName], alpha)
-
-            # draw view path
-            if (arguments.v):
-                print("drawing view path...")
-
-                # get all optional parameters for viewpath drawing
-                pathStrength = heatmapUtils.PATH_STRENGTH
-                if (arguments.p):
-                    pathStrength = getINTFromArg(arguments.p)
-
-                pathColor = heatmapUtils.PATH_COLOR
-                if (arguments.i):
-                    pathColor = getRGBFromArgs(arguments.i)
-
-                pointRadius = heatmapUtils.POINT_RADIUS
-                if (arguments.u):
-                    pointRadius = getINTFromArg(arguments.u)
-
-                pointColor = heatmapUtils.POINT_COLOR
-                if (arguments.o):
-                    pointColor = getRGBFromArgs(arguments.o)
-
-                viewPathImage = heatmapUtils.drawViewPath(
-                  baseImage,
-                  imageSectionsDict[fileName],
-                  pathStrength,
-                  pathColor,
-                  pointRadius,
-                  pointColor)
-
-            # update name and save
-            baseName = fileName[: len(fileName) - 4]
-            pathologistName = file[6 : len(file) - 4]
-
-            saveName = baseName
-            hatchingName = baseName
-            viewPathName = baseName
-            
-            baseName += "_base_"
-            baseName += pathologistName
-            
-            saveName += "_heatmap_"
-            saveName += pathologistName
-            saveName += ".jpg"
-
-            hatchingName += "_hatching_"
-            hatchingName += pathologistName
-            hatchingName += ".jpg"
-
-            viewPathName += "_viewpath_"
-            viewPathName += pathologistName
-            viewPathName += ".jpg"
-            
-            print(f'saving {baseName} for pathologist {pathologistName}')
-
-            # now save save image
-            baseImage.save(EXPORT_DIR + baseName + ".jpg")
-            heatmapImage.save(EXPORT_DIR + saveName)
-
-            if (arguments.s):
-                hatchingImage.save(EXPORT_DIR + hatchingName)
-
-            if (arguments.v):
-                viewPathImage.save(EXPORT_DIR + viewPathName)
-
-            # new line for every svs
-            print(" ")
-
-        # split off output for every csv file
-        print("-------------")
+    # first thing to do is to export thumbnails of all wsi files which are mentioned inside
+    # the given csv file(s). do this in seperate processes.
+    # so first get the csv file(s)!
 
     print("done.")
     
