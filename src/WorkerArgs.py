@@ -21,6 +21,7 @@ class WorkerArgs():
       exportLayer,
       exportResolution,
       cellSize,
+      hatchingAlpha,
       viewPathStrength,
       viewPathColor,
       viewPathPointSize,
@@ -35,6 +36,7 @@ class WorkerArgs():
         self._exportLayer = exportLayer
         self._exportResolution = exportResolution
         self._cellSize = cellSize
+        self._hatchingAlpha = hatchingAlpha
         self._hatchedFlag = hatchedFlag
         self._viewPathFlag = viewPathFlag
         self._viewPathStrength = viewPathStrength

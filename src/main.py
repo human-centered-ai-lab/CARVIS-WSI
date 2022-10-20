@@ -12,6 +12,8 @@ import argparse
 from os.path import exists
 import multiprocessing
 from multiprocessing import Process, Lock
+
+from click import argument
 from ImageSection import ImageSection
 from GazePoint import GazePoint
 from HeatMapUtils import HeatMapUtils
@@ -375,10 +377,20 @@ def worker(csvFile, baseWsiImages):
 
 # returns object of type WorkerArgs for easier use of input parameters
 def getWorkerArgs(arguments):
+
+    if (not arguments.c):
+        print("No CSV file or input directory given!")
+        terminate()
+    
+    if (not arguments.l and not arguments.r):
+        print("No export layer or resolution given!")
+        terminate()
+
     csvFile = arguments.c
-    exportLayer = arguments.l
+    exportLayer = 0
     exportResolution = (0, 0)
     cellSize = 0
+    hatchingAlpha = 0
     viewPathStrength = 0
     viewPathColor = 0
     viewPathPointSize = 0
@@ -388,6 +400,9 @@ def getWorkerArgs(arguments):
     cellLabelFlag = False
     roiLabelFlag = False
 
+    if (arguments.l):
+        exportLayer = int(arguments.l)
+
     if (arguments.r):
         exportResolution = getResolutionFromArgs(arguments.r)
     
@@ -396,10 +411,37 @@ def getWorkerArgs(arguments):
 
     if (arguments.p):
         viewPathStrength = int(arguments.p)
+
+    if (arguments.r):
+        exportResolution = getResolutionFromArgs(arguments.r)
     
-    if (arguments.i):
-        pass
-        #viewPathColor = 
+    if (arguments.t):
+        cellSize = int(arguments.t)
+
+    if (arguments.s):
+        hatchedFlag = True
+        hatchingAlpha = int(arguments.s)
+    
+    if (arguments.v):
+        viewPathFlag = True
+
+        if (arguments.p):
+            viewPathStrength = int(arguments.p)
+        
+        if (arguments.i):
+            viewPathColor = getRGBFromArgs(arguments.i)
+        
+        if (arguments.u):
+            viewPathPointSize = int(arguments.u)
+        
+        if (arguments.o):
+            viewPathPointColor = getRGBFromArgs(arguments.o)
+        
+    if (arguments.a):
+        cellLabelFlag = True
+    
+    if (arguments.b):
+        roiLabelFlag = True
     
 
     workerArgs = WorkerArgs(
