@@ -636,7 +636,7 @@ if __name__ == "__main__":
     for csvName in returnHeatMapsDict:
         for wsiName in returnHeatMapsDict[csvName]:
             wsiFileName = wsiName[: -4]
-            pathologistName = csvName[5 : -4] + ".jpg"
+            pathologistName = csvName[6 : -4] + ".jpg"
 
             returnHeatMapsDict[csvName][wsiName]['base'].save(EXPORT_DIR + wsiFileName + "_base_" + pathologistName)
             returnHeatMapsDict[csvName][wsiName]['color'].save(EXPORT_DIR + wsiFileName + "_colorHeatMap_" + pathologistName)
