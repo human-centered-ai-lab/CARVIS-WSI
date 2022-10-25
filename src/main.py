@@ -449,6 +449,32 @@ def getExportPixel(wsi, workerArgs):
     else:
         return workerArgs._exportResolution
 
+# here comes everything for doing heatmap stuff
+def heatmapWorker(ImageSections, rawWsiDict, wsiBaseDict, workerArgs, colorHeatMapDict, roiHeatMapDict, hatchingHeatMapDict, viewPathDict):
+    for wsiName in ImageSections:
+        # imageSectionList = ImageSections[wsiName]
+        if (wsiName == "None"):
+            continue
+
+        print(f'wsiName: {wsiName}')
+        #for imageSection in ImageSections[wsiName]:
+        #    print(imageSection._fileName)
+
+            # get needed data for heatmap utils
+        wsi = rawWsiDict[wsiName]            
+        exportPixelX, exportPixelY = getExportPixel(wsi, workerArgs)
+        layer0X, layer0Y = wsi.dimensions
+        heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, workerArgs._cellSize)
+
+        if (workerArgs._roiLabelFlag):
+            roiHeatMapDict[]
+
+
+
+
+
+
+
 if __name__ == "__main__":
     initArgumentParser()
     arguments = parser.parse_args()
@@ -552,11 +578,46 @@ if __name__ == "__main__":
         wsiProcessList[-1].start()
 
     for proc in wsiProcessList:
-        ret = proc.join()
+        proc.join()
     
     # now got all base images in wsiBaseImages
     # going further with doing the heatmap work
+    # one process per csv file
+    heatMapProcessList = [ ]
 
+    # prepare dicts for rendered heatmaps
+    colorHeatMapDict = sharedMemoryManager.dict()
+    roiHeatMapDict = sharedMemoryManager.dict()
+    hatchingHeatMapDict = sharedMemoryManager.dict()
+    viewPathDict = sharedMemoryManager.dict()
+
+    wsi = wsiBaseImages.keys()
+    #print(type(wsiBaseImages[wsi[0]]))
+
+    for csvFile in csvImageSections:
+        print("")        
+        # csvImageSections: csvFilename
+        # csvFileDict: wsi file names
+        # 
+
+        heatMapProcessList.append(
+            Process(target=heatmapWorker, args=(
+                csvImageSections[csvFile],
+                rawWsiDict,
+                wsiBaseImages,
+                workerArgs,
+                colorHeatMapDict,
+                roiHeatMapDict,
+                hatchingHeatMapDict,
+                viewPathDict
+            ))
+        )
+        heatMapProcessList[-1].start()
+
+    for proc in heatMapProcessList:
+        proc.join()
+
+    # now save collected data...
 
     print("done.")
     
