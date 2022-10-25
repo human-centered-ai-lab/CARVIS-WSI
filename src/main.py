@@ -453,7 +453,7 @@ def getExportPixel(wsi, workerArgs):
 # gets run in seperate processes. on process should only work on one csv file
 # this is the return structure:
 # returnHeatMapsDict[csvName][wsiName] = { color: {colorWsi}, roi: {roiWdi}, hatching: {hatchingWsi}, viewpath: {viePathWsi} }
-def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, returnHeatMapsDict):
+def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, returnHeatMapsDict, csvWsiDict):
     print(f'working on CSV: {csvFile}')
     for wsiName in ImageSections:
         # imageSectionList = ImageSections[wsiName]
@@ -472,30 +472,34 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
         else:
             heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y)
 
-        returnHeatMapsDict[csvFile] = { wsiName: { 'roi': heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName]) } }
-        #returnHeatMapsDict[csvFile][wsiName] = { 'base': baseImage.copy() }
-        returnHeatMapsDict[csvFile][wsiName]['base'] = baseImage.copy()
+        #returnHeatMapsDict[csvFile] = { wsiName: { 'base': baseImage.copy() }}
+        #returnHeatMapsDict[csvFile] = { wsiName: { 'roi': heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName]) }}
+        csvWsiDict['base'] = baseImage.copy()
+        csvWsiDict['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName])
+        
         if (workerArgs._roiLabelFlag):
-            roiHeatMap = returnHeatMapsDict[csvFile][wsiName]['roi']
-            returnHeatMapsDict[csvFile][wsiName]['roi'] = heatMapUtils.addRoiColorLegend(roiHeatMap)
+            roiHeatMap = csvWsiDict['roi']
+            csvWsiDict['roi'] = heatMapUtils.addRoiColorLegend(roiHeatMap)
 
-        returnHeatMapsDict[csvFile][wsiName]['color'] = heatMapUtils.getHeatmap(baseImage, ImageSections[wsiName])
+        csvWsiDict['color'] = heatMapUtils.getHeatmap(baseImage, ImageSections[wsiName])
         if (workerArgs._cellLabelFlag):
-            colorHeatMap = returnHeatMapsDict[csvFile][wsiName]['color']
-            returnHeatMapsDict[csvFile][wsiName]['color'] = heatMapUtils.addHeatmapColorLegend(colorHeatMap)
+            colorHeatMap = csvWsiDict['color']
+            csvWsiDict['color'] = heatMapUtils.addHeatmapColorLegend(colorHeatMap)
         
         if (workerArgs._hatchedFlag):
-            returnHeatMapsDict[csvFile] = { wsiName: { 'hatching': heatMapUtils.getHatchingHeatmap(baseImage, ImageSections[wsiName], workerArgs._hatchingAlpha)} }
+            #returnHeatMapsDict[csvFile] = { wsiName: { 'hatching': heatMapUtils.getHatchingHeatmap(baseImage, ImageSections[wsiName], workerArgs._hatchingAlpha)} }
+            csvWsiDict['hatching'] = heatMapUtils.getHatchingHeatmap(baseImage, ImageSections[wsiName], workerArgs._hatchingAlpha)
         
         if (workerArgs._viewPathFlag):
-            returnHeatMapsDict[csvFile] = { wsiName: { 'viewpath': heatMapUtils.drawViewPath(
+            csvWsiDict['viewpath'] = heatMapUtils.drawViewPath(
                 baseImage,
                 ImageSections[wsiName],
                 workerArgs._viewPathStrength,
                 workerArgs._viewPathColor,
                 workerArgs._viewPathPointSize,
                 workerArgs._viewPathPointColor
-            ) } }
+            )
+        returnHeatMapsDict[csvFile] = { wsiName: csvWsiDict.copy() }
             
     print(f'done with cvs {csvFile}')
 
@@ -545,6 +549,7 @@ if __name__ == "__main__":
 
     # this will hold all thumbnails and wsi name will be key
     wsiBaseImages = sharedMemoryManager.dict()
+    csvWsiDict = sharedMemoryManager.dict()
 
     # this will hold all image sections and the csv name will be key
     csvImageSections = { } # dont need to be on shared memory
@@ -623,7 +628,8 @@ if __name__ == "__main__":
                 rawWsiDict,
                 wsiBaseImages,
                 workerArgs,
-                returnHeatMapsDict
+                returnHeatMapsDict,
+                csvWsiDict
             ))
         )
         heatMapProcessList[-1].start()
@@ -639,7 +645,8 @@ if __name__ == "__main__":
             pathologistName = csvName[5 : -4]
             saveFileName = wsiFileName + '_' + pathologistName
             
-            # does not contain 3rd level?
+            # does not contain 3rd level?+
+            print(f'last layer keys: {returnHeatMapsDict[csvName][wsiName].keys()}')
             returnHeatMapsDict[csvName][wsiName]['base'].save(EXPORT_DIR + saveFileName + '_' + "_base.jpg")
             returnHeatMapsDict[csvName][wsiName]['color'].save(EXPORT_DIR + saveFileName + '_' + "colorHeatMap.jpg")
             returnHeatMapsDict[csvName][wsiName]['roi'].save(EXPORT_DIR + saveFileName + '_' + "roiHeatmap.jpg")
