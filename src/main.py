@@ -518,6 +518,8 @@ if __name__ == "__main__":
 
         # add wsi files to list to later sort out multiples
         for wsiName in csvImageSections[csvFile].keys():
+            if (wsiName is None or wsiName == "None"):
+                continue
             wsiFileList.append(wsiName)
 
     # remove multiples from wsiFilesList
@@ -534,9 +536,7 @@ if __name__ == "__main__":
     wsiProcessList = [ ]
 
     for wsiName in wsiFileList:
-        if (wsiName is None):
-            continue
-        
+        print(wsiName)
         exportRes = rawWsiDict[wsiName].level_dimensions[workerArgs._exportLayer]
 
         heatMapUtils = HeatMapUtils(
@@ -551,6 +551,11 @@ if __name__ == "__main__":
         )
         wsiProcessList[-1].start()
 
+    for proc in wsiProcessList:
+        ret = proc.join()
+    
+    # now got all base images in wsiBaseImages
+    # going further with doing the heatmap work
 
 
     print("done.")
