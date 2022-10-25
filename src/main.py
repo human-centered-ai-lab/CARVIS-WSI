@@ -459,27 +459,22 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
         if (wsiName == "None"):
             continue
 
-        print(f'wsi name: {wsiName}')
-        baseImage = wsiBaseDict[wsiName]
-
         # get some data needed for heatmap utils
+        baseImage = wsiBaseDict[wsiName]
         wsi = rawWsiDict[wsiName]            
         exportPixelX, exportPixelY = getExportPixel(wsi, workerArgs)
         layer0X, layer0Y = wsi.dimensions
-        heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, workerArgs._cellSize)
 
-        print(f'img sec key: {ImageSections.keys()}')
-        print(f'key: {wsiName}')
+        heatMapUtils = object
+        if (workerArgs._cellSize != 0):
+            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, workerArgs._cellSize)
+        else:
+            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y)
 
-        #returnHeatmapsDict[csvFile][wsiName]['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName]) # key error
         returnHeatmapsDict[csvFile] = { wsiName: { 'roi': heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName]) } }
         if (workerArgs._roiLabelFlag):
             roiHeatMap = returnHeatmapsDict[csvFile][wsiName]['roi']
             returnHeatmapsDict[csvFile][wsiName]['roi'] = heatMapUtils.addRoiColorLegend(roiHeatMap)
-        
-        #returnHeatmapsDict[csvFile][wsiName]['color'] = heatMapUtils.getHeatmap(baseImage, ImageSections[csvFile])
-
-        print(heatMapUtils.CELL_SIZE_X)
 
         returnHeatmapsDict[csvFile][wsiName]['color'] = heatMapUtils.getHeatmap(baseImage, ImageSections[wsiName])
         if (workerArgs._cellLabelFlag):
@@ -487,18 +482,9 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
             returnHeatmapsDict[csvFile][wsiName]['color'] = heatMapUtils.addHeatmapColorLegend(colorHeatMap)
         
         if (workerArgs._hatchedFlag):
-            #returnHeatmapsDict[csvFile][wsiName]['hatching'] = heatMapUtils.getHatchingHeatmap(baseImage, ImageSections[csvFile], workerArgs._hatchingAlpha)
             returnHeatmapsDict[csvFile] = { wsiName: { 'hatching': heatMapUtils.getHatchingHeatmap(baseImage, ImageSections[wsiName], workerArgs._hatchingAlpha)} }
         
         if (workerArgs._viewPathFlag):
-            #returnHeatmapsDict[csvFile][wsiName]['viewpath'] = heatMapUtils.drawViewPath(
-            #    baseImage,
-            #    ImageSections[wsi],
-            #    workerArgs._viewPathStrength,
-            #    workerArgs._viewPathColor,
-            #    workerArgs._viewPathPointSize,
-            #    workerArgs._viewPathPointColor
-            #)
             returnHeatmapsDict[csvFile] = { wsiName: { 'viewpath': heatMapUtils.drawViewPath(
                 baseImage,
                 ImageSections[wsiName],
@@ -508,7 +494,7 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
                 workerArgs._viewPathPointColor
             ) } }
             
-        print("this process had no problems!")
+    print(f'done with cvs {csvFile}')
 
 
 if __name__ == "__main__":
