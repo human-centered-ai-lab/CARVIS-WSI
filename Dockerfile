@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y \
     openslide-tools gcc \
     && rm -rf /var/lib/apt/lists/*
 
-RUN python3 -m pip install --no-cache-dir openslide-python pillow pyvips
+RUN pip install --no-cache-dir --upgrade pip && python3 -m pip install --no-cache-dir openslide-python pillow pyvips
 
 # get pixman from build container
 COPY --from=pixman-builder /usr/include/pixman-1/ /usr/include/pixman-1/
