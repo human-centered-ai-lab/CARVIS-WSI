@@ -549,7 +549,6 @@ if __name__ == "__main__":
 
     # this will hold all thumbnails and wsi name will be key
     wsiBaseImages = sharedMemoryManager.dict()
-    csvWsiDict = sharedMemoryManager.dict()
 
     # this will hold all image sections and the csv name will be key
     csvImageSections = { } # dont need to be on shared memory
@@ -615,10 +614,13 @@ if __name__ == "__main__":
     heatMapProcessList = [ ]
 
     # prepare dicts for rendered heatmaps
+    # csvWsiDict will be the nested dict inside returnHeatMapsDict
+    # we need to do it like this, othrewise the nested members are 
+    # not getting saved
     returnHeatMapsDict = sharedMemoryManager.dict()
+    csvWsiDict = sharedMemoryManager.dict()
 
     wsi = wsiBaseImages.keys()
-    #print(type(wsiBaseImages[wsi[0]]))
 
     for csvFile in csvImageSections:
         heatMapProcessList.append(
@@ -645,8 +647,7 @@ if __name__ == "__main__":
             pathologistName = csvName[5 : -4]
             saveFileName = wsiFileName + '_' + pathologistName
             
-            # does not contain 3rd level?+
-            print(f'last layer keys: {returnHeatMapsDict[csvName][wsiName].keys()}')
+            # does not contain 3rd level?
             returnHeatMapsDict[csvName][wsiName]['base'].save(EXPORT_DIR + saveFileName + '_' + "_base.jpg")
             returnHeatMapsDict[csvName][wsiName]['color'].save(EXPORT_DIR + saveFileName + '_' + "colorHeatMap.jpg")
             returnHeatMapsDict[csvName][wsiName]['roi'].save(EXPORT_DIR + saveFileName + '_' + "roiHeatmap.jpg")
