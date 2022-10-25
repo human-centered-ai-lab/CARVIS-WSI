@@ -10,6 +10,7 @@ import sys
 import csv
 import argparse
 import multiprocessing as mp
+from multiprocessing import Process
 from os.path import exists
 from ImageSection import ImageSection
 from GazePoint import GazePoint
@@ -479,7 +480,6 @@ if __name__ == "__main__":
     # if input is okey, load it in an workerArg object
     workerArgs = getWorkerArgs(arguments)
 
-
     # now sorting all data to be used in a seperate process
     # the idea is to sort the data by csv file. so a worker can get its csv file name
     # and gets shared memory to the csvImageSectionDict and wsiBaseImageDict and can
@@ -494,7 +494,7 @@ if __name__ == "__main__":
     sharedMemoryManager = mp.Manager()
 
     # this will hold all thumbnails and wsi name will be key
-    baseWsiDict = sharedMemoryManager.dict()
+    wsiBaseImages = sharedMemoryManager.dict()
 
     # this will hold all image sections and the csv name will be key
     csvImageSections = { } # dont need to be on shared memory
@@ -530,6 +530,28 @@ if __name__ == "__main__":
         rawWsiDict[wsiFile] = readSVS(wsiFile)
 
     # now start the parallised base image export
+    # holds rendered base images. keys are wsi names
+    wsiProcessList = [ ]
+
+    for wsiName in wsiFileList:
+        if (wsiName is None):
+            continue
+        
+        exportRes = rawWsiDict[wsiName].level_dimensions[workerArgs._exportLayer]
+
+        heatMapUtils = HeatMapUtils(
+            exportRes[0],
+            exportRes[1],
+            rawWsiDict[wsiName].dimensions[0],
+            rawWsiDict[wsiName].dimensions[1],
+            workerArgs._cellSize)
+
+        wsiProcessList.append(
+            Process(target=heatMapUtils.extractJPG, args=(rawWsiDict[wsiName], wsiBaseImages, wsiName))
+        )
+        wsiProcessList[-1].start()
+
+
 
     print("done.")
     
