@@ -390,9 +390,6 @@ def getWorkerArgs(arguments):
 
     if (arguments.r):
         exportResolution = getResolutionFromArgs(arguments)
-    
-    if (arguments.t):
-        cellSize = getINTFromArg(arguments.t)
 
     if (arguments.p):
         viewPathStrength = getINTFromArg(arguments.p)
@@ -456,7 +453,6 @@ def getExportPixel(wsi, workerArgs):
 def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, returnHeatMapsDict, csvWsiDict):
     print(f'working on CSV: {csvFile}')
     for wsiName in ImageSections:
-        # imageSectionList = ImageSections[wsiName]
         if (wsiName == "None"):
             continue
 
@@ -472,11 +468,9 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
         else:
             heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y)
 
-        #returnHeatMapsDict[csvFile] = { wsiName: { 'base': baseImage.copy() }}
-        #returnHeatMapsDict[csvFile] = { wsiName: { 'roi': heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName]) }}
         csvWsiDict['base'] = baseImage.copy()
         csvWsiDict['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName])
-        
+
         if (workerArgs._roiLabelFlag):
             roiHeatMap = csvWsiDict['roi']
             csvWsiDict['roi'] = heatMapUtils.addRoiColorLegend(roiHeatMap)
@@ -487,7 +481,6 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
             csvWsiDict['color'] = heatMapUtils.addHeatmapColorLegend(colorHeatMap)
         
         if (workerArgs._hatchedFlag):
-            #returnHeatMapsDict[csvFile] = { wsiName: { 'hatching': heatMapUtils.getHatchingHeatmap(baseImage, ImageSections[wsiName], workerArgs._hatchingAlpha)} }
             csvWsiDict['hatching'] = heatMapUtils.getHatchingHeatmap(baseImage, ImageSections[wsiName], workerArgs._hatchingAlpha)
         
         if (workerArgs._viewPathFlag):
@@ -500,7 +493,6 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
                 workerArgs._viewPathPointColor
             )
         returnHeatMapsDict[csvFile] = { wsiName: csvWsiDict.copy() }
-            
     print(f'done with cvs {csvFile}')
 
 if __name__ == "__main__":
@@ -640,23 +632,21 @@ if __name__ == "__main__":
         proc.join()
     
     # now save collected data
-    # wsiName + PathologistName + base/color/hatching/viewpath
+    # wsiName + base/color/hatching/viewpath + PathologistName
     for csvName in returnHeatMapsDict:
         for wsiName in returnHeatMapsDict[csvName]:
             wsiFileName = wsiName[: -4]
-            pathologistName = csvName[5 : -4]
-            saveFileName = wsiFileName + '_' + pathologistName
-            
-            # does not contain 3rd level?
-            returnHeatMapsDict[csvName][wsiName]['base'].save(EXPORT_DIR + saveFileName + '_' + "_base.jpg")
-            returnHeatMapsDict[csvName][wsiName]['color'].save(EXPORT_DIR + saveFileName + '_' + "colorHeatMap.jpg")
-            returnHeatMapsDict[csvName][wsiName]['roi'].save(EXPORT_DIR + saveFileName + '_' + "roiHeatmap.jpg")
+            pathologistName = csvName[5 : -4] + ".jpg"
+
+            returnHeatMapsDict[csvName][wsiName]['base'].save(EXPORT_DIR + wsiFileName + "_base_" + pathologistName)
+            returnHeatMapsDict[csvName][wsiName]['color'].save(EXPORT_DIR + wsiFileName + "_colorHeatMap_" + pathologistName)
+            returnHeatMapsDict[csvName][wsiName]['roi'].save(EXPORT_DIR + wsiFileName + "_roiHeatmap_" + pathologistName)
 
             if (workerArgs._hatchedFlag):
-                returnHeatMapsDict[csvName][wsiName]['hatching'].save(EXPORT_DIR + saveFileName + '_' + "_hatchingHeatmap.jpg")
+                returnHeatMapsDict[csvName][wsiName]['hatching'].save(EXPORT_DIR + wsiFileName + "_hatchingHeatmap_" + pathologistName)
             
             if (workerArgs._viewPathFlag):
-                returnHeatMapsDict[csvName][wsiName]['viewpath'].save(EXPORT_DIR + saveFileName + '_' + "viewPath.jpg")
+                returnHeatMapsDict[csvName][wsiName]['viewpath'].save(EXPORT_DIR + wsiFileName + "viewPath_" + pathologistName)
 
     print("done.")
     
