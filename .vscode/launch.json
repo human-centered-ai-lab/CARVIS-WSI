@@ -118,7 +118,7 @@
             "console": "externalTerminal"
         },
         {
-            "name": "Run layer export with one csv all viewpath parameters",
+            "name": "Run layer export with one csv all viewpath parameters + legends",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
@@ -135,12 +135,14 @@
                 "-u",
                 "9",
                 "-o",
-                "3,252,161"
+                "3,252,161",
+                "-a",
+                "-b"
             ],
             "console": "externalTerminal"
         },
         {
-            "name": "Run layer export with dir input + all viewpath parameters",
+            "name": "Run layer export with dir input + all viewpath parameters + legends",
             "type": "python",
             "request": "launch",
             "program": "src/main.py",
@@ -157,7 +159,9 @@
                 "-u",
                 "9",
                 "-o",
-                "3,252,161"
+                "3,252,161",
+                "-a",
+                "-b"
             ],
             "console": "externalTerminal"
         },
