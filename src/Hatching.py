@@ -19,7 +19,6 @@ class Hatching():
     
     # resizes all pattern at once for every wsi
     def resizePattern(self, cellSizeX, cellSizeY):
-        print(f'cell size: {cellSizeX, cellSizeY}')
         for key, image in self._hatchingDict.items():
             self._hatchingDict[key] = image.resize((cellSizeX, cellSizeY))
             
