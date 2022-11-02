@@ -5,6 +5,7 @@
 import sys
 import math
 from os.path import exists
+from textwrap import fill
 from PIL import Image, ImageDraw, ImageFont
 import PIL
 from Hatching import Hatching
@@ -361,7 +362,8 @@ class HeatMapUtils():
     # returns wsi image with rectangle on it
     def drawRoiOnImage(self, baseImage, imageSections, filling=None, lineWidth=10):
         image = baseImage.copy()
-        draw = ImageDraw.Draw(image, "RGBA")
+        roiImage = Image.new('RGBA', image.size, (255, 255, 255, 255))
+        draw = ImageDraw.Draw(roiImage, "RGBA")
 
         # get normalized timestamp data for all image sections
         normalizedList = self.normalizeTimestampData(imageSections)
@@ -408,6 +410,9 @@ class HeatMapUtils():
               outlineColor[2],
               int(100 * normalizedList[index]))
 
+            # ToDo: also calculate filling for right alpha drawing!
+            # make two images and put them together with alpha_composite
+
             draw.rectangle((
                 topLeftX,
                 topLeftY,
@@ -417,7 +422,7 @@ class HeatMapUtils():
                 outline=outlineing,
                 width=lineWidth)
 
-        return image
+        return Image.alpha_composite(baseImage, roiImage)
 
     # extracts a "level" (only resolution) of the whole slide image and converts it to a jpg
     # returns the level on success or None on failure
