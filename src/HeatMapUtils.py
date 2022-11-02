@@ -115,7 +115,7 @@ class HeatMapUtils():
         cellSizeHalf = 50   # make this scalable with heatmap size!
         legendHeight = int(image.size[1] * 0.1) + (2*cellSizeHalf)
 
-        legend = Image.new('RGB', (heatmapWidth, legendHeight), color=(255, 255, 255))
+        legend = Image.new('RGBA', (heatmapWidth, legendHeight), color=(255, 255, 255))
         draw = ImageDraw.Draw(legend, 'RGBA')
 
         # draw one "cell" with color and underneath the "zoom" rating
@@ -139,7 +139,7 @@ class HeatMapUtils():
             draw.text((fontWidthOffset, drawHeight + 70), self.ROI_LABELS[i], font=sizedFont, fill=(0, 0, 0))
 
         totalHeight = image.size[1] + legendHeight
-        heatmapLegend = Image.new('RGB', (heatmapWidth, totalHeight))
+        heatmapLegend = Image.new('RGBA', (heatmapWidth, totalHeight))
         heatmapLegend.paste(image, (0, 0))
         heatmapLegend.paste(legend, (0, (image.size[1] + 1)))
         return heatmapLegend
@@ -154,7 +154,7 @@ class HeatMapUtils():
         heatmapWidth = image.size[0]
         legendHeight = int(image.size[1] * 0.1)
 
-        legend = Image.new('RGB', (heatmapWidth, legendHeight), (255, 255, 255))
+        legend = Image.new('RGBA', (heatmapWidth, legendHeight), (255, 255, 255))
         draw = ImageDraw.Draw(legend, 'RGBA')
         
         # draw 0.0 on left side
@@ -197,7 +197,7 @@ class HeatMapUtils():
 
         # now merge both
         totalHeight = image.size[1] + legendHeight
-        heatmapLegend = Image.new('RGB', (heatmapWidth, totalHeight))
+        heatmapLegend = Image.new('RGBA', (heatmapWidth, totalHeight))
 
         heatmapLegend.paste(image, (0, 0))
         heatmapLegend.paste(legend, (0, (image.size[1] + 1)))

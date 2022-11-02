@@ -8,6 +8,7 @@ draws heatmap of eye tracking on jpeg extraction of whole slide image
 import os
 import sys
 import csv
+import copy
 import argparse
 import multiprocessing as mp
 from multiprocessing import Process
@@ -464,7 +465,11 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
 
         # get some data needed for heatmap utils
         # and convert base image as greyscale for better readabillity
-        baseImageColor = wsiBaseDict[wsiName].copy()
+
+        # ToDo: get deep copy to work!
+        wsiBaseImage = wsiBaseDict[wsiName]
+        baseImageColor = wsiBaseImage.copy()
+        #baseImageColor = copy.deepcopy( wsiBaseDict[wsiName])
         baseImageGreyscale = ImageOps.grayscale(baseImageColor)
         baseImage = Image.new('RGBA', baseImageGreyscale.size, (255, 255, 255))
 
