@@ -26,6 +26,7 @@ class WorkerArgs():
       viewPathColor,
       viewPathPointSize,
       viewPathPointColor,
+      heatmapBackgroundAlpha,
       hatchedFlag=False,
       viewPathFlag=False,
       cellLabelFlag=False,
@@ -42,5 +43,6 @@ class WorkerArgs():
         self._viewPathColor = viewPathColor,
         self._viewPathPointSize = viewPathPointSize
         self._viewPathPointColor = viewPathPointColor
+        self._heatmapBackgroundAlpha = heatmapBackgroundAlpha
         self._cellLabelFlag = cellLabelFlag
         self._roiLabelFlag = roiLabelFlag

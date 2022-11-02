@@ -11,8 +11,8 @@ import csv
 import argparse
 import multiprocessing as mp
 from multiprocessing import Process
+from PIL import Image, ImageOps
 from os.path import exists
-from typing import ClassVar
 from ImageSection import ImageSection
 from GazePoint import GazePoint
 from HeatMapUtils import HeatMapUtils
@@ -318,6 +318,7 @@ def initArgumentParser():
     parser.add_argument("-i", nargs='?', help="[OPTIONAL] Specify path RGB color. Default is (3, 252, 102).")
     parser.add_argument("-u", nargs='?', help="[OPTIONAL] Specify point radius. Default value is 9.")
     parser.add_argument("-o", nargs='?', help="[OPTIONAL] Specify point RGB color. Default is (3, 252, 161).")
+    parser.add_argument("-d", nargs='?', help="[OPTIONAL] Specify heatmap background alpha value.")
     parser.add_argument("-a", action='store_true', help="[OPTIONAL] enable cell labeling to be rendered onto exported image.")
     parser.add_argument("-b", action='store_true', help="[OPTIONAL] enable roi labeling to be rendered onto exported image.")
 
@@ -380,6 +381,7 @@ def getWorkerArgs(arguments):
     viewPathColor = 0
     viewPathPointSize = 0
     viewPathPointColor = 0
+    heatmapBackgroundAlpha = 0
     hatchedFlag = False
     viewPathFlag = False
     cellLabelFlag = False
@@ -415,7 +417,10 @@ def getWorkerArgs(arguments):
         
         if (arguments.o):
             viewPathPointColor = getRGBFromArgs(arguments.o)
-        
+
+    if (arguments.d):
+        heatmapBackgroundAlpha = getINTFromArg(arguments.h)
+
     if (arguments.a):
         cellLabelFlag = True
     
@@ -432,6 +437,7 @@ def getWorkerArgs(arguments):
       viewPathColor,
       viewPathPointSize,
       viewPathPointColor,
+      heatmapBackgroundAlpha,
       hatchedFlag,
       viewPathFlag,
       cellLabelFlag,
@@ -457,7 +463,16 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
             continue
 
         # get some data needed for heatmap utils
-        baseImage = wsiBaseDict[wsiName]
+        # and convert base image as greyscale for better readabillity
+        baseImageColor = wsiBaseDict[wsiName].copy()
+        baseImageGreyscale = ImageOps.grayscale(baseImageColor)
+        baseImage = Image.new('RGBA', baseImageGreyscale.size, (255, 255, 255))
+
+        if (workerArgs._heatmapBackgroundAlpha > 0):
+            baseImage.putalpha(workerArgs._heatmapBackgroundAlpha)
+
+        baseImage.paste(baseImageGreyscale)
+
         wsi = rawWsiDict[wsiName]            
         exportPixelX, exportPixelY = getExportPixel(wsi, workerArgs)
         layer0X, layer0Y = wsi.dimensions
@@ -636,7 +651,7 @@ if __name__ == "__main__":
     for csvName in returnHeatMapsDict:
         for wsiName in returnHeatMapsDict[csvName]:
             wsiFileName = wsiName[: -4]
-            pathologistName = csvName[6 : -4] + ".jpg"
+            pathologistName = csvName[6 : -4] + ".png"
 
             returnHeatMapsDict[csvName][wsiName]['base'].save(EXPORT_DIR + wsiFileName + "_base_" + pathologistName)
             returnHeatMapsDict[csvName][wsiName]['color'].save(EXPORT_DIR + wsiFileName + "_colorHeatMap_" + pathologistName)
