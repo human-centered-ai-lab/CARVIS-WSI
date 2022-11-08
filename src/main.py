@@ -9,6 +9,7 @@ import os
 import sys
 import csv
 import argparse
+from copy import deepcopy
 import multiprocessing as mp
 from multiprocessing import Process
 from PIL import Image, ImageOps
@@ -419,7 +420,7 @@ def getWorkerArgs(arguments):
             viewPathPointColor = getRGBFromArgs(arguments.o)
 
     if (arguments.d):
-        heatmapBackgroundAlpha = getINTFromArg(arguments.h)
+        heatmapBackgroundAlpha = getINTFromArg(arguments.d)
 
     if (arguments.a):
         cellLabelFlag = True
@@ -464,21 +465,24 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
 
         # get some data needed for heatmap utils
         # and convert base image as greyscale for better readabillity
+        
+        # deep copy workaround
+        #baseImageColor = Image.new("RGBA", wsiBaseDict[wsiName].size, color=0)
+        #baseImageColor.paste(wsiBaseDict[wsiName])
 
-        # ToDo: get deep copy to work! -> otherwise the wsiBaseDict gets 
-        # overwritten with the greyscale image
         baseImageColor = wsiBaseDict[wsiName].copy()
+        
         baseImageGreyscale = ImageOps.grayscale(baseImageColor)
-        baseImage = Image.new('RGBA', baseImageGreyscale.size, (255, 255, 255))
+        baseImage = baseImageGreyscale.convert("RGBA")
 
-        if (workerArgs._heatmapBackgroundAlpha > 0):
-            baseImage.putalpha(workerArgs._heatmapBackgroundAlpha)
+        #if (workerArgs._heatmapBackgroundAlpha > 0):
+        #    baseImage.putalpha(workerArgs._heatmapBackgroundAlpha)
 
+        baseImage = Image.new("RGBA", wsiBaseDict[wsiName].size, color=0)
         baseImage.paste(baseImageGreyscale)
 
-        wsi = rawWsiDict[wsiName]            
-        exportPixelX, exportPixelY = getExportPixel(wsi, workerArgs)
-        layer0X, layer0Y = wsi.dimensions
+        exportPixelX, exportPixelY = getExportPixel(rawWsiDict[wsiName], workerArgs)
+        layer0X, layer0Y = rawWsiDict[wsiName].dimensions
 
         heatMapUtils = object
         if (workerArgs._cellSize != 0):
@@ -486,7 +490,8 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
         else:
             heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y)
 
-        csvWsiDict['base'] = baseImage.copy()
+        csvWsiDict['base'] = baseImageColor.copy()
+
         csvWsiDict['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName])
 
         if (workerArgs._roiLabelFlag):
@@ -499,7 +504,10 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
             csvWsiDict['color'] = heatMapUtils.addHeatmapColorLegend(colorHeatMap)
         
         if (workerArgs._hatchedFlag):
-            csvWsiDict['hatching'] = heatMapUtils.getHatchingHeatmap(baseImage, ImageSections[wsiName], workerArgs._hatchingAlpha)
+            csvWsiDict['hatching'] = heatMapUtils.getHatchingHeatmap(
+                baseImage,
+                ImageSections[wsiName],
+                workerArgs._hatchingAlpha)
         
         if (workerArgs._viewPathFlag):
             csvWsiDict['viewpath'] = heatMapUtils.drawViewPath(
@@ -510,6 +518,7 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
                 workerArgs._viewPathPointSize,
                 workerArgs._viewPathPointColor
             )
+
         returnHeatMapsDict[csvFile] = { wsiName: csvWsiDict.copy() }
     print(f'done with cvs {csvFile}')
 
@@ -629,8 +638,6 @@ if __name__ == "__main__":
     # not getting saved
     returnHeatMapsDict = sharedMemoryManager.dict()
     csvWsiDict = sharedMemoryManager.dict()
-
-    wsi = wsiBaseImages.keys()
 
     for csvFile in csvImageSections:
         heatMapProcessList.append(
