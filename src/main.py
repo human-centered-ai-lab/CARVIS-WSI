@@ -467,13 +467,7 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
         # and convert base image as greyscale for better readabillity
         baseImageColor = wsiBaseDict[wsiName].copy()        
         baseImageGreyscale = ImageOps.grayscale(baseImageColor)
-        baseImage = baseImageGreyscale.convert("RGBA")
-
-        #if (workerArgs._heatmapBackgroundAlpha > 0):
-        #    baseImage.putalpha(workerArgs._heatmapBackgroundAlpha)
-
-        baseImage = Image.new("RGBA", wsiBaseDict[wsiName].size, color=0)
-        baseImage.paste(baseImageGreyscale)
+        baseImage = baseImageGreyscale.convert('RGBA')
 
         exportPixelX, exportPixelY = getExportPixel(rawWsiDict[wsiName], workerArgs)
         layer0X, layer0Y = rawWsiDict[wsiName].dimensions
