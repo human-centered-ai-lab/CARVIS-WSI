@@ -465,13 +465,7 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
 
         # get some data needed for heatmap utils
         # and convert base image as greyscale for better readabillity
-        
-        # deep copy workaround
-        #baseImageColor = Image.new("RGBA", wsiBaseDict[wsiName].size, color=0)
-        #baseImageColor.paste(wsiBaseDict[wsiName])
-
-        baseImageColor = wsiBaseDict[wsiName].copy()
-        
+        baseImageColor = wsiBaseDict[wsiName].copy()        
         baseImageGreyscale = ImageOps.grayscale(baseImageColor)
         baseImage = baseImageGreyscale.convert("RGBA")
 
@@ -620,7 +614,7 @@ if __name__ == "__main__":
             workerArgs._cellSize)
 
         wsiProcessList.append(
-            Process(target=heatMapUtils.extractJPG, args=(rawWsiDict[wsiName], wsiBaseImages, wsiName))
+            Process(target=heatMapUtils.extractThumbnail, args=(rawWsiDict[wsiName], wsiBaseImages, wsiName))
         )
         wsiProcessList[-1].start()
 

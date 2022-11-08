@@ -426,7 +426,7 @@ class HeatMapUtils():
 
     # extracts a "level" (only resolution) of the whole slide image and converts it to a jpg
     # returns the level on success or None on failure
-    def extractJPG(self, slide, wsiDict, wsiName):
+    def extractThumbnail(self, slide, wsiDict, wsiName):
         wsiDict[wsiName] = slide.get_thumbnail((self._exportWidth, self._exportHeight))
 
     # turns grid values into cell colors and draws them on given image
