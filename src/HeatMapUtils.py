@@ -123,7 +123,6 @@ class HeatMapUtils():
                 lastPoint = (gazePointX, gazePointY)
         
         viewPath = Image.alpha_composite(image, viewPath)
-        viewPath.show()
         return viewPath
 
     # returns roi legend drawn on bottom of roi image

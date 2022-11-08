@@ -9,7 +9,6 @@ import os
 import sys
 import csv
 import argparse
-from copy import deepcopy
 import multiprocessing as mp
 from multiprocessing import Process
 from PIL import Image, ImageOps
@@ -479,13 +478,16 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
         else:
             heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y)
 
-        csvWsiDict['base'] = baseImageColor.copy()
+        #csvWsiDict['base'] = baseImageColor.copy()
+        returnHeatMapsDict[csvFile][wsiName]['base'] = baseImageColor.copy()
 
-        csvWsiDict['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName])
+        #csvWsiDict['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName])
+        returnHeatMapsDict[csvFile][wsiName]['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName])
 
         if (workerArgs._roiLabelFlag):
             roiHeatMap = csvWsiDict['roi']
-            csvWsiDict['roi'] = heatMapUtils.addRoiColorLegend(roiHeatMap)
+            #csvWsiDict['roi'] = heatMapUtils.addRoiColorLegend(roiHeatMap)
+            returnHeatMapsDict[csvFile][wsiName]['roi'] = heatMapUtils.addRoiColorLegend(returnHeatMapsDict[csvFile][wsiName]['roi'])
 
         csvWsiDict['color'] = heatMapUtils.getHeatmap(baseImage,
           ImageSections[wsiName],
@@ -511,8 +513,12 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
                 workerArgs._viewPathPointColor
             )
 
+        print(f'csv {csvFile} wsi {wsiName}')
+
         # only last one gets saved?
-        returnHeatMapsDict[csvFile] = { wsiName: csvWsiDict.copy() }
+        #returnHeatMapsDict[csvFile] = { wsiName: csvWsiDict.copy() } # only the last one survives!
+        #returnHeatMapsDict[csvFile][wsiName] = csvWsiDict.copy()
+        print(f'nestedDictLen: {len(returnHeatMapsDict[csvFile])}')
     print(f'done with cvs {csvFile}')
 
 if __name__ == "__main__":
@@ -648,10 +654,16 @@ if __name__ == "__main__":
 
     for proc in heatMapProcessList:
         proc.join()
+
+    # create nested structure for returnHeatMapsDict
+    for csvFile in csvFileList:
+        for wsiName in wsiBaseImages:
+            #print(f'csv {csvFile} wsi {wsiName}')
+            returnHeatMapsDict[csvFile][wsiName] = sharedMemoryManager.dict()
     
     # now save collected data
     # wsiName + base/color/hatching/viewpath + PathologistName
-    for csvName in returnHeatMapsDict:
+    '''for csvName in returnHeatMapsDict:
         for wsiName in returnHeatMapsDict[csvName]:
             wsiFileName = wsiName[: -4]
             pathologistName = csvName[6 : -4] + ".png"
@@ -660,11 +672,21 @@ if __name__ == "__main__":
             returnHeatMapsDict[csvName][wsiName]['color'].save(EXPORT_DIR + wsiFileName + "_colorHeatMap_" + pathologistName)
             returnHeatMapsDict[csvName][wsiName]['roi'].save(EXPORT_DIR + wsiFileName + "_roiHeatmap_" + pathologistName)
 
+            print(f'nested el in dict: {len(returnHeatMapsDict)}')
+
             if (workerArgs._hatchedFlag):
                 returnHeatMapsDict[csvName][wsiName]['hatching'].save(EXPORT_DIR + wsiFileName + "_hatchingHeatmap_" + pathologistName)
             
             if (workerArgs._viewPathFlag):
                 returnHeatMapsDict[csvName][wsiName]['viewpath'].save(EXPORT_DIR + wsiFileName + "viewPath_" + pathologistName)
+    '''
+
+    for csvFile in returnHeatMapsDict:
+        for wsiName in returnHeatMapsDict[csvFile]:
+            print(f'csv {csvFile} wsi {wsiName}')
+            pass
+
+
 
     print("done.")
     
