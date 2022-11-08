@@ -67,12 +67,12 @@ If you don't have a special need for this you can leave it like it is and don't 
 |   -l   | (Recommended) specify extraction layer. the extraction resolution will be read from WSI metadata. |
 |   -r   | render resolution for WSI (only needed of no -l is given). |
 |   -t   | specify cell size. default is 50. cells are always square. |
-|   -s   | output hatched heatmap and specify alpha value of pattern. it is recommended to use a bigger cell size (~100) in combination with this option. |
+|   -s   | output hatched heatmap and specify alpha value of pattern. it is recommended to use a bigger cell size (~100) in combination with this option. Alpha has no default value, so specifying is necessary. Best results have been observed at around 230. |
 |   -v   | enables viewpath drawing. the following parameters can be specifyed if -v is used. |
 |   -p   | specify path strength. default value is 2. |
-|   -i   | specify path RGB color. default is (3, 252, 102). |
+|   -i   | specify path RGBA color. default is (3, 252, 102, 230). |
 |   -u   | specify point radius. default value is 9. |
-|   -o   | specify point RGB color. default is (3, 252, 161). |
+|   -o   | specify point RGBA color. default is (3, 252, 161, 230). |
 |   -a   | enable cell labeling to be rendered onto exported image. |
 |   -b   | enable roi labeling to be rendered onto exported image. |
 |   -d   | specify heatmap background apha value in range [0-255]. |

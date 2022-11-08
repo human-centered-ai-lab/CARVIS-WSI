@@ -16,9 +16,9 @@ class HeatMapUtils():
     DISPLAY_X = 1920
     DISPLAY_Y = 1080
     PATH_STRENGTH = 2
-    PATH_COLOR = (3, 252, 102)
+    PATH_COLOR = (3, 252, 102, 255)
     POINT_RADIUS = 9
-    POINT_COLOR = (3, 252, 161)
+    POINT_COLOR = (3, 252, 161, 255)
 
     FONT_FILE = "templates/arial.ttf"
 
@@ -63,11 +63,20 @@ class HeatMapUtils():
 
     # draws view path with data from the eye tracker
     # returns base image with drawn on path
-    def drawViewPath(self, baseImage, imageSections, pathStrength=PATH_STRENGTH,
-      pathColor=PATH_COLOR, pointRadius=POINT_RADIUS, pointColor=POINT_COLOR):
+    def drawViewPath(self,
+      baseImage,
+      imageSections,
+      pathColor=POINT_COLOR,
+      pointRadius=POINT_RADIUS,
+      pathStrength=PATH_STRENGTH,
+      pointColor=POINT_COLOR):
         image = baseImage.copy()
-        imageDraw = ImageDraw.Draw(image)
+        viewPath = Image.new('RGBA', image.size, color=0)
+        imageDraw = ImageDraw.Draw(viewPath, 'RGBA')
         lastPoint = None
+
+        if (pointRadius == (0,)):
+            pointRadius = self.POINT_RADIUS
 
         pointOffset = int(pointRadius / 2)
 
@@ -84,6 +93,12 @@ class HeatMapUtils():
                 # check if mapped point is inside image section frame
                 if (self.outsideImageSectionFrame(imageSection, gazePointX, gazePointY)):
                     continue
+
+                if (pointColor == 0):
+                    pointColor = self.POINT_COLOR
+                
+                if (pathColor == 0):
+                    pathColor = self.PATH_COLOR                
 
                 # draw point
                 imageDraw.ellipse(
@@ -106,8 +121,10 @@ class HeatMapUtils():
                       joint=None)
 
                 lastPoint = (gazePointX, gazePointY)
-
-        return image
+        
+        viewPath = Image.alpha_composite(image, viewPath)
+        viewPath.show()
+        return viewPath
 
     # returns roi legend drawn on bottom of roi image
     def addRoiColorLegend(self, image):
@@ -209,6 +226,7 @@ class HeatMapUtils():
     # returns image with hatched cell tiles
     def getHatchingHeatmap(self, baseImage, imageSections, alpha):
         image = baseImage.copy()
+        hatching = Image.new('RGBA', image.size, color=0)
         
         # see how much time someone has spent looking on one grid cell...
         for imageSection in imageSections:
@@ -265,8 +283,9 @@ class HeatMapUtils():
 
         # draw patterns on grid based on watching time
         # also scale up or down templates based on cell size
-        image = self.drawHatching(image, self._gridTimestamps, gridSampleFactors, alpha)
-        return image
+        heatmap = self.drawHatching(hatching, self._gridTimestamps, gridSampleFactors, alpha)
+        smth = Image.alpha_composite(image, heatmap)
+        return smth
 
     # normalizes timestamp data for one image
     # returns grid of normalized values for timestamp between 0 and 1
@@ -297,7 +316,7 @@ class HeatMapUtils():
         return normalizedList.copy()
 
     # returns image with drawn on hatching
-    def drawHatching(self, image, grid, gridMagnification, alpha):
+    def drawHatching(self, image, grid, gridMagnification, alpha=230):
         hatching = Hatching(alpha)
         hatching.resizePattern(self.CELL_SIZE_X, self.CELL_SIZE_Y)
 
@@ -362,8 +381,8 @@ class HeatMapUtils():
     # returns wsi image with rectangle on it
     def drawRoiOnImage(self, baseImage, imageSections, filling=None, lineWidth=10):
         image = baseImage.copy()
-        roiImage = Image.new('RGBA', image.size, (255, 255, 255, 255))
-        draw = ImageDraw.Draw(roiImage, "RGBA")
+        roi = Image.new('RGBA', image.size, color=0)
+        draw = ImageDraw.Draw(roi, 'RGBA')
 
         # get normalized timestamp data for all image sections
         normalizedList = self.normalizeTimestampData(imageSections)
@@ -422,7 +441,7 @@ class HeatMapUtils():
                 outline=outlineing,
                 width=lineWidth)
 
-        return Image.alpha_composite(baseImage, roiImage)
+        return Image.alpha_composite(image, roi)
 
     # extracts a "level" (only resolution) of the whole slide image and converts it to a jpg
     # returns the level on success or None on failure
@@ -433,7 +452,8 @@ class HeatMapUtils():
     # grid values need to be normalized first!
     # returns drawing on image
     def drawGridValues(self, image, gridValues):
-        draw = ImageDraw.Draw(image, "RGBA")
+        image = Image.new('RGBA', image.size, color=0)
+        draw = ImageDraw.Draw(image, 'RGBA')
         # [width, height] (for all rows make the columns)
         gridColors = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
@@ -460,7 +480,7 @@ class HeatMapUtils():
 
                 if (pixelY > self._exportHeight or pixelYEnd > self._exportHeight):
                     continue
-                
+
                 # or grid size must be recalculated
                 A = gridColors[yCell][xCell][0]
                 R = gridColors[yCell][xCell][1]
@@ -556,7 +576,7 @@ class HeatMapUtils():
     # uses GazePoints, which are mapped to export resolution
     # to draw a map on an image
     # returns colored, mostly transparent, cells rendered onto a .jpg
-    def getHeatmap(self, baseImage, imageSections):
+    def getHeatmap(self, baseImage, imageSections, alphaValue):
         image = baseImage.copy()
         for imageSection in imageSections:
             for gazePoints in imageSection._eyeTracking:
@@ -585,4 +605,8 @@ class HeatMapUtils():
         normalizedGridData = self.normalizeGridData(self._grid)
         
         # draw grid values on image and return
-        return self.drawGridValues(image, normalizedGridData)
+        #alphaBlend = 1.0 - (alphaValue / 255)
+        #print(f'alpha blend: {alphaBlend}')
+        heatmap = self.drawGridValues(image, normalizedGridData)
+        #somth = Image.blend(baseImage, heatmap, alpha=alphaBlend)
+        return Image.alpha_composite(baseImage, heatmap)

@@ -401,6 +401,7 @@ def getWorkerArgs(arguments):
         cellSize = getINTFromArg(arguments.t)
 
     if (arguments.s):
+        print(f'hatching alpha!!')
         hatchedFlag = True
         hatchingAlpha = getINTFromArg(arguments.s)
     
@@ -486,7 +487,10 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
             roiHeatMap = csvWsiDict['roi']
             csvWsiDict['roi'] = heatMapUtils.addRoiColorLegend(roiHeatMap)
 
-        csvWsiDict['color'] = heatMapUtils.getHeatmap(baseImage, ImageSections[wsiName])
+        csvWsiDict['color'] = heatMapUtils.getHeatmap(baseImage,
+          ImageSections[wsiName],
+          workerArgs._heatmapBackgroundAlpha)
+
         if (workerArgs._cellLabelFlag):
             colorHeatMap = csvWsiDict['color']
             csvWsiDict['color'] = heatMapUtils.addHeatmapColorLegend(colorHeatMap)
@@ -507,6 +511,7 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
                 workerArgs._viewPathPointColor
             )
 
+        # only last one gets saved?
         returnHeatMapsDict[csvFile] = { wsiName: csvWsiDict.copy() }
     print(f'done with cvs {csvFile}')
 
