@@ -18,7 +18,6 @@ from GazePoint import GazePoint
 from HeatMapUtils import HeatMapUtils
 from WorkerArgs import WorkerArgs
 from openslide import open_slide
-import concurrent.futures
 
 EXPORT_DIR = "export/"
 ROI_LEGEND_FILE = "ROI_LEGEND.png"
@@ -467,7 +466,7 @@ def saveHeatmaps(heatmapDict, workerArgs):
     for csvName in heatmapDict:
         for wsiName in heatmapDict[csvName]:
             wsiFileName = wsiName[: -4]
-            pathologistName = csvName[6 : -4] + ".jpg"
+            pathologistName = csvName[6 : -4] + ".png"
 
             heatmapDict[csvName][wsiName]['base'].save(EXPORT_DIR + wsiFileName + "_base_" + pathologistName)
             heatmapDict[csvName][wsiName]['color'].save(EXPORT_DIR + wsiFileName + "_colorHeatMap_" + pathologistName)
