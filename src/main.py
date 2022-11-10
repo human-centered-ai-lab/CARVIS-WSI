@@ -497,6 +497,11 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
         baseImageGreyscale = ImageOps.grayscale(baseImageColor)
         baseImage = baseImageGreyscale.convert('RGBA')
 
+        if (workerArgs._heatmapBackgroundAlpha):
+            alpha = baseImage.getchannel('A')
+            newAlpha = alpha.point(lambda x: workerArgs._heatmapBackgroundAlpha if x > 0 else 0)
+            baseImage.putalpha(newAlpha)
+
         exportPixelX, exportPixelY = getExportPixel(rawWsiDict[wsiName], workerArgs)
         layer0X, layer0Y = rawWsiDict[wsiName].dimensions
 
