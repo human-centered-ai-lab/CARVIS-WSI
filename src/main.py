@@ -454,6 +454,12 @@ def getExportPixel(wsi, workerArgs):
     else:
         return workerArgs._exportResolution
 
+# converts png to jpg
+def pngToJpg(png):
+    #retImg = Image.new('RGB', png.size, (255, 255, 255))
+    #retImg.paste(png,png)
+    return png.convert('RGB')
+
 # saves all heatmaps in given dictionary
 def saveHeatmaps(heatmapDict, workerArgs):
     # now save collected data
@@ -461,7 +467,7 @@ def saveHeatmaps(heatmapDict, workerArgs):
     for csvName in heatmapDict:
         for wsiName in heatmapDict[csvName]:
             wsiFileName = wsiName[: -4]
-            pathologistName = csvName[6 : -4] + ".png"
+            pathologistName = csvName[6 : -4] + ".jpg"
 
             heatmapDict[csvName][wsiName]['base'].save(EXPORT_DIR + wsiFileName + "_base_" + pathologistName)
             heatmapDict[csvName][wsiName]['color'].save(EXPORT_DIR + wsiFileName + "_colorHeatMap_" + pathologistName)
