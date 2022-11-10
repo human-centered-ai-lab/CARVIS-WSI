@@ -478,16 +478,16 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
         else:
             heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y)
 
-        #csvWsiDict['base'] = baseImageColor.copy()
-        returnHeatMapsDict[csvFile][wsiName]['base'] = baseImageColor.copy()
+        csvWsiDict['base'] = baseImageColor.copy()
+        #returnHeatMapsDict[csvFile][wsiName]['base'] = baseImageColor.copy()
 
-        #csvWsiDict['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName])
-        returnHeatMapsDict[csvFile][wsiName]['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName])
+        csvWsiDict['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName])
+        #returnHeatMapsDict[csvFile][wsiName]['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName])
 
         if (workerArgs._roiLabelFlag):
             roiHeatMap = csvWsiDict['roi']
-            #csvWsiDict['roi'] = heatMapUtils.addRoiColorLegend(roiHeatMap)
-            returnHeatMapsDict[csvFile][wsiName]['roi'] = heatMapUtils.addRoiColorLegend(returnHeatMapsDict[csvFile][wsiName]['roi'])
+            csvWsiDict['roi'] = heatMapUtils.addRoiColorLegend(roiHeatMap)
+            #returnHeatMapsDict[csvFile][wsiName]['roi'] = heatMapUtils.addRoiColorLegend(returnHeatMapsDict[csvFile][wsiName]['roi'])
 
         csvWsiDict['color'] = heatMapUtils.getHeatmap(baseImage,
           ImageSections[wsiName],
@@ -516,10 +516,11 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs, r
         print(f'csv {csvFile} wsi {wsiName}')
 
         # only last one gets saved?
-        #returnHeatMapsDict[csvFile] = { wsiName: csvWsiDict.copy() } # only the last one survives!
+        returnHeatMapsDict[csvFile] = { wsiName: csvWsiDict.copy() } # only the last one survives!
         #returnHeatMapsDict[csvFile][wsiName] = csvWsiDict.copy()
         print(f'nestedDictLen: {len(returnHeatMapsDict[csvFile])}')
     print(f'done with cvs {csvFile}')
+    print(returnHeatMapsDict)
 
 if __name__ == "__main__":
     initArgumentParser()
@@ -574,7 +575,6 @@ if __name__ == "__main__":
     # this will hold raw wsi from drive and be given to 
     # wsi name will be key for later use
     rawWsiDict = { }
-
     wsiFileList = [ ]
 
     for csvFile in csvFileList:
