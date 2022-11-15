@@ -7,7 +7,6 @@ import math
 from os.path import exists
 from textwrap import fill
 from PIL import Image, ImageDraw, ImageFont
-import PIL
 from Hatching import Hatching
 
 class HeatMapUtils():
@@ -22,18 +21,29 @@ class HeatMapUtils():
 
     FONT_FILE = "templates/arial.ttf"
 
-    DOWNSAMPLE_1 = (204,255,51, 255)
+    MAG_40_SCAN_RES = 100000
+    MAG_20_SCAN_RES = 50000
+    MAG_10_SCAN_RES = 25000
+    MAG_5_SCAN_RES = 12500
+
+    '''DOWNSAMPLE_1 = (204,255,51, 255)
     DOWNSAMPLE_4 = (102,255,51, 255)
     DOWNSAMPLE_10 = (51,255,102, 255)
     DOWNSAMPLE_20 = (51,255,204, 255)
     DOWNSAMPLE_30 = (51,204,255, 255)
     DOWNSAMPLE_40 = (51,102,255, 255)
-    DOWNSAMPLE_X = (102,51,255, 255)
+    DOWNSAMPLE_X = (102,51,255, 255)'''
+    MAGNIFICATION_2_5 = (102,51,255, 255)
+    MAGNIFICATION_5 = (51,204,255, 255)
+    MAGNIFICATION_10 = (51,255,204, 255)
+    MAGNIFICATION_20 = (51,255,102, 255)
+    MAGNIFICATION_30 = (102,255,51, 255)
+    MAGNIFICATION_40 = (204,255,51, 255)
 
-    ROI_COLORS = [DOWNSAMPLE_1, DOWNSAMPLE_4, DOWNSAMPLE_10, DOWNSAMPLE_20, DOWNSAMPLE_30, DOWNSAMPLE_40, DOWNSAMPLE_X]
-    ROI_LABELS = ["< 1", "< 4", "< 10", "< 20", "< 30", "< 40", "> 40"]
+    ROI_COLORS = [MAGNIFICATION_2_5, MAGNIFICATION_5, MAGNIFICATION_10, MAGNIFICATION_20, MAGNIFICATION_30, MAGNIFICATION_40]
+    ROI_LABELS = ["2.5", "5", "10", "20", "30", "40"]
 
-    def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y, cellSize=50):
+    def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y, scanMagnification, cellSize=50):
         self._grid = 0
         self._exportWidth = int(pixelCountX)
         self._exportHeight = int(pixelCountY)
@@ -43,6 +53,7 @@ class HeatMapUtils():
         self._gridHeight = math.ceil(self._exportHeight/self.CELL_SIZE_Y)
         self.CELL_SIZE_X = int(cellSize)
         self.CELL_SIZE_Y = int(cellSize)
+        self.SCAN_MAG = int(scanMagnification)
 
         # get font file
         if (not exists(self.FONT_FILE)):
@@ -60,6 +71,10 @@ class HeatMapUtils():
 
         # crete 2d grid array for mapping timestamp data
         self._gridTimestamps = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+    
+    # returns the magnification form the downsample factor
+    def getMagnification(self, downsampleFactor):
+        return self.SCAN_MAG / downsampleFactor
 
     # draws view path with data from the eye tracker
     # returns base image with drawn on path
@@ -128,8 +143,8 @@ class HeatMapUtils():
     # returns roi legend drawn on bottom of roi image
     def addRoiColorLegend(self, image):
         heatmapWidth = image.size[0]
-        cellNumber = 7
-        cellSizeHalf = 50   # make this scalable with heatmap size!
+        cellNumber = len(self.ROI_LABELS)
+        cellSizeHalf = 50   # ToDo: make this scalable with heatmap size!
         legendHeight = int(image.size[1] * 0.1) + (2*cellSizeHalf)
 
         legend = Image.new('RGBA', (heatmapWidth, legendHeight), color=(255, 255, 255))
@@ -149,7 +164,7 @@ class HeatMapUtils():
               fill=None,
               outline=self.ROI_COLORS[i],
               width=10)
-            
+
             fontWidth, _ = draw.textsize(self.ROI_LABELS[i], sizedFont)
             fontWidthOffset = startX - int(fontWidth / 2)
 
@@ -238,7 +253,7 @@ class HeatMapUtils():
             imageSectionTimestamps = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
             
             # additionally grid to save highest sample factor on grid
-            gridSampleFactors = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+            gridMagnificationFactors = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
             for gazePoint in imageSection._eyeTracking:
                 # if incomplete data -> drop gazepoint
@@ -265,9 +280,9 @@ class HeatMapUtils():
                 # grid must be image section dependent
                 imageSectionTimestamps[yCell][xCell] += 1
 
-                # now save sampleFactor
-                if (imageSection._downsampleFactor > gridSampleFactors[yCell][xCell]):
-                    gridSampleFactors[yCell][xCell] = imageSection._downsampleFactor
+                # now save it as magnification
+                if (imageSection._downsampleFactor > gridMagnificationFactors[yCell][xCell]):
+                    gridMagnificationFactors[yCell][xCell] = self.getMagnification(imageSection._downsampleFactor)
 
             # after all eye data inside a imageSection normalize hitmap grid
             normalizedTimeData = self.normalizeGridData(imageSectionTimestamps)
@@ -282,7 +297,7 @@ class HeatMapUtils():
 
         # draw patterns on grid based on watching time
         # also scale up or down templates based on cell size
-        heatmap = self.drawHatching(hatching, self._gridTimestamps, gridSampleFactors, alpha)
+        heatmap = self.drawHatching(hatching, self._gridTimestamps, gridMagnificationFactors, alpha)
         smth = Image.alpha_composite(image, heatmap)
         return smth
 
@@ -315,7 +330,7 @@ class HeatMapUtils():
         return normalizedList.copy()
 
     # returns image with drawn on hatching
-    def drawHatching(self, image, grid, gridMagnification, alpha=230):
+    def drawHatching(self, image, grid, gridMagnificationFactors, alpha=230):
         hatching = Hatching(alpha)
         hatching.resizePattern(self.CELL_SIZE_X, self.CELL_SIZE_Y)
 
@@ -332,7 +347,7 @@ class HeatMapUtils():
                     continue
                 
                 # drawing part
-                hatchingPattern = hatching.getHatching(grid[yCell][xCell], gridMagnification[yCell][xCell])
+                hatchingPattern = hatching.getHatching(grid[yCell][xCell], gridMagnificationFactors[yCell][xCell])
                 image.paste(hatchingPattern, (cellCenterX, cellCenterY), hatchingPattern)
 
         return image
@@ -397,39 +412,33 @@ class HeatMapUtils():
             bottomRightX = int(imageSection._bottomRightX * scaleFactorX)
             bottomRightY = int(imageSection._bottomRightY * scaleFactorY)
 
-            # check sample factor and draw lines in corresponding colors
-            sampleFactor = imageSection._downsampleFactor
+            # check magnification and draw lines in corresponding colors
+            magnification = self.getMagnification(imageSection._downsampleFactor)
             outlineColor = (0, 0, 0)
 
-            if (sampleFactor < 1):
-                outlineColor = self.DOWNSAMPLE_1
+            if (magnification < 5):
+                outlineColor = self.MAGNIFICATION_2_5
             
-            elif (sampleFactor < 4 and sampleFactor >= 1):
-                outlineColor = self.DOWNSAMPLE_4
+            elif (magnification >= 5 and magnification < 10):
+                outlineColor = self.MAGNIFICATION_5
             
-            elif (sampleFactor < 10 and sampleFactor >= 4):
-                outlineColor = self.DOWNSAMPLE_10
+            elif (magnification >= 10 and magnification < 20):
+                outlineColor = self.MAGNIFICATION_10
             
-            elif (sampleFactor < 20 and sampleFactor >= 10):
-                outlineColor = self.DOWNSAMPLE_20
+            elif (magnification >= 20 and magnification < 30):
+                outlineColor = self.MAGNIFICATION_20
 
-            elif (sampleFactor < 30 and sampleFactor >= 20):
-                outlineColor = self.DOWNSAMPLE_30
+            elif (magnification >= 30 and magnification < 40):
+                outlineColor = self.MAGNIFICATION_30
             
-            elif (sampleFactor < 40 and sampleFactor >= 30):
-                outlineColor = self.DOWNSAMPLE_30
-            
-            elif (sampleFactor > 40):
-                outlineColor = self.DOWNSAMPLE_X
+            elif (magnification > 40 and magnification >= 30):
+                outlineColor = self.MAGNIFICATION_40
 
             outlineing=(
               outlineColor[0],
               outlineColor[1],
               outlineColor[2],
               int(100 * normalizedList[index]))
-
-            # ToDo: also calculate filling for right alpha drawing!
-            # make two images and put them together with alpha_composite
 
             draw.rectangle((
                 topLeftX,

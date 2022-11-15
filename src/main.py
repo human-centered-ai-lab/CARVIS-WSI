@@ -501,6 +501,7 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
         baseImageColor = wsiBaseDict[wsiName].copy()        
         baseImageGreyscale = ImageOps.grayscale(baseImageColor)
         baseImage = baseImageGreyscale.convert('RGBA')
+        scanMagnification = rawWsiDict[wsiName].properties['openslide.objective-power']
 
         if (workerArgs._heatmapBackgroundAlpha):
             alpha = baseImage.getchannel('A')
@@ -512,7 +513,7 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
 
         heatMapUtils = object
         if (workerArgs._cellSize != 0):
-            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, workerArgs._cellSize)
+            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, workerArgs._cellSize, scanMagnification)
         else:
             heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y)
 
