@@ -78,10 +78,10 @@ class HeatMapUtils():
         timeSpent = 0.0
         for imageSection in ImageSections:
             diff = imageSection._timestamps[-1] - imageSection._timestamps[0]
-            timeSpent += float(round(diff, 2))
+            timeSpent += diff
         
         timeSpent = timeSpent / 1000
-        return float("{:.2f}".format(timeSpent))  # round does not behave like expected
+        return int(timeSpent)  # round does not behave like expected
 
     # returns the magnification form the downsample factor
     def getMagnification(self, downsampleFactor):
@@ -189,7 +189,7 @@ class HeatMapUtils():
 
     # returns legend drawing on bottom of heatmap
     def addHeatmapColorLegend(self, image, ImageSections):
-        legendStep = 125
+        legendStep = 75
 
         # draw legend, not high but as wide as image
         # merge both together. heatmap on top, legend on bottom
@@ -213,15 +213,12 @@ class HeatMapUtils():
         # draw time spent on the right side
         # + also the 1.0 mark for convenience
         timeSpent = self.getTimeSpentOnWSI(ImageSections)
-        print(timeSpent)
-        timeText = " 1.0 | time spent: " + str(timeSpent) + " seconds"
-        textWidth = sizedFont.getsize(timeText)[0] + 10
+        timeText = " | total time: " + str(timeSpent) + " seconds"
+        textWidth = sizedFont.getsize(timeText)[0] + 80
         draw.text((heatmapWidth - textWidth, drawLine), timeText, font=sizedFont, fill=(0, 0, 0))
-
-        # draw 1.0 on right side # ToDo: update offset to the left!
-        #textWidth = sizedFont.getsize(self.ROI_LABELS[0])[0]
-        #textCenterOffset = int(textWidth / 2) + 30
-        #draw.text((heatmapWidth - offsetX - textCenterOffset, drawLine), "1.0", font=sizedFont, fill=(0, 0, 0))
+        oneWidth = sizedFont.getsize("1.0")[0]
+        oneOffset = heatmapWidth - textWidth - oneWidth - offsetX - 30
+        draw.text((oneOffset, drawLine), "1.0", font=sizedFont, fill=(0, 0, 0))
 
         # make color gradient from left to right
         # maybe as straight line, with just the alpha value scaled to draw width
@@ -232,7 +229,9 @@ class HeatMapUtils():
         # and calculate color for each pixel in x direction
         lineHeight = int(legendHeight / 2)
         startX = (2 * offsetX) + zeroWidth
-        endX = heatmapWidth - startX - textWidth
+        endX = heatmapWidth - startX - textWidth - oneWidth
+
+        print(f'start: {startX}, end: {endX}')
 
         for pixelX in range(startX, endX + 1, legendStep):
             stepEnd = pixelX + legendStep - 1
