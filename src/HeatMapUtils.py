@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 from Hatching import Hatching
 
 class HeatMapUtils():
+    CAN_MAG = 40
     CELL_SIZE_X = 50
     CELL_SIZE_Y = 50
     DISPLAY_X = 1920
@@ -49,11 +50,13 @@ class HeatMapUtils():
         self._exportHeight = int(pixelCountY)
         self._layer0X = int(layer0X)
         self._layer0Y = int(layer0Y)
-        self._gridWidth = math.ceil(self._exportWidth/self.CELL_SIZE_X)
-        self._gridHeight = math.ceil(self._exportHeight/self.CELL_SIZE_Y)
+        self._gridWidth = math.ceil(self._exportWidth / self.CELL_SIZE_X)
+        self._gridHeight = math.ceil(self._exportHeight / self.CELL_SIZE_Y)
         self.CELL_SIZE_X = int(cellSize)
         self.CELL_SIZE_Y = int(cellSize)
         self.SCAN_MAG = int(scanMagnification)
+
+        self.fixGridSize()
 
         # get font file
         if (not exists(self.FONT_FILE)):
@@ -71,6 +74,15 @@ class HeatMapUtils():
 
         # crete 2d grid array for mapping timestamp data
         self._gridTimestamps = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+
+    # calculates grid size
+    def fixGridSize(self):
+        leftoverX = self._exportWidth - (self._gridWidth * self.CELL_SIZE_X)
+        self._gridWidth += math.ceil(leftoverX / self.CELL_SIZE_X)
+
+        leftoverY = self._exportHeight - (self._gridHeight * self.CELL_SIZE_Y)
+        self._gridHeight += math.ceil(leftoverY / self.CELL_SIZE_Y)
+        pass
 
     # returns the calculated time spent on one wsi file
     # time is in seconds
@@ -230,8 +242,6 @@ class HeatMapUtils():
         lineHeight = int(legendHeight / 2)
         startX = (2 * offsetX) + zeroWidth
         endX = heatmapWidth - startX - textWidth - oneWidth
-
-        print(f'start: {startX}, end: {endX}')
 
         for pixelX in range(startX, endX + 1, legendStep):
             stepEnd = pixelX + legendStep - 1

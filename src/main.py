@@ -515,7 +515,7 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
         if (workerArgs._cellSize != 0):
             heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, workerArgs._cellSize, scanMagnification)
         else:
-            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y)
+            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, scanMagnification)
 
         returnDict[csvFile][wsiName]['base'] = baseImageColor.copy()
 
