@@ -622,6 +622,10 @@ if __name__ == "__main__":
                 continue
             wsiFileList.append(wsiName)
 
+    # not needed anymore so free some ram
+    del csvFileList
+    del csvFileDict
+
     # remove multiples from wsiFilesList
     # then load all the wsi's into rawWsiDict and use wsifileName as key
     wsiFileList = sorted(set(wsiFileList))
@@ -649,9 +653,13 @@ if __name__ == "__main__":
             Process(target=heatMapUtils.extractThumbnail, args=(rawWsiDict[wsiName], wsiBaseImages, wsiName))
         )
         wsiProcessList[-1].start()
+    
+    del wsiFileList
 
     for proc in wsiProcessList:
         proc.join()
+    
+    del wsiProcessList
     
     # now got all base images in wsiBaseImages
     # going further with doing the heatmap work
