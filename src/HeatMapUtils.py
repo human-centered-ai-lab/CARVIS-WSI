@@ -41,7 +41,7 @@ class HeatMapUtils():
     MAGNIFICATION_40 = (204,255,51, 255)
 
     ROI_COLORS = [MAGNIFICATION_2_5, MAGNIFICATION_5, MAGNIFICATION_10, MAGNIFICATION_20, MAGNIFICATION_30, MAGNIFICATION_40]
-    ROI_LABELS = ["2.5", "5", "10", "20", "30", "40"]
+    ROI_LABELS = ["x2.5", "x5", "x10", "x20", "x30", "x40"]
 
     def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y, scanMagnification, cellSize=50):
         self._grid = 0
