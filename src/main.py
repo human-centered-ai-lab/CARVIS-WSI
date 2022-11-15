@@ -529,7 +529,7 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
           workerArgs._heatmapBackgroundAlpha)
 
         if (workerArgs._cellLabelFlag):
-            returnDict[csvFile][wsiName]['color'] = heatMapUtils.addHeatmapColorLegend(returnDict[csvFile][wsiName]['color'])
+            returnDict[csvFile][wsiName]['color'] = heatMapUtils.addHeatmapColorLegend(returnDict[csvFile][wsiName]['color'], ImageSections[wsiName])
         
         if (workerArgs._hatchedFlag):
             returnDict[csvFile][wsiName]['hatching'] = heatMapUtils.getHatchingHeatmap(

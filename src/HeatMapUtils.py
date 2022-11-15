@@ -71,7 +71,18 @@ class HeatMapUtils():
 
         # crete 2d grid array for mapping timestamp data
         self._gridTimestamps = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
-    
+
+    # returns the calculated time spent on one wsi file
+    # time is in seconds
+    def getTimeSpentOnWSI(self, ImageSections):
+        timeSpent = 0.0
+        for imageSection in ImageSections:
+            diff = imageSection._timestamps[-1] - imageSection._timestamps[0]
+            timeSpent += float(round(diff, 2))
+        
+        timeSpent = timeSpent / 1000
+        return float("{:.2f}".format(timeSpent))  # round does not behave like expected
+
     # returns the magnification form the downsample factor
     def getMagnification(self, downsampleFactor):
         return self.SCAN_MAG / downsampleFactor
@@ -177,9 +188,8 @@ class HeatMapUtils():
         return heatmapLegend
 
     # returns legend drawing on bottom of heatmap
-    def addHeatmapColorLegend(self, image):
-        textWidth = 123
-        legendSteps = 50
+    def addHeatmapColorLegend(self, image, ImageSections):
+        legendStep = 125
 
         # draw legend, not high but as wide as image
         # merge both together. heatmap on top, legend on bottom
@@ -190,18 +200,28 @@ class HeatMapUtils():
         draw = ImageDraw.Draw(legend, 'RGBA')
         
         # draw 0.0 on left side
-        # make x offset 5% of width and drawHeight 30% of height
-        offsetX = int(heatmapWidth * 0.05)
+        # make x offset 1% of width and drawHeight 30% of height
+        offsetX = int(heatmapWidth * 0.01) #0.05
         drawHeight = int(legendHeight * 0.5)
         drawLine = int(drawHeight / 2)
 
         # need to load again to change size
         sizedFont = ImageFont.truetype(self.FONT_FILE, size=drawHeight)
         draw.text((offsetX, drawLine), "0.0", font=sizedFont, fill=(0, 0, 0))
+        zeroWidth = sizedFont.getsize("0.0")[0]
 
-        # draw 1.0 on right side
-        textCenterOffset = int(textWidth / 2)
-        draw.text((heatmapWidth - offsetX - textCenterOffset, drawLine), "1.0", font=sizedFont, fill=(0, 0, 0))
+        # draw time spent on the right side
+        # + also the 1.0 mark for convenience
+        timeSpent = self.getTimeSpentOnWSI(ImageSections)
+        print(timeSpent)
+        timeText = " 1.0 | time spent: " + str(timeSpent) + " seconds"
+        textWidth = sizedFont.getsize(timeText)[0] + 10
+        draw.text((heatmapWidth - textWidth, drawLine), timeText, font=sizedFont, fill=(0, 0, 0))
+
+        # draw 1.0 on right side # ToDo: update offset to the left!
+        #textWidth = sizedFont.getsize(self.ROI_LABELS[0])[0]
+        #textCenterOffset = int(textWidth / 2) + 30
+        #draw.text((heatmapWidth - offsetX - textCenterOffset, drawLine), "1.0", font=sizedFont, fill=(0, 0, 0))
 
         # make color gradient from left to right
         # maybe as straight line, with just the alpha value scaled to draw width
@@ -211,11 +231,11 @@ class HeatMapUtils():
         # do this for every x pixel
         # and calculate color for each pixel in x direction
         lineHeight = int(legendHeight / 2)
-        startX = (2 * offsetX) + textWidth
-        endX = heatmapWidth - startX
+        startX = (2 * offsetX) + zeroWidth
+        endX = heatmapWidth - startX - textWidth
 
-        for pixelX in range(startX, endX + 1, legendSteps):
-            stepEnd = pixelX + legendSteps - 1
+        for pixelX in range(startX, endX + 1, legendStep):
+            stepEnd = pixelX + legendStep - 1
 
             # create color gradient
             colorX = (pixelX - startX) / (endX - startX)
