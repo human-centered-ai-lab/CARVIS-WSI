@@ -89,6 +89,9 @@ class HeatMapUtils():
     def getTimeSpentOnWSI(self, ImageSections):
         timeSpent = 0.0
         for imageSection in ImageSections:
+            if (len(imageSection._timestamps) == 0):
+                continue
+
             diff = imageSection._timestamps[-1] - imageSection._timestamps[0]
             timeSpent += diff
         
