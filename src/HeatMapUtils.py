@@ -429,9 +429,13 @@ class HeatMapUtils():
     # parts of this code is from Markus
     # returns wsi image with rectangle on it
     def drawRoiOnImage(self, baseImage, imageSections, filling=None, lineWidth=10):
-        image = baseImage.copy()
-        roi = Image.new('RGBA', image.size, color=0)
-        draw = ImageDraw.Draw(roi, 'RGBA')
+        alphaImage = baseImage.copy()
+        alphaImage.load() # needed for split()
+
+        image = Image.new('RGB', alphaImage.size, (255, 255, 255))
+        image.paste(alphaImage, mask=alphaImage.split()[3]) # 3 is alpha
+
+        draw = ImageDraw.Draw(image, 'RGBA')
 
         # get normalized timestamp data for all image sections
         normalizedList = self.normalizeTimestampData(imageSections)
@@ -484,7 +488,7 @@ class HeatMapUtils():
                 outline=outlineing,
                 width=lineWidth)
 
-        return Image.alpha_composite(image, roi)
+        return image
 
     # extracts a "level" (only resolution) of the whole slide image and converts it to a jpg
     # returns the level on success or None on failure
