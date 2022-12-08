@@ -142,8 +142,7 @@ class HeatMapUtils():
 
         legend = Image.new('RGBA', (heatmapWidth, legendHeight), (255, 255, 255))
         draw = ImageDraw.Draw(legend, 'RGBA')
-        
-        # draw 0.0 on left side
+
         # make x offset 1% of width and drawHeight 30% of height
         offsetX = int(heatmapWidth * 0.01) #0.05
         drawHeight = int(legendHeight * 0.5)
@@ -159,9 +158,6 @@ class HeatMapUtils():
         timeText = "end"
         textWidth = sizedFont.getsize(timeText)[0] + (2 * offsetX)
         draw.text((heatmapWidth - textWidth, drawLine), timeText, font=sizedFont, fill=(0, 0, 0))
-        #oneWidth = sizedFont.getsize("1.0")[0]
-        #oneOffset = heatmapWidth - textWidth - oneWidth - offsetX - 30
-        #draw.text((oneOffset, drawLine), "1.0", font=sizedFont, fill=(0, 0, 0))
 
         # make color gradient from left to right
         # maybe as straight line, with just the alpha value scaled to draw width
@@ -174,11 +170,11 @@ class HeatMapUtils():
         startX = (2 * offsetX) + zeroWidth
         endX = heatmapWidth - startX - int(textWidth / 2)
 
-        # TODO: cleanup
+        # TODO: cleanup and refactor (also in drawViewpathLegend)
         legendStep = 75
         for pixelX in range(startX, endX, legendStep):
             stepEnd = pixelX + legendStep - 1
-            drawnPercentage = pixelX / (endX)
+            drawnPercentage = pixelX / endX
 
             # create color gradient
             R = int(startColor[0] * drawnPercentage + endColor[0] * (1 - drawnPercentage))
@@ -257,10 +253,6 @@ class HeatMapUtils():
                 if (drawnPercentage > 1.0):
                     print(f'drawnPercentage: {drawnPercentage}')
 
-                # R
-                # G
-                # B
-                # A
                 # TODO: fix alpha value passthrough!
                 pathColor = (
                     int(startColor[0] * drawnPercentage + endColor[0] * (1 - drawnPercentage)),
