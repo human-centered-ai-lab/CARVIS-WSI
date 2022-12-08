@@ -478,7 +478,7 @@ def saveHeatmaps(heatmapDict, workerArgs):
                 fileCounter += 1
             
             if (workerArgs._viewPathFlag):
-                heatmapDict[csvName][wsiName]['viewpath'].save(EXPORT_DIR + wsiFileName + "viewPath_" + pathologistName)
+                heatmapDict[csvName][wsiName]['viewpath'].save(EXPORT_DIR + wsiFileName + "_viewPath_" + pathologistName)
                 fileCounter += 1
     print(f'saved {fileCounter} files for {csvFile}.')
 
