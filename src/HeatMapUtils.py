@@ -124,6 +124,79 @@ class HeatMapUtils():
                 counter += 1
         return counter
 
+    # draws legend on bottom of the image to display start and end colors
+    def addViewPathColorLegend(self, image):
+        # create new image which is bigger than original
+        # create image where legend is drawn on
+        # create ether two blocks with color filled or make it a gradient like in color legend
+        #   this can be made by color variables and width of legend image
+        # paste original + legend onto new img
+
+        startColor = (127, 191, 15, 255)
+        endColor = (15, 109, 191, 255)
+
+        # draw legend, not high but as wide as image
+        # merge both together. heatmap on top, legend on bottom
+        heatmapWidth = image.size[0]
+        legendHeight = int(image.size[1] * 0.1)
+
+        legend = Image.new('RGBA', (heatmapWidth, legendHeight), (255, 255, 255))
+        draw = ImageDraw.Draw(legend, 'RGBA')
+        
+        # draw 0.0 on left side
+        # make x offset 1% of width and drawHeight 30% of height
+        offsetX = int(heatmapWidth * 0.01) #0.05
+        drawHeight = int(legendHeight * 0.5)
+        drawLine = int(drawHeight / 2)
+
+        # need to load again to change size
+        sizedFont = ImageFont.truetype(self.FONT_FILE, size=drawHeight)
+        draw.text((offsetX, drawLine), "start", font=sizedFont, fill=(0, 0, 0))
+        zeroWidth = sizedFont.getsize("start")[0]
+
+        # draw time spent on the right side
+        # + also the 1.0 mark for convenience
+        timeText = "end"
+        textWidth = sizedFont.getsize(timeText)[0] + 80
+        draw.text((heatmapWidth - textWidth, drawLine), timeText, font=sizedFont, fill=(0, 0, 0))
+        #oneWidth = sizedFont.getsize("1.0")[0]
+        #oneOffset = heatmapWidth - textWidth - oneWidth - offsetX - 30
+        #draw.text((oneOffset, drawLine), "1.0", font=sizedFont, fill=(0, 0, 0))
+
+        # make color gradient from left to right
+        # maybe as straight line, with just the alpha value scaled to draw width
+        # like done in color heatmap
+        lineWidth = int(legendHeight * 0.7)
+
+        # do this for every x pixel
+        # and calculate color for each pixel in x direction
+        lineHeight = int(legendHeight / 2)
+        startX = (2 * offsetX) + zeroWidth
+        endX = heatmapWidth - startX - textWidth
+
+        # TODO: use same algorithm as in drawViewPath for color
+        legendStep = 75
+        for pixelX in range(startX, endX + 1, legendStep):
+            stepEnd = pixelX + legendStep - 1
+            drawnPercentage = pixelX / (endX + 1)
+            print(f'drawnPercentage: {drawnPercentage}: {pixelX} / {endX + 1}')
+
+            # create color gradient
+            R = int(startColor[0] * drawnPercentage + endColor[0] * (1 - drawnPercentage))
+            G = int(startColor[1] * drawnPercentage + endColor[1] * (1 - drawnPercentage))
+            B = int(startColor[2] * drawnPercentage + endColor[2] * (1 - drawnPercentage))
+            A = 255
+
+            draw.line(((pixelX, lineHeight), (stepEnd, lineHeight)), fill=(R, G, B, A), width=lineWidth)
+
+        # now merge both
+        totalHeight = image.size[1] + legendHeight
+        heatmapLegend = Image.new('RGBA', (heatmapWidth, totalHeight))
+
+        heatmapLegend.paste(image, (0, 0))
+        heatmapLegend.paste(legend, (0, (image.size[1] + 1)))
+        return heatmapLegend
+
     # draws view path with data from the eye tracker
     # returns base image with drawn on path
     def drawViewPath(self,
