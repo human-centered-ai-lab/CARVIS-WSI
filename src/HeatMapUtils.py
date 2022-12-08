@@ -157,7 +157,7 @@ class HeatMapUtils():
         # draw time spent on the right side
         # + also the 1.0 mark for convenience
         timeText = "end"
-        textWidth = sizedFont.getsize(timeText)[0] + 80
+        textWidth = sizedFont.getsize(timeText)[0] + (2 * offsetX)
         draw.text((heatmapWidth - textWidth, drawLine), timeText, font=sizedFont, fill=(0, 0, 0))
         #oneWidth = sizedFont.getsize("1.0")[0]
         #oneOffset = heatmapWidth - textWidth - oneWidth - offsetX - 30
@@ -172,14 +172,13 @@ class HeatMapUtils():
         # and calculate color for each pixel in x direction
         lineHeight = int(legendHeight / 2)
         startX = (2 * offsetX) + zeroWidth
-        endX = heatmapWidth - startX - textWidth
+        endX = heatmapWidth - startX - int(textWidth / 2)
 
-        # TODO: use same algorithm as in drawViewPath for color
+        # TODO: cleanup
         legendStep = 75
-        for pixelX in range(startX, endX + 1, legendStep):
+        for pixelX in range(startX, endX, legendStep):
             stepEnd = pixelX + legendStep - 1
-            drawnPercentage = pixelX / (endX + 1)
-            print(f'drawnPercentage: {drawnPercentage}: {pixelX} / {endX + 1}')
+            drawnPercentage = pixelX / (endX)
 
             # create color gradient
             R = int(startColor[0] * drawnPercentage + endColor[0] * (1 - drawnPercentage))
