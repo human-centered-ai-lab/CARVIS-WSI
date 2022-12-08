@@ -19,6 +19,8 @@ class HeatMapUtils():
     PATH_COLOR = (3, 252, 102, 255)
     POINT_RADIUS = 9
     POINT_COLOR = (3, 252, 161, 255)
+    PATH_START_COLOR = (127, 191, 15, 255)
+    PATH_END_COLOR = (15, 109, 191, 255)
 
     FONT_FILE = "templates/arial.ttf"
 
@@ -132,9 +134,6 @@ class HeatMapUtils():
         #   this can be made by color variables and width of legend image
         # paste original + legend onto new img
 
-        startColor = (127, 191, 15, 255)
-        endColor = (15, 109, 191, 255)
-
         # draw legend, not high but as wide as image
         # merge both together. heatmap on top, legend on bottom
         heatmapWidth = image.size[0]
@@ -177,9 +176,9 @@ class HeatMapUtils():
             drawnPercentage = pixelX / endX
 
             # create color gradient
-            R = int(startColor[0] * drawnPercentage + endColor[0] * (1 - drawnPercentage))
-            G = int(startColor[1] * drawnPercentage + endColor[1] * (1 - drawnPercentage))
-            B = int(startColor[2] * drawnPercentage + endColor[2] * (1 - drawnPercentage))
+            R = int(self.PATH_START_COLOR[0] * drawnPercentage + self.PATH_END_COLOR[0] * (1 - drawnPercentage))
+            G = int(self.PATH_START_COLOR[1] * drawnPercentage + self.PATH_END_COLOR[1] * (1 - drawnPercentage))
+            B = int(self.PATH_START_COLOR[2] * drawnPercentage + self.PATH_END_COLOR[2] * (1 - drawnPercentage))
             A = 255
 
             draw.line(((pixelX, lineHeight), (stepEnd, lineHeight)), fill=(R, G, B, A), width=lineWidth)
@@ -255,9 +254,9 @@ class HeatMapUtils():
 
                 # TODO: fix alpha value passthrough!
                 pathColor = (
-                    int(startColor[0] * drawnPercentage + endColor[0] * (1 - drawnPercentage)),
-                    int(startColor[1] * drawnPercentage + endColor[1] * (1 - drawnPercentage)),
-                    int(startColor[2] * drawnPercentage + endColor[2] * (1 - drawnPercentage)),
+                    int(self.PATH_START_COLOR[0] * drawnPercentage + self.PATH_END_COLOR[0] * (1 - drawnPercentage)),
+                    int(self.PATH_START_COLOR[1] * drawnPercentage + self.PATH_END_COLOR[1] * (1 - drawnPercentage)),
+                    int(self.PATH_START_COLOR[2] * drawnPercentage + self.PATH_END_COLOR[2] * (1 - drawnPercentage)),
                     255
                 )
                 #print(pathColor)
