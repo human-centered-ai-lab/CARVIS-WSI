@@ -652,7 +652,7 @@ if __name__ == "__main__":
     for wsiName in wsiFileList:
         exportRes = rawWsiDict[wsiName].level_dimensions[workerArgs._exportLayer]
 
-        heatMapUtils = HeatMapUtils(returnDict[csvFile][wsiName]['viewpath']
+        heatMapUtils = HeatMapUtils(
             exportRes[0],
             exportRes[1],
             rawWsiDict[wsiName].dimensions[0],
