@@ -128,12 +128,6 @@ class HeatMapUtils():
 
     # draws legend on bottom of the image to display start and end colors
     def addViewPathColorLegend(self, image):
-        # create new image which is bigger than original
-        # create image where legend is drawn on
-        # create ether two blocks with color filled or make it a gradient like in color legend
-        #   this can be made by color variables and width of legend image
-        # paste original + legend onto new img
-
         # draw legend, not high but as wide as image
         # merge both together. heatmap on top, legend on bottom
         heatmapWidth = image.size[0]
@@ -143,7 +137,7 @@ class HeatMapUtils():
         draw = ImageDraw.Draw(legend, 'RGBA')
 
         # make x offset 1% of width and drawHeight 30% of height
-        offsetX = int(heatmapWidth * 0.01) #0.05
+        offsetX = int(heatmapWidth * 0.01)
         drawHeight = int(legendHeight * 0.5)
         drawLine = int(drawHeight / 2)
 
@@ -152,19 +146,15 @@ class HeatMapUtils():
         draw.text((offsetX, drawLine), "start", font=sizedFont, fill=(0, 0, 0))
         zeroWidth = sizedFont.getsize("start")[0]
 
-        # draw time spent on the right side
-        # + also the 1.0 mark for convenience
+        # draw end on the right side
         timeText = "end"
         textWidth = sizedFont.getsize(timeText)[0] + (2 * offsetX)
         draw.text((heatmapWidth - textWidth, drawLine), timeText, font=sizedFont, fill=(0, 0, 0))
 
         # make color gradient from left to right
-        # maybe as straight line, with just the alpha value scaled to draw width
-        # like done in color heatmap
         lineWidth = int(legendHeight * 0.7)
 
-        # do this for every x pixel
-        # and calculate color for each pixel in x direction
+        # do this for x direction
         lineHeight = int(legendHeight / 2)
         startX = (2 * offsetX) + zeroWidth
         endX = heatmapWidth - startX - int(textWidth / 2)
@@ -207,21 +197,7 @@ class HeatMapUtils():
 
         if (pointRadius == (0,)):
             pointRadius = self.POINT_RADIUS
-
         pointOffset = int(pointRadius / 2)
-
-        # color gradient from start to end
-        # define start color and end color
-        # use pathLen and alreadyDrawnDistance for color calculation
-        # start color: 84, 168, 255
-        # end color: 84, 168, 0
-
-        # color formula 2 (zwei ganz verschiedene farben):
-        # für jede farbkomponente, wo p prozentsatz der gezeichneten länge ist:
-        # C = startColor.C * p + endColor.C * (1 - p)
-
-        startColor = (127, 191, 15, 255)
-        endColor = (15, 109, 191, 255)
 
         for imageSection in imageSections:
             # just get point count and interpolate color over points
@@ -259,7 +235,6 @@ class HeatMapUtils():
                     int(self.PATH_START_COLOR[2] * drawnPercentage + self.PATH_END_COLOR[2] * (1 - drawnPercentage)),
                     255
                 )
-                #print(pathColor)
 
                 # draw point
                 imageDraw.ellipse(
@@ -269,13 +244,12 @@ class HeatMapUtils():
                     (gazePointX + pointOffset,
                     gazePointY + pointOffset)
                   ], 
-                  fill=pointColor,
+                  fill=pathColor,
                   outline=None, 
                   width=pointRadius)
 
                 # if it is the first one we can't draw a line yet
                 if (lastPoint is not None):
-                    #print(f'farbe: {pathColor}, drawn {drawnPointsCount} / {pointCount}')
                     imageDraw.line([
                       (lastPoint[0], lastPoint[1]), (gazePointX, gazePointY)],
                       fill=pathColor,
@@ -339,9 +313,8 @@ class HeatMapUtils():
         legend = Image.new('RGBA', (heatmapWidth, legendHeight), (255, 255, 255))
         draw = ImageDraw.Draw(legend, 'RGBA')
         
-        # draw 0.0 on left side
-        # make x offset 1% of width and drawHeight 30% of height
-        offsetX = int(heatmapWidth * 0.01) #0.05
+        # draw start on left side
+        offsetX = int(heatmapWidth * 0.01)
         drawHeight = int(legendHeight * 0.5)
         drawLine = int(drawHeight / 2)
 
@@ -350,8 +323,7 @@ class HeatMapUtils():
         draw.text((offsetX, drawLine), "0.0", font=sizedFont, fill=(0, 0, 0))
         zeroWidth = sizedFont.getsize("0.0")[0]
 
-        # draw time spent on the right side
-        # + also the 1.0 mark for convenience
+        # draw end on the right side
         timeSpent = self.getTimeSpentOnWSI(ImageSections)
         timeText = " | total time: " + str(timeSpent) + " seconds"
         textWidth = sizedFont.getsize(timeText)[0] + 80
@@ -361,12 +333,9 @@ class HeatMapUtils():
         draw.text((oneOffset, drawLine), "1.0", font=sizedFont, fill=(0, 0, 0))
 
         # make color gradient from left to right
-        # maybe as straight line, with just the alpha value scaled to draw width
-        # like done in color heatmap
         lineWidth = int(legendHeight * 0.7)
 
         # do this for every x pixel
-        # and calculate color for each pixel in x direction
         lineHeight = int(legendHeight / 2)
         startX = (2 * offsetX) + zeroWidth
         endX = heatmapWidth - startX - textWidth - oneWidth
