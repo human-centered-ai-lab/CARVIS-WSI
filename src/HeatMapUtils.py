@@ -105,6 +105,25 @@ class HeatMapUtils():
     def getMagnification(self, downsampleFactor):
         return self.SCAN_MAG / downsampleFactor
 
+    # filters out invalid points
+    # returns number of usable points
+    def getValidGazepointCount(self, imageSection):
+        counter = 0
+        for gazePoints in imageSection._eyeTracking:
+            # drop incomplete points
+                if (self.incompleteGazeData(gazePoints)):
+                    continue
+
+                # map eye data to gaze point on output resolution image
+                gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoints)
+
+                # check if mapped point is inside image section frame
+                if (self.outsideImageSectionFrame(imageSection, gazePointX, gazePointY)):
+                    continue
+                
+                counter += 1
+        return counter
+
     # draws view path with data from the eye tracker
     # returns base image with drawn on path
     def drawViewPath(self,
@@ -139,7 +158,7 @@ class HeatMapUtils():
 
         for imageSection in imageSections:
             # just get point count and interpolate color over points
-            pointCount = len(imageSection._eyeTracking)
+            pointCount = self.getValidGazepointCount(imageSection)
             drawnPointsCount = 0
             for gazePoints in imageSection._eyeTracking:
 
@@ -201,6 +220,10 @@ class HeatMapUtils():
                       joint=None)
 
                 lastPoint = (gazePointX, gazePointY)
+
+            if (drawnPointsCount != pointCount):
+                print(f'drawn: {drawnPointsCount} / {pointCount}')
+                print("[ERROR] drawn counter does not reach point counter!")
         
         viewPath = Image.alpha_composite(image, viewPath)
         return viewPath
