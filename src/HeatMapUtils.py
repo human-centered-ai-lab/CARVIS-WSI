@@ -124,7 +124,23 @@ class HeatMapUtils():
 
         pointOffset = int(pointRadius / 2)
 
+        # color gradient from start to end
+        # define start color and end color
+        # use pathLen and alreadyDrawnDistance for color calculation
+        # start color: 84, 168, 255
+        # end color: 84, 168, 0
+
+        # color formula 2 (zwei ganz verschiedene farben):
+        # für jede farbkomponente, wo p prozentsatz der gezeichneten länge ist:
+        # C = startColor.C * p + endColor.C * (1 - p)
+
+        startColor = (127, 191, 15, 255)
+        endColor = (15, 109, 191, 255)
+
         for imageSection in imageSections:
+            # just get point count and interpolate color over points
+            pointCount = len(imageSection._eyeTracking)
+            drawnPointsCount = 0
             for gazePoints in imageSection._eyeTracking:
 
                 # drop incomplete points
@@ -142,7 +158,26 @@ class HeatMapUtils():
                     pointColor = self.POINT_COLOR
                 
                 if (pathColor == 0):
-                    pathColor = self.PATH_COLOR                
+                    pathColor = self.PATH_COLOR             
+
+                # now get color from number of already drawn points...
+                drawnPointsCount += 1
+                drawnPercentage = drawnPointsCount / pointCount
+                if (drawnPercentage > 1.0):
+                    print(f'drawnPercentage: {drawnPercentage}')
+
+                # R
+                # G
+                # B
+                # A
+                # TODO: fix alpha value passthrough!
+                pathColor = (
+                    int(startColor[0] * drawnPercentage + endColor[0] * (1 - drawnPercentage)),
+                    int(startColor[1] * drawnPercentage + endColor[1] * (1 - drawnPercentage)),
+                    int(startColor[2] * drawnPercentage + endColor[2] * (1 - drawnPercentage)),
+                    255
+                )
+                #print(pathColor)
 
                 # draw point
                 imageDraw.ellipse(
@@ -152,12 +187,13 @@ class HeatMapUtils():
                     (gazePointX + pointOffset,
                     gazePointY + pointOffset)
                   ], 
-                  fill=pointColor, 
+                  fill=pointColor,
                   outline=None, 
                   width=pointRadius)
 
-                # if it is the first 
+                # if it is the first one we can't draw a line yet
                 if (lastPoint is not None):
+                    #print(f'farbe: {pathColor}, drawn {drawnPointsCount} / {pointCount}')
                     imageDraw.line([
                       (lastPoint[0], lastPoint[1]), (gazePointX, gazePointY)],
                       fill=pathColor,
