@@ -30,7 +30,8 @@ class WorkerArgs():
       hatchedFlag=False,
       viewPathFlag=False,
       cellLabelFlag=False,
-      roiLabelFlag=False
+      roiLabelFlag=False,
+      viewPathLabelFlag=False
       ):
 
         self._exportLayer = exportLayer
@@ -46,3 +47,4 @@ class WorkerArgs():
         self._heatmapBackgroundAlpha = heatmapBackgroundAlpha
         self._cellLabelFlag = cellLabelFlag
         self._roiLabelFlag = roiLabelFlag
+        self._viewPathLabelFlag = viewPathLabelFlag

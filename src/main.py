@@ -321,6 +321,7 @@ def initArgumentParser():
     parser.add_argument("-d", nargs='?', help="[OPTIONAL] Specify heatmap background alpha value.")
     parser.add_argument("-a", action='store_true', help="[OPTIONAL] enable cell labeling to be rendered onto exported image.")
     parser.add_argument("-b", action='store_true', help="[OPTIONAL] enable roi labeling to be rendered onto exported image.")
+    parser.add_argument("-e", action='store_true', help="[OPTIONAL] enable view path labeling to be rendered onto exported image.")
 
 # gets relsolution from input argument
 # returns [x, y] tuple
@@ -386,6 +387,7 @@ def getWorkerArgs(arguments):
     viewPathFlag = False
     cellLabelFlag = False
     roiLabelFlag = False
+    viewPathLabelFlag = False
 
     if (arguments.l):
         exportLayer = getINTFromArg(arguments.l)
@@ -426,7 +428,9 @@ def getWorkerArgs(arguments):
     
     if (arguments.b):
         roiLabelFlag = True
-    
+
+    if (arguments.e):
+        viewPathLabelFlag = True
 
     workerArgs = WorkerArgs(
       exportLayer,
@@ -441,7 +445,8 @@ def getWorkerArgs(arguments):
       hatchedFlag,
       viewPathFlag,
       cellLabelFlag,
-      roiLabelFlag)
+      roiLabelFlag,
+      viewPathLabelFlag)
 
     return workerArgs
 
@@ -547,6 +552,11 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
                 workerArgs._viewPathPointColor
             )
 
+            if (workerArgs._viewPathLabelFlag):
+                returnDict[csvFile][wsiName]['viewpath'] = heatMapUtils.addViewPathColorLegend(
+                    returnDict[csvFile][wsiName]['viewpath']
+                )
+
     saveHeatmaps(returnDict, workerArgs)
 
 if __name__ == "__main__":
@@ -642,7 +652,7 @@ if __name__ == "__main__":
     for wsiName in wsiFileList:
         exportRes = rawWsiDict[wsiName].level_dimensions[workerArgs._exportLayer]
 
-        heatMapUtils = HeatMapUtils(
+        heatMapUtils = HeatMapUtils(returnDict[csvFile][wsiName]['viewpath']
             exportRes[0],
             exportRes[1],
             rawWsiDict[wsiName].dimensions[0],
