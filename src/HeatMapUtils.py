@@ -223,10 +223,7 @@ class HeatMapUtils():
                     continue
 
                 if (pointColor == 0):
-                    pointColor = self.POINT_COLOR
-                
-                if (pathColor == 0):
-                    pathColor = self.PATH_COLOR             
+                    pointColor = self.POINT_COLOR         
 
                 # count how many points are drawable
                 drawnPointsCount += 1
