@@ -315,7 +315,8 @@ def initArgumentParser():
     parser.add_argument("-s", nargs='?', help="[OPTIONAL] Exports a hatched heatmap. Specify alpha value of hatching [0 - 255]. Default value is 170.")
     parser.add_argument("-v", action='store_true', help="[OPTIONAL] Exports base image with a drawn view path.")
     parser.add_argument("-p", nargs='?', help="[OPTIONAL] Specify path strength. Default value is 2.")
-    parser.add_argument("-i", nargs='?', help="[OPTIONAL] Specify path RGB color. Default is (3, 252, 102).")
+    parser.add_argument("-i", nargs='?', help="[OPTIONAL] Specify start path RGBA color. default is (127, 191, 15, 255).")
+    parser.add_argument("-j", nargs='?', help="[OPTIONAL] Specify end path RGBA color. default is (15, 109, 191, 255).")
     parser.add_argument("-u", nargs='?', help="[OPTIONAL] Specify point radius. Default value is 9.")
     parser.add_argument("-o", nargs='?', help="[OPTIONAL] Specify point RGB color. Default is (3, 252, 161).")
     parser.add_argument("-d", nargs='?', help="[OPTIONAL] Specify heatmap background alpha value.")
@@ -380,7 +381,8 @@ def getWorkerArgs(arguments):
     cellSize = 0
     hatchingAlpha = 0
     viewPathStrength = 0
-    viewPathColor = 0
+    viewPathColorStart = 0
+    viewPathColorEnd = 0
     viewPathPointSize = 0
     viewPathPointColor = 0
     heatmapBackgroundAlpha = 0
@@ -416,7 +418,10 @@ def getWorkerArgs(arguments):
             viewPathStrength = getINTFromArg(arguments.p)
         
         if (arguments.i):
-            viewPathColor = getRGBFromArgs(arguments.i)
+            viewPathColorStart = getRGBFromArgs(arguments.i)
+        
+        if (arguments.j):
+            viewPathColorEnd = getRGBFromArgs(arguments.j)
         
         if (arguments.u):
             viewPathPointSize = getINTFromArg(arguments.u)
@@ -448,7 +453,8 @@ def getWorkerArgs(arguments):
       cellSize,
       hatchingAlpha,
       viewPathStrength,
-      viewPathColor,
+      viewPathColorStart,
+      viewPathColorEnd,
       viewPathPointSize,
       viewPathPointColor,
       heatmapBackgroundAlpha,

@@ -196,7 +196,8 @@ class HeatMapUtils():
         lastPoint = None
 
         pointRadius = workerArgs._viewPathPointSize
-        pathColor = workerArgs._viewPathColor
+        pathColorStart = workerArgs._viewPathColorStart
+        pathColorEnd = workerArgs._viewPathColorEnd
         pathStrength = workerArgs._viewPathStrength
         pointColor = workerArgs._viewPathPointColor
 
@@ -258,9 +259,12 @@ class HeatMapUtils():
                 # check if mapped point is inside image section frame
                 if (self.outsideImageSectionFrame(imageSection, gazePointX, gazePointY)):
                     continue
+
+                if (pathColorStart == (0,)):
+                    pathColorStart = self.PATH_START_COLOR
                 
-                if (pathColor == 0):
-                    pathColor = self.PATH_COLOR
+                if (pathColorEnd == (0,)):
+                    pathColorEnd = self.PATH_END_COLOR
                 
                 if (pathStrength == 0):
                     print(f'ERROR: pathStrenght: {pathStrength}')
@@ -274,9 +278,9 @@ class HeatMapUtils():
 
                 # TODO: alpha value passthrough!
                 pathColor = (
-                   int(self.PATH_START_COLOR[0] * drawnPercentage + self.PATH_END_COLOR[0] * (1 - drawnPercentage)),
-                   int(self.PATH_START_COLOR[1] * drawnPercentage + self.PATH_END_COLOR[1] * (1 - drawnPercentage)),
-                   int(self.PATH_START_COLOR[2] * drawnPercentage + self.PATH_END_COLOR[2] * (1 - drawnPercentage)),
+                   int(pathColorStart[0] * drawnPercentage + pathColorEnd[0] * (1 - drawnPercentage)),
+                   int(pathColorStart[1] * drawnPercentage + pathColorEnd[1] * (1 - drawnPercentage)),
+                   int(pathColorStart[2] * drawnPercentage + pathColorEnd[2] * (1 - drawnPercentage)),
                    255)
 
                 # if it is the first one we can't draw a line yet

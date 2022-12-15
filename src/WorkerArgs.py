@@ -23,7 +23,8 @@ class WorkerArgs():
       cellSize,
       hatchingAlpha,
       viewPathStrength,
-      viewPathColor,
+      viewPathColorStart,
+      viewPathColorEnd,
       viewPathPointSize,
       viewPathPointColor,
       heatmapBackgroundAlpha,
@@ -44,7 +45,8 @@ class WorkerArgs():
         self._hatchedFlag = hatchedFlag
         self._viewPathFlag = viewPathFlag
         self._viewPathStrength = viewPathStrength
-        self._viewPathColor = viewPathColor,
+        self._viewPathColorStart = viewPathColorStart,
+        self._viewPathColorEnd = viewPathColorEnd,
         self._viewPathPointSize = viewPathPointSize
         self._viewPathPointColor = viewPathPointColor
         self._heatmapBackgroundAlpha = heatmapBackgroundAlpha
