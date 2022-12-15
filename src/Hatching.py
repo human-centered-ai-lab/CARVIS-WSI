@@ -2,7 +2,7 @@
 
 ''' dataframe for hatching patterns '''
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 
 class Hatching():
     def __init__(self, alpha=170):
