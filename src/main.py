@@ -549,9 +549,9 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
         if (workerArgs._roiLabelFlag):
             returnDict[csvFile][wsiName]['roi'] = heatMapUtils.addRoiColorLegend(returnDict[csvFile][wsiName]['roi'])
 
-        returnDict[csvFile][wsiName]['color'] = heatMapUtils.getHeatmap(baseImage,
-          ImageSections[wsiName],
-          workerArgs._heatmapBackgroundAlpha)
+        returnDict[csvFile][wsiName]['color'] = heatMapUtils.getHeatmap(
+          baseImage,
+          ImageSections[wsiName])
 
         if (workerArgs._cellLabelFlag):
             returnDict[csvFile][wsiName]['color'] = heatMapUtils.addHeatmapColorLegend(returnDict[csvFile][wsiName]['color'], ImageSections[wsiName])
@@ -612,7 +612,7 @@ if __name__ == "__main__":
     workerArgs = getWorkerArgs(arguments)
 
     # now sorting all data to be used in a seperate process
-    # the idea is to sort the data by csv file. so a worker can get its csv file name
+    # the idea is to sort the data by csv file (or participant). so a worker can get its csv file name
     # and gets shared memory to the csvImageSectionDict and wsiBaseImageDict and can
     # use the csvfileName as base for the work like:
     # wsiBaseImage  = wsiBaseImageDict[csvImageSectionDict[fileName]._fileName]

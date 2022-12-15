@@ -727,7 +727,7 @@ class HeatMapUtils():
     # uses GazePoints, which are mapped to export resolution
     # to draw a map on an image
     # returns colored, mostly transparent, cells rendered onto a .jpg
-    def getHeatmap(self, baseImage, imageSections, alphaValue):
+    def getHeatmap(self, baseImage, imageSections):
         image = baseImage.copy()
         for imageSection in imageSections:
             for gazePoints in imageSection._eyeTracking:
@@ -756,8 +756,5 @@ class HeatMapUtils():
         normalizedGridData = self.normalizeGridData(self._grid)
         
         # draw grid values on image and return
-        #alphaBlend = 1.0 - (alphaValue / 255)
-        #print(f'alpha blend: {alphaBlend}')
         heatmap = self.drawGridValues(image, normalizedGridData)
-        #somth = Image.blend(baseImage, heatmap, alpha=alphaBlend)
         return Image.alpha_composite(baseImage, heatmap)
