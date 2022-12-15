@@ -471,11 +471,11 @@ def getExportPixel(wsi, workerArgs):
     else:
         return workerArgs._exportResolution
 
-# converts png to jpg
-def pngToJpg(png):
-    #retImg = Image.new('RGB', png.size, (255, 255, 255))
-    #retImg.paste(png,png)
-    return png.convert('RGB')
+# converts a RGBA mode image into an RGB mode image
+def convertToJpg(image):
+    newImage = Image.new('RGB', size=image.size)
+    newImage.paste(image)
+    return newImage.copy()
 
 # saves all heatmaps in given dictionary
 def saveHeatmaps(heatmapDict, workerArgs):
@@ -484,19 +484,26 @@ def saveHeatmaps(heatmapDict, workerArgs):
     for csvName in heatmapDict:
         for wsiName in heatmapDict[csvName]:
             wsiFileName = wsiName[: -4]
-            pathologistName = csvName[6 : -4] + ".png"
+            pathologistName = csvName[6 : -4] + ".jpg"
 
-            heatmapDict[csvName][wsiName]['base'].save(EXPORT_DIR + wsiFileName + "_base_" + pathologistName)
-            heatmapDict[csvName][wsiName]['color'].save(EXPORT_DIR + wsiFileName + "_colorHeatMap_" + pathologistName)
-            heatmapDict[csvName][wsiName]['roi'].save(EXPORT_DIR + wsiFileName + "_roiHeatmap_" + pathologistName)
+            # first convert to rgb mode to be savable as jpg
+            baseImage = convertToJpg(heatmapDict[csvName][wsiName]['base'])
+            colorImage = convertToJpg(heatmapDict[csvName][wsiName]['color'])
+            roiImage = convertToJpg(heatmapDict[csvName][wsiName]['roi'])
+
+            baseImage.save(EXPORT_DIR + wsiFileName + "_base_" + pathologistName)
+            colorImage.save(EXPORT_DIR + wsiFileName + "_colorHeatMap_" + pathologistName)
+            roiImage.save(EXPORT_DIR + wsiFileName + "_roiHeatmap_" + pathologistName)
             fileCounter += 3
 
             if (workerArgs._hatchedFlag):
-                heatmapDict[csvName][wsiName]['hatching'].save(EXPORT_DIR + wsiFileName + "_hatchingHeatmap_" + pathologistName)
+                hatchingImage = convertToJpg(heatmapDict[csvName][wsiName]['hatching'])
+                hatchingImage.save(EXPORT_DIR + wsiFileName + "_hatchingHeatmap_" + pathologistName)
                 fileCounter += 1
             
             if (workerArgs._viewPathFlag):
-                heatmapDict[csvName][wsiName]['viewpath'].save(EXPORT_DIR + wsiFileName + "_viewPath_" + pathologistName)
+                viewPathImage = convertToJpg(heatmapDict[csvName][wsiName]['viewpath'])
+                viewPathImage.save(EXPORT_DIR + wsiFileName + "_viewPath_" + pathologistName)
                 fileCounter += 1
     print(f'saved {fileCounter} files for {csvFile}.')
 
