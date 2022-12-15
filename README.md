@@ -77,7 +77,7 @@ If you don't have a special need for this you can leave it like it is and don't 
 |   -b   | enable roi labeling to be rendered onto exported image. |
 |   -d   | specify heatmap background apha value in range [0-255]. |
 |   -e   | enable viewPath color legend to visualise start and end colors. |
-|   -f   | Specify use and threshold values for canny edge detection. Default is (100, 400) |
+|   -f   | Specify use and threshold values for canny edge detection. Default is (100, 400). |
 
 ### Minmal native working example
 To get heatmap data rendered on all wsi files used in one specific iMotions meeting and export all JPG's with their layer 3 resolution, use following line.
