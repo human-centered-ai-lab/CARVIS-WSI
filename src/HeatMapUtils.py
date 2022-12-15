@@ -269,7 +269,8 @@ class HeatMapUtils():
     def addRoiColorLegend(self, image):
         heatmapWidth = image.size[0]
         cellNumber = len(self.ROI_LABELS)
-        cellSizeHalf = 50   # ToDo: make this scalable with heatmap size!
+        #cellSizeHalf = 50   # ToDo: make this scalable with heatmap size!
+        cellSizeHalf = int(self.CELL_SIZE_X / 2)
         legendHeight = int(image.size[1] * 0.1) + (2*cellSizeHalf)
 
         legend = Image.new('RGBA', (heatmapWidth, legendHeight), color=(255, 255, 255))
