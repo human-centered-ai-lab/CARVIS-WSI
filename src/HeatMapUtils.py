@@ -189,17 +189,16 @@ class HeatMapUtils():
 
     # draws view path with data from the eye tracker
     # returns base image with drawn on path
-    def drawViewPath(self,
-      baseImage,
-      imageSections,
-      pathColor=POINT_COLOR,
-      pointRadius=POINT_RADIUS,
-      pathStrength=PATH_STRENGTH,
-      pointColor=POINT_COLOR):
+    def drawViewPath(self, baseImage, imageSections, workerArgs):
         image = baseImage.copy()
         viewPath = Image.new('RGBA', image.size, color=0)
         imageDraw = ImageDraw.Draw(viewPath, 'RGBA')
         lastPoint = None
+
+        pointRadius = workerArgs._viewPathPointSize
+        pathColor = workerArgs._viewPathColor
+        pathStrength = workerArgs._viewPathStrength
+        pointColor = workerArgs._viewPathPointColor
 
         if (pointRadius == (0,)):
             pointRadius = self.POINT_RADIUS
@@ -236,7 +235,7 @@ class HeatMapUtils():
                     (gazePointX + pointOffset,
                     gazePointY + pointOffset)
                   ], 
-                  fill=pathColor,
+                  fill=pointColor,
                   outline=None, 
                   width=pointRadius)
 
@@ -262,6 +261,10 @@ class HeatMapUtils():
                 
                 if (pathColor == 0):
                     pathColor = self.PATH_COLOR
+                
+                if (pathStrength == 0):
+                    print(f'ERROR: pathStrenght: {pathStrength}')
+                    pathStrength = self.PATH_STRENGTH
 
                 colorGradientCounter += 1
 

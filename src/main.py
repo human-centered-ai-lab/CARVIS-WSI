@@ -568,15 +568,12 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
                 baseImage,
                 ImageSections[wsiName],
                 workerArgs._hatchingAlpha)
-        
+
         if (workerArgs._viewPathFlag):
             returnDict[csvFile][wsiName]['viewpath'] = heatMapUtils.drawViewPath(
                 baseImage,
                 ImageSections[wsiName],
-                workerArgs._viewPathStrength,
-                workerArgs._viewPathColor,
-                workerArgs._viewPathPointSize,
-                workerArgs._viewPathPointColor
+                workerArgs
             )
 
             if (workerArgs._viewPathLabelFlag):
@@ -620,13 +617,11 @@ if __name__ == "__main__":
 
     # now sorting all data to be used in a seperate process
     # the idea is to sort the data by csv file (or participant). so a worker can get its csv file name
-    # and gets shared memory to the csvImageSectionDict and wsiBaseImageDict and can
-    # use the csvfileName as base for the work like:
-    # wsiBaseImage  = wsiBaseImageDict[csvImageSectionDict[fileName]._fileName]
+    # and gets shared memory to the csvImageSectionDict and wsiBaseImageDict
 
     # first thing to do is to export thumbnails of all wsi files which are mentioned inside
-    # the given csv file(s). do this in seperate processes.
-    # so first get the csv file(s)!
+    # the given csv file(s). do this in seperate processes so it should be faster.
+    # but first get the csv file(s)!
 
     # to get return values use shared memory
     sharedMemoryManager = mp.Manager()
