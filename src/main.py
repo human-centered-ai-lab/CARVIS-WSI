@@ -322,15 +322,16 @@ def initArgumentParser():
     parser.add_argument("-a", action='store_true', help="[OPTIONAL] enable cell labeling to be rendered onto exported image.")
     parser.add_argument("-b", action='store_true', help="[OPTIONAL] enable roi labeling to be rendered onto exported image.")
     parser.add_argument("-e", action='store_true', help="[OPTIONAL] enable view path labeling to be rendered onto exported image.")
+    parser.add_argument("-f", nargs='?', help="[OPTIONAL] Specify use and threshold values for canny edge detection. Default is (100, 400).")
 
 # gets relsolution from input argument
 # returns [x, y] tuple
-def getResolutionFromArgs(arguments):
+def getIntTupleFromArgs(argument):
     # get resolution from string
-    comma = arguments.r.find(",")
-    x = int(arguments.r[: comma])
+    comma = argument.find(",")
+    x = int(argument[: comma])
     comma += 1
-    y = int(arguments.r[comma :])
+    y = int(argument[comma :])
 
     return (x, y)
 
@@ -383,17 +384,20 @@ def getWorkerArgs(arguments):
     viewPathPointSize = 0
     viewPathPointColor = 0
     heatmapBackgroundAlpha = 0
+    cannythreashold1 = 0
+    cannythreashold2 = 0
     hatchedFlag = False
     viewPathFlag = False
     cellLabelFlag = False
     roiLabelFlag = False
     viewPathLabelFlag = False
+    edgeDetectionFlag = False
 
     if (arguments.l):
         exportLayer = getINTFromArg(arguments.l)
 
     if (arguments.r):
-        exportResolution = getResolutionFromArgs(arguments)
+        exportResolution = getIntTupleFromArgs(arguments.r)
 
     if (arguments.p):
         viewPathStrength = getINTFromArg(arguments.p)
@@ -432,6 +436,12 @@ def getWorkerArgs(arguments):
     if (arguments.e):
         viewPathLabelFlag = True
 
+    if (arguments.f):
+        edgeDetectionFlag = True
+        threshold = getIntTupleFromArgs(arguments.f)
+        cannythreashold1 = threshold[0]
+        cannythreashold2 = threshold[1]
+
     workerArgs = WorkerArgs(
       exportLayer,
       exportResolution,
@@ -442,11 +452,14 @@ def getWorkerArgs(arguments):
       viewPathPointSize,
       viewPathPointColor,
       heatmapBackgroundAlpha,
+      cannythreashold1,
+      cannythreashold2,
       hatchedFlag,
       viewPathFlag,
       cellLabelFlag,
       roiLabelFlag,
-      viewPathLabelFlag)
+      viewPathLabelFlag,
+      edgeDetectionFlag)
 
     return workerArgs
 
@@ -503,15 +516,11 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
 
         # get some data needed for heatmap utils
         # and convert base image as greyscale for better readabillity
-        baseImageColor = wsiBaseDict[wsiName].copy()        
+        baseImageColor = wsiBaseDict[wsiName].copy()
         baseImageGreyscale = ImageOps.grayscale(baseImageColor)
+
         baseImage = baseImageGreyscale.convert('RGBA')
         scanMagnification = rawWsiDict[wsiName].properties['openslide.objective-power']
-
-        if (workerArgs._heatmapBackgroundAlpha):
-            alpha = baseImage.getchannel('A')
-            newAlpha = alpha.point(lambda x: workerArgs._heatmapBackgroundAlpha if x > 0 else 0)
-            baseImage.putalpha(newAlpha)
 
         exportPixelX, exportPixelY = getExportPixel(rawWsiDict[wsiName], workerArgs)
         layer0X, layer0Y = rawWsiDict[wsiName].dimensions
@@ -521,6 +530,17 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
             heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, workerArgs._cellSize, scanMagnification)
         else:
             heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, scanMagnification)
+
+        if (workerArgs._edgeDetectionFlag):
+            baseImage = heatMapUtils.getCannyImage(
+                baseImageColor,
+                workerArgs._cannyThreashold1,
+                workerArgs._cannyThreashold2)
+
+        if (workerArgs._heatmapBackgroundAlpha):
+            alpha = baseImage.getchannel('A')
+            newAlpha = alpha.point(lambda x: workerArgs._heatmapBackgroundAlpha if x > 0 else 0)
+            baseImage.putalpha(newAlpha)
 
         returnDict[csvFile][wsiName]['base'] = baseImageColor.copy()
 

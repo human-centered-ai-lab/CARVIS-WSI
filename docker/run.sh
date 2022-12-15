@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts 'c:l:r:t:s:vp:i:u:o:h:ab' flag;
+while getopts 'c:l:r:t:s:vp:i:u:o:d:f:abe' flag;
 do
     case "${flag}" in
         c) CSV_FILE=${OPTARG};;
@@ -15,7 +15,9 @@ do
         o) POINT_COLOR=${OPTARG};;
         a) CELL_HEATMAP_LABEL=true;;
         b) ROI_HEATMAP_LABEL=true;;
-        h) HEATMAP_BACKGROUND_ALPHA=${OPTARG};;
+        d) HEATMAP_BACKGROUND_ALPHA=${OPTARG};;
+        e) VIEWPATH_COLOR_LEGEND=${OPTARG};;
+        f) CANNY_EDGE_DETECTION=${OPTARG};;
     esac
 done
 
@@ -35,16 +37,16 @@ if [ ! -z $EXPORT_RESOLUTION ]; then
     PARAMETERS+=" -r $EXPORT_RESOLUTION"
 fi
 
+if [ ! -z $VIEW_PATH ]; then
+    PARAMETERS+=" -v"
+fi
+
 if [ ! -z $CELL_SIZE ]; then
     PARAMETERS+=" -t $CELL_SIZE"
 fi
 
 if [ ! -z $HATCHED ]; then
     PARAMETERS+=" -s $HATCHED"
-fi
-
-if [ ! -z $VIEW_PATH ]; then
-    PARAMETERS+=" -v"
 fi
 
 if [ ! -z $PATH_STRENGTH ]; then
@@ -72,7 +74,15 @@ if [ ! -z $ROI_HEATMAP_LABEL ]; then
 fi
 
 if [ ! -z $HEATMAP_BACKGROUND_ALPHA ]; then
-    PARAMETERS+=" -o $HEATMAP_BACKGROUND_ALPHA"
+    PARAMETERS+=" -d $HEATMAP_BACKGROUND_ALPHA"
+fi
+
+if [ ! -z $VIEWPATH_COLOR_LEGEND ]; then
+    PARAMETERS+=" -e"
+fi
+
+if [ ! -z $CANNY_EDGE_DETECTION ]; then
+    PARAMETERS+=" -f $CANNY_EDGE_DETECTION"
 fi
 
 eval $PARAMETERS

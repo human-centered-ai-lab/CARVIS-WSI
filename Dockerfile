@@ -21,10 +21,10 @@ LABEL maintainer="stefan.baumann@medunigraz.at"
 ENV PIP_ROOT_USER_ACTION=ignore
 
 RUN apt-get update && apt-get install -y \
-    openslide-tools gcc \
+    openslide-tools gcc python3-opencv \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir --upgrade pip && python3 -m pip install --no-cache-dir openslide-python pillow pyvips
+RUN pip install --no-cache-dir --upgrade pip && python3 -m pip install --no-cache-dir openslide-python pillow pyvips opencv-python numpy
 
 # get pixman from build container
 COPY --from=pixman-builder /usr/include/pixman-1/ /usr/include/pixman-1/

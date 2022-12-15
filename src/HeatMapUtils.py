@@ -4,6 +4,8 @@
 
 import sys
 import math
+import cv2 as cv
+import numpy as np
 from os.path import exists
 from textwrap import fill
 from PIL import Image, ImageDraw, ImageFont
@@ -74,6 +76,17 @@ class HeatMapUtils():
 
         # crete 2d grid array for mapping timestamp data
         self._gridTimestamps = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+
+    # runs the canny edge detection over the given image 
+    # returns the result
+    def getCannyImage(self, image, param1=100, param2=400):
+        cannyImage = cv.cvtColor(np.array(image), cv.COLOR_BGR2GRAY)
+        cannyImage = cv.Canny(cannyImage, threshold1=param1, threshold2=param2)
+        cannyImage = Image.fromarray(cannyImage)
+
+        newImage = Image.new('RGBA', (image.size[0], image.size[1]), color=(255, 255, 255, 255))
+        newImage.paste(cannyImage)
+        return newImage.copy()
 
     # calculates grid size
     def calculateGridSize(self):
@@ -269,7 +282,6 @@ class HeatMapUtils():
     def addRoiColorLegend(self, image):
         heatmapWidth = image.size[0]
         cellNumber = len(self.ROI_LABELS)
-        #cellSizeHalf = 50   # ToDo: make this scalable with heatmap size!
         cellSizeHalf = int(self.CELL_SIZE_X / 2)
         legendHeight = int(image.size[1] * 0.1) + (2*cellSizeHalf)
 

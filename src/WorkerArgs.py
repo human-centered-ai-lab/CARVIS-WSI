@@ -27,11 +27,14 @@ class WorkerArgs():
       viewPathPointSize,
       viewPathPointColor,
       heatmapBackgroundAlpha,
+      cannyThreashold1,
+      cannyThreashold2,
       hatchedFlag=False,
       viewPathFlag=False,
       cellLabelFlag=False,
       roiLabelFlag=False,
-      viewPathLabelFlag=False
+      viewPathLabelFlag=False,
+      edgeDetectionFlag=False
       ):
 
         self._exportLayer = exportLayer
@@ -45,6 +48,9 @@ class WorkerArgs():
         self._viewPathPointSize = viewPathPointSize
         self._viewPathPointColor = viewPathPointColor
         self._heatmapBackgroundAlpha = heatmapBackgroundAlpha
+        self._cannyThreashold1 = cannyThreashold1
+        self._cannyThreashold2 = cannyThreashold2
         self._cellLabelFlag = cellLabelFlag
         self._roiLabelFlag = roiLabelFlag
         self._viewPathLabelFlag = viewPathLabelFlag
+        self._edgeDetectionFlag = edgeDetectionFlag
