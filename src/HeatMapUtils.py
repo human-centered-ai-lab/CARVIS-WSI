@@ -208,7 +208,6 @@ class HeatMapUtils():
         drawnPoints = 0
         for imageSection in imageSections:
             # just get point count and interpolate color over points
-            pointCount = self.getValidGazepointCount(imageSection)
             drawnPointsCount = 0
             for gazePoints in imageSection._eyeTracking:
 
@@ -229,19 +228,8 @@ class HeatMapUtils():
                 if (pathColor == 0):
                     pathColor = self.PATH_COLOR             
 
-                # now get color from number of already drawn points...
+                # count how many points are drawable
                 drawnPointsCount += 1
-                #drawnPercentage = drawnPointsCount / pointCount
-                #if (drawnPercentage > 1.0):
-                #    print(f'drawnPercentage: {drawnPercentage}')
-
-                # TODO: fix alpha value passthrough!
-                #pathColor = (
-                #    int(self.PATH_START_COLOR[0] * drawnPercentage + self.PATH_END_COLOR[0] * (1 - drawnPercentage)),
-                #    int(self.PATH_START_COLOR[1] * drawnPercentage + self.PATH_END_COLOR[1] * (1 - drawnPercentage)),
-                #    int(self.PATH_START_COLOR[2] * drawnPercentage + self.PATH_END_COLOR[2] * (1 - drawnPercentage)),
-                #    255
-                #)
 
                 # draw point
                 imageDraw.ellipse(
@@ -255,26 +243,12 @@ class HeatMapUtils():
                   outline=None, 
                   width=pointRadius)
 
-                # if it is the first one we can't draw a line yet
-                #if (lastPoint is not None):
-                #    imageDraw.line([
-                #      (lastPoint[0], lastPoint[1]), (gazePointX, gazePointY)],
-                #      fill=pathColor,
-                #      width=pathStrength,
-                #      joint=None)
-
-                #lastPoint = (gazePointX, gazePointY)
             drawnPoints += drawnPointsCount
-
-            #if (drawnPointsCount != pointCount):
-            #    print(f'drawn: {drawnPointsCount} / {pointCount}')
-            #    print("[ERROR] drawn counter does not reach point counter!")
 
         # now draw lines with clor gradient
         # need to draw start to end over all image sections
         # so calculate number of image sections and get number of points per image section to claculate percentage
         # this is no tperfectly efficcient to iterate and check all points twice...
-        print(f'drawn points count: {drawnPoints}')
         colorGradientCounter = 0
         for imageSection in imageSections:
             for gazePoints in imageSection._eyeTracking:
@@ -298,13 +272,14 @@ class HeatMapUtils():
                 if (drawnPercentage > 1.0):
                    print(f'drawnPercentage: {drawnPercentage}')
 
+                # TODO: alpha value passthrough!
                 pathColor = (
                    int(self.PATH_START_COLOR[0] * drawnPercentage + self.PATH_END_COLOR[0] * (1 - drawnPercentage)),
                    int(self.PATH_START_COLOR[1] * drawnPercentage + self.PATH_END_COLOR[1] * (1 - drawnPercentage)),
                    int(self.PATH_START_COLOR[2] * drawnPercentage + self.PATH_END_COLOR[2] * (1 - drawnPercentage)),
                    255)
 
-                #if it is the first one we can't draw a line yet
+                # if it is the first one we can't draw a line yet
                 if (lastPoint is not None):
                    imageDraw.line([
                      (lastPoint[0], lastPoint[1]), (gazePointX, gazePointY)],
