@@ -10,6 +10,7 @@ from os.path import exists
 from textwrap import fill
 from PIL import Image, ImageDraw, ImageFont
 from Hatching import Hatching
+from HatchingGridCell import HatchingGridCell as HGC
 
 class HeatMapUtils():
     CAN_MAG = 40
@@ -18,7 +19,6 @@ class HeatMapUtils():
     DISPLAY_X = 1920
     DISPLAY_Y = 1080
     PATH_STRENGTH = 2
-    PATH_COLOR = (3, 252, 102, 255)
     POINT_RADIUS = 9
     POINT_COLOR = (3, 252, 161, 255)
     PATH_START_COLOR = (127, 191, 15, 255)
@@ -30,6 +30,9 @@ class HeatMapUtils():
     MAG_20_SCAN_RES = 50000
     MAG_10_SCAN_RES = 25000
     MAG_5_SCAN_RES = 12500
+
+    CANNY_PARAM1 = 100
+    CANNY_PARAM2 = 400
 
     MAGNIFICATION_2_5 = (102,51,255, 255)
     MAGNIFICATION_5 = (51,204,255, 255)
@@ -72,7 +75,7 @@ class HeatMapUtils():
 
     # runs the canny edge detection over the given image 
     # returns the result
-    def getCannyImage(self, image, param1=100, param2=400):
+    def getCannyImage(self, image, param1, param2):
         cannyImage = cv.cvtColor(np.array(image), cv.COLOR_BGR2GRAY)
         cannyImage = cv.Canny(cannyImage, threshold1=param1, threshold2=param2)
         cannyImage = Image.fromarray(cannyImage)
@@ -267,7 +270,6 @@ class HeatMapUtils():
                     pathColorEnd = self.PATH_END_COLOR
                 
                 if (pathStrength == 0):
-                    print(f'ERROR: pathStrenght: {pathStrength}')
                     pathStrength = self.PATH_STRENGTH
 
                 colorGradientCounter += 1
@@ -381,7 +383,6 @@ class HeatMapUtils():
             B = 205
             G = 244
             R = 50
-
             draw.line(((pixelX, lineHeight), (stepEnd, lineHeight)), fill=(R, G, B, A), width=lineWidth)
 
         # now merge both
@@ -399,14 +400,14 @@ class HeatMapUtils():
         image = baseImage.copy()
         hatching = Image.new('RGBA', image.size, color=0)
         
-        # see how much time someone has spent looking on one grid cell...
+        # see how much time someone has spent looking on one grid cell
         for imageSection in imageSections:
             # time is in ms
             timeSpent = 0.0
             if (len(imageSection._timestamps) >= 1):
                 timeSpent = imageSection._timestamps[-1] - imageSection._timestamps[0]
 
-            # create a grid for every image section...
+            # create a grid for every image section
             imageSectionTimestamps = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
             
             # additionally grid to save highest sample factor on grid
