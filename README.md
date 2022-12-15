@@ -29,12 +29,15 @@ For writing the exported files, there will be a user and user group with the sam
 
 -----
 
-If you want to run this program outside of docker you neede to install the following dependencies by pip, your package manager or by source:
+If you want to run this program outside of docker you neede to install the following dependencies by pip, your package manager or by source. Make sure to run at least the version listed below:
 - [pixman-0.40.0](https://www.linuxfromscratch.org/blfs/view/cvs/general/pixman.html)
 - [openslide-python 1.2.0](https://openslide.org/api/python/)
 - [OpenSlide 3.4.1](https://openslide.org/)
 - [Pillow 9.2.0](https://pillow.readthedocs.io/en/stable/)
 - [pyvips 2.21](https://pypi.org/project/pyvips/)
+- [numpy 1.21.5](https://numpy.org/)
+- [opencv 4.6.0](https://opencv.org/)
+
 
 ## Usage
 To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed in the iMotions meeting must be present inside `data` directory.
