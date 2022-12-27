@@ -12,14 +12,14 @@ class HatchingGridCell:
                                         'sx_m10': False,
                                         's1_mx': False,
                                         's5_mx': False,
-                                        'sx_mx': False}
+                                        'sx_mx': False }
 
     # returns flag of given key
     def getHatchingFlag(self, key):
         return self._hatchingGridCellFlags[key]
 
     # returns a list of all hatching flags
-    def getHatchingFlags(self):
+    def getAllHatchingFlags(self):
         flagList = [ ]
         for key in self._hatchingGridCellFlags:
             if (self._hatchingGridCellFlags[key]):
@@ -44,7 +44,7 @@ class HatchingGridCell:
             
             if (magnification >= 2.0 and magnification < 10.0):
                 self._hatchingGridCellFlags['s5_m10'] = True
-            
+
             if (magnification >= 10.0):
                 self._hatchingGridCellFlags['sx_m10'] = True
         
@@ -57,3 +57,23 @@ class HatchingGridCell:
             
             if (magnification >= 10.0):
                 self._hatchingGridCellFlags['sx_mx'] = True
+
+    # returns list of keys
+    def getKeys(self):
+        return self._hatchingGridCellFlags.keys()
+
+    # returns list of true valued keys
+    def getActiveKeys(self):
+        activeFlagList = [ ]
+        for key in self._hatchingGridCellFlags:
+            if (self._hatchingGridCellFlags[key]):
+                activeFlagList.append(key)
+        return activeFlagList
+
+    # gets number of true set flags
+    def getNumOfSetFlags(self):
+        flagCounter = 0
+        for key in self._hatchingGridCellFlags:
+            if (self._hatchingGridCellFlags[key]):
+                flagCounter += 1
+        return flagCounter

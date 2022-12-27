@@ -2,6 +2,7 @@
 
 ''' dataframe for hatching patterns '''
 
+import sys
 from PIL import Image
 
 class Hatching():
@@ -62,3 +63,14 @@ class Hatching():
             
             if (magnification >= 10.0):
                 return self._hatchingDict['sx_mx']
+
+    # returns hatching image for cell, based on the given key
+    def getHatching(self, key):
+        if (not key in self._hatchingDict.keys()):
+            sys.stderr.write("ERROR: given key is not valid!")
+            return False        
+        return self._hatchingDict[key]
+
+    # retuns standard hatching, minimal time, minimal magnification
+    def getDefautlHatching(self):
+        return self._hatchingDict['s1_m2']

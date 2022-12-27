@@ -73,6 +73,16 @@ class HeatMapUtils():
         # crete 2d grid array for mapping timestamp data
         self._gridTimestamps = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
+        # create 2d grid array for hatching heatmap
+        self._gridHatchingData = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
+        self.initGridHatchingData()
+
+    # initialises grid with HatchingGridCell data
+    def initGridHatchingData(self):
+        for yCell in range(self._gridHeight):
+            for xCell in range(self._gridWidth):
+                self._gridHatchingData[yCell][xCell] = HGC()
+
     # runs the canny edge detection over the given image 
     # returns the result
     def getCannyImage(self, image, param1, param2):
@@ -438,9 +448,16 @@ class HeatMapUtils():
                 # grid must be image section dependent
                 imageSectionTimestamps[yCell][xCell] += 1
 
+                magnificationFactor = self.getMagnification(imageSection._downsampleFactor)
+
+                # print overlapping hatching instead of just max "values"
+                self._gridHatchingData[yCell][xCell].setHatchingFlag(
+                    imageSectionTimestamps[yCell][xCell],
+                    magnificationFactor)
+
                 # now save it as magnification
                 if (imageSection._downsampleFactor > gridMagnificationFactors[yCell][xCell]):
-                    gridMagnificationFactors[yCell][xCell] = self.getMagnification(imageSection._downsampleFactor)
+                    gridMagnificationFactors[yCell][xCell] = magnificationFactor
 
             # after all eye data inside a imageSection normalize hitmap grid
             normalizedTimeData = self.normalizeGridData(imageSectionTimestamps)
@@ -455,7 +472,8 @@ class HeatMapUtils():
 
         # draw patterns on grid based on watching time
         # also scale up or down templates based on cell size
-        heatmap = self.drawHatching(hatching, self._gridTimestamps, gridMagnificationFactors, alpha)
+        #heatmap = self.drawHatching(hatching, self._gridTimestamps, gridMagnificationFactors, alpha)
+        heatmap = self.drawHatchingData(hatching, alpha)
         smth = Image.alpha_composite(image, heatmap)
         return smth
 
@@ -486,6 +504,36 @@ class HeatMapUtils():
             normalizedList.append(n)
 
         return normalizedList.copy()
+
+    # draws hatching with complex data
+    def drawHatchingData(self, image, alpha):
+        hatching = Hatching(alpha)
+        hatching.resizePattern(self.CELL_SIZE_X, self.CELL_SIZE_Y)
+
+        for yCell in range(self._gridHeight):
+            for xCell in range(self._gridWidth):
+                # map the cell to an image pixel coordinate
+                cellCenterX = xCell * self.CELL_SIZE_X
+                cellCenterY = yCell * self.CELL_SIZE_Y
+
+                if (cellCenterX > self._exportWidth):
+                    continue
+
+                if (cellCenterY > self._exportHeight):
+                    continue
+                
+                for key in self._gridHatchingData[yCell][xCell].getKeys():
+                    hatchingPattern = object
+                    gotCurrentFlag = self._gridHatchingData[yCell][xCell].getHatchingFlag(key)
+                    if (gotCurrentFlag):
+                        hatchingPattern = hatching.getHatching(key)
+                        print(f'key: {key}. x/y: {xCell}/{yCell} hatching')
+                    if (not gotCurrentFlag and
+                      self._gridHatchingData[yCell][xCell] != 0): # TODO: before using default pattern -> check if other pattern is active...
+                        hatchingPattern = hatching.getDefautlHatching()
+                        print(f'key: {key}. x/y: {xCell}/{yCell} default hatching')
+                    image.paste(hatchingPattern, (cellCenterX, cellCenterY), hatchingPattern)
+        return image
 
     # returns image with drawn on hatching
     def drawHatching(self, image, grid, gridMagnificationFactors, alpha=230):
