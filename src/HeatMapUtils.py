@@ -528,8 +528,9 @@ class HeatMapUtils():
                     if (gotCurrentFlag):
                         hatchingPattern = hatching.getHatching(key)
                     if ((not gotCurrentFlag) and
-                      (self._gridHatchingData[yCell][xCell] != 0)): # TODO: before using default pattern -> check if other pattern is active...
+                      (self._gridHatchingData[yCell][xCell].getNumOfSetFlags() < 1)): # TODO: before using default pattern -> check if other pattern is active...
                         hatchingPattern = hatching.getDefautlHatching()
+                        # ERROR: something is not right with this here...
                     image.paste(hatchingPattern, (cellCenterX, cellCenterY), hatchingPattern)
         return image
 
