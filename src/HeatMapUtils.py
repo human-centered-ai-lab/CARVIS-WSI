@@ -326,7 +326,7 @@ class HeatMapUtils():
             fontWidth, _ = draw.textsize(self.ROI_LABELS[i], sizedFont)
             fontWidthOffset = startX - int(fontWidth / 2)
 
-            draw.text((fontWidthOffset, drawHeight + 70), self.ROI_LABELS[i], font=sizedFont, fill=(0, 0, 0))
+            draw.text((fontWidthOffset, drawHeight + (legendHeight * 0.2)), self.ROI_LABELS[i], font=sizedFont, fill=(0, 0, 0))
 
         totalHeight = image.size[1] + legendHeight
         heatmapLegend = Image.new('RGBA', (heatmapWidth, totalHeight))
