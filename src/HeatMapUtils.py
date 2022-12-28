@@ -293,7 +293,7 @@ class HeatMapUtils():
                    int(pathColorStart[0] * drawnPercentage + pathColorEnd[0] * (1 - drawnPercentage)),
                    int(pathColorStart[1] * drawnPercentage + pathColorEnd[1] * (1 - drawnPercentage)),
                    int(pathColorStart[2] * drawnPercentage + pathColorEnd[2] * (1 - drawnPercentage)),
-                   255)
+                   int(pathColorEnd[3]))
 
                 # if it is the first one we can't draw a line yet
                 if (lastPoint is not None):

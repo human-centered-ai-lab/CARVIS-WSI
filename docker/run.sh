@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts 'c:l:r:t:s:vp:i:u:o:d:f:abe' flag;
+while getopts 'c:l:r:t:s:vp:i:j:u:o:d:f:abe' flag;
 do
     case "${flag}" in
         c) CSV_FILE=${OPTARG};;
@@ -10,7 +10,8 @@ do
         s) HATCHED=${OPTARG};;
         v) VIEW_PATH=true;;
         p) PATH_STRENGTH=${OPTARG};;
-        i) PATH_COLOR=${OPTARG};;
+        i) PATH_COLOR_START=${OPTARG};;
+        j) PATH_COLOR_END=${OPTARG};;
         u) POINT_RADIUS=${OPTARG};;
         o) POINT_COLOR=${OPTARG};;
         a) CELL_HEATMAP_LABEL=true;;
@@ -53,8 +54,12 @@ if [ ! -z $PATH_STRENGTH ]; then
     PARAMETERS+=" -p $PATH_STRENGTH"
 fi
 
-if [ ! -z $PATH_COLOR ]; then
-    PARAMETERS+=" -i $PATH_COLOR"
+if [ ! -z $PATH_COLOR_START ]; then
+    PARAMETERS+=" -i $PATH_COLOR_START"
+fi
+
+if [ ! -z $PATH_COLOR_END ]; then
+    PARAMETERS+=" -j $PATH_COLOR_END"
 fi
 
 if [ ! -z $POINT_RADIUS ]; then

@@ -339,14 +339,15 @@ def getIntTupleFromArgs(argument):
 
 # gets rgb values from input argument
 # returns [R, G, B] integer 'tuple'
-def getRGBFromArgs(argument):
+def getRGBAFromArgs(argument):
     arg = argument.split(',')
     
     r = int(arg[0])
     g = int(arg[1])
     b = int(arg[2])
+    a = int(arg[3])
 
-    return (r, g, b)
+    return (r, g, b, a)
 
 # gets single integer value from input argument
 # returns int argument
@@ -419,16 +420,16 @@ def getWorkerArgs(arguments):
             viewPathStrength = getINTFromArg(arguments.p)
         
         if (arguments.i):
-            viewPathColorStart = getRGBFromArgs(arguments.i)
+            viewPathColorStart = getRGBAFromArgs(arguments.i)
         
         if (arguments.j):
-            viewPathColorEnd = getRGBFromArgs(arguments.j)
+            viewPathColorEnd = getRGBAFromArgs(arguments.j)
         
         if (arguments.u):
             viewPathPointSize = getINTFromArg(arguments.u)
         
         if (arguments.o):
-            viewPathPointColor = getRGBFromArgs(arguments.o)
+            viewPathPointColor = getRGBAFromArgs(arguments.o)
 
     if (arguments.d):
         heatmapBackgroundAlpha = getINTFromArg(arguments.d)

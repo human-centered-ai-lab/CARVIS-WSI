@@ -45,8 +45,8 @@ class WorkerArgs():
         self._hatchedFlag = hatchedFlag
         self._viewPathFlag = viewPathFlag
         self._viewPathStrength = viewPathStrength
-        self._viewPathColorStart = viewPathColorStart,
-        self._viewPathColorEnd = viewPathColorEnd,
+        self._viewPathColorStart = viewPathColorStart
+        self._viewPathColorEnd = viewPathColorEnd
         self._viewPathPointSize = viewPathPointSize
         self._viewPathPointColor = viewPathPointColor
         self._heatmapBackgroundAlpha = heatmapBackgroundAlpha
