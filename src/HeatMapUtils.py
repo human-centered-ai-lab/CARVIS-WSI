@@ -54,8 +54,6 @@ class HeatMapUtils():
         self.CELL_SIZE_Y = int(cellSize)
         self.SCAN_MAG = int(scanMagnification)
 
-        print(f'cell size: {self.CELL_SIZE_X} or: {cellSize}')
-
         self._gridHeight, self._gridWidth = self.calculateGridSize()
 
         # get font file
