@@ -16,7 +16,7 @@ do
         a) CELL_HEATMAP_LABEL=true;;
         b) ROI_HEATMAP_LABEL=true;;
         d) HEATMAP_BACKGROUND_ALPHA=${OPTARG};;
-        e) VIEWPATH_COLOR_LEGEND=${OPTARG};;
+        e) VIEWPATH_COLOR_LEGEND=true;;
         f) CANNY_EDGE_DETECTION=${OPTARG};;
     esac
 done
