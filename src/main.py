@@ -9,15 +9,20 @@ import os
 import sys
 import csv
 import argparse
+import multiprocessing as mp
+from multiprocessing import Process
+from PIL import Image, ImageOps
 from os.path import exists
 from ImageSection import ImageSection
 from GazePoint import GazePoint
 from HeatMapUtils import HeatMapUtils
+from WorkerArgs import WorkerArgs
 from openslide import open_slide
 
 EXPORT_DIR = "export/"
 ROI_LEGEND_FILE = "ROI_LEGEND.png"
 ROI_CHANGE_SIGNAL = "%7b%22"
+DEFAUTL_CELL_SIZE = 50
 
 wsiLevel = 0
 parser = None
@@ -265,7 +270,7 @@ def readCSV(file):
         else:
             return None
 
-# checks if the user choosen input makes sense
+# checks if the user choosen input makes sens>e
 def verifyInput(arguments):
     if (len(sys.argv) < 1):
         terminate()
@@ -311,20 +316,24 @@ def initArgumentParser():
     parser.add_argument("-s", nargs='?', help="[OPTIONAL] Exports a hatched heatmap. Specify alpha value of hatching [0 - 255]. Default value is 170.")
     parser.add_argument("-v", action='store_true', help="[OPTIONAL] Exports base image with a drawn view path.")
     parser.add_argument("-p", nargs='?', help="[OPTIONAL] Specify path strength. Default value is 2.")
-    parser.add_argument("-i", nargs='?', help="[OPTIONAL] Specify path RGB color. Default is (3, 252, 102).")
+    parser.add_argument("-i", nargs='?', help="[OPTIONAL] Specify start path RGBA color. default is (127, 191, 15, 255).")
+    parser.add_argument("-j", nargs='?', help="[OPTIONAL] Specify end path RGBA color. default is (15, 109, 191, 255).")
     parser.add_argument("-u", nargs='?', help="[OPTIONAL] Specify point radius. Default value is 9.")
     parser.add_argument("-o", nargs='?', help="[OPTIONAL] Specify point RGB color. Default is (3, 252, 161).")
+    parser.add_argument("-d", nargs='?', help="[OPTIONAL] Specify heatmap background alpha value.")
     parser.add_argument("-a", action='store_true', help="[OPTIONAL] enable cell labeling to be rendered onto exported image.")
     parser.add_argument("-b", action='store_true', help="[OPTIONAL] enable roi labeling to be rendered onto exported image.")
+    parser.add_argument("-e", action='store_true', help="[OPTIONAL] enable view path labeling to be rendered onto exported image.")
+    parser.add_argument("-f", nargs='?', help="[OPTIONAL] Specify use and threshold values for canny edge detection. Default is (100, 400).")
 
 # gets relsolution from input argument
 # returns [x, y] tuple
-def getResolutionFromArgs(arguments):
+def getIntTupleFromArgs(argument):
     # get resolution from string
-    comma = arguments.r.find(",")
-    x = int(arguments.r[: comma])
+    comma = argument.find(",")
+    x = int(argument[: comma])
     comma += 1
-    y = int(arguments.r[comma :])
+    y = int(argument[comma :])
 
     return (x, y)
 
@@ -362,12 +371,245 @@ def loadSVSFiles(imageSectionDict):
 
     return wsiFiles.copy()
 
+# returns object of type WorkerArgs for easier use of input parameters for worker threads
+def getWorkerArgs(arguments):
+    if (not arguments.l and not arguments.r):
+        print("No export layer or resolution given!")
+        terminate()
+
+    exportLayer = 0
+    exportResolution = (0, 0)
+    cellSize = 0
+    hatchingAlpha = 0
+    viewPathStrength = 0
+    viewPathColorStart = 0
+    viewPathColorEnd = 0
+    viewPathPointSize = 0
+    viewPathPointColor = 0
+    heatmapBackgroundAlpha = 0
+    cannythreashold1 = 0
+    cannythreashold2 = 0
+    hatchedFlag = False
+    viewPathFlag = False
+    cellLabelFlag = False
+    roiLabelFlag = False
+    viewPathLabelFlag = False
+    edgeDetectionFlag = False
+
+    if (arguments.l):
+        exportLayer = getINTFromArg(arguments.l)
+
+    if (arguments.r):
+        exportResolution = getIntTupleFromArgs(arguments.r)
+
+    if (arguments.p):
+        viewPathStrength = getINTFromArg(arguments.p)
+    
+    if (arguments.t):
+        cellSize = getINTFromArg(arguments.t)
+
+    if (arguments.s):
+        hatchedFlag = True
+        hatchingAlpha = getINTFromArg(arguments.s)
+    
+    if (arguments.v):
+        viewPathFlag = True
+
+        if (arguments.p):
+            viewPathStrength = getINTFromArg(arguments.p)
+        
+        if (arguments.i):
+            viewPathColorStart = getRGBFromArgs(arguments.i)
+        
+        if (arguments.j):
+            viewPathColorEnd = getRGBFromArgs(arguments.j)
+        
+        if (arguments.u):
+            viewPathPointSize = getINTFromArg(arguments.u)
+        
+        if (arguments.o):
+            viewPathPointColor = getRGBFromArgs(arguments.o)
+
+    if (arguments.d):
+        heatmapBackgroundAlpha = getINTFromArg(arguments.d)
+
+    if (arguments.a):
+        cellLabelFlag = True
+    
+    if (arguments.b):
+        roiLabelFlag = True
+
+    if (arguments.e):
+        viewPathLabelFlag = True
+
+    if (arguments.f):
+        edgeDetectionFlag = True
+        threshold = getIntTupleFromArgs(arguments.f)
+        cannythreashold1 = threshold[0]
+        cannythreashold2 = threshold[1]
+
+    workerArgs = WorkerArgs(
+      exportLayer,
+      exportResolution,
+      cellSize,
+      hatchingAlpha,
+      viewPathStrength,
+      viewPathColorStart,
+      viewPathColorEnd,
+      viewPathPointSize,
+      viewPathPointColor,
+      heatmapBackgroundAlpha,
+      cannythreashold1,
+      cannythreashold2,
+      hatchedFlag,
+      viewPathFlag,
+      cellLabelFlag,
+      roiLabelFlag,
+      viewPathLabelFlag,
+      edgeDetectionFlag)
+
+    return workerArgs
+
+# returns export resolution
+# in seperate mehtod since this will be used more often
+def getExportPixel(wsi, workerArgs):
+    if (workerArgs._exportLayer > 0):
+        return wsi.level_dimensions[workerArgs._exportLayer]
+    else:
+        return workerArgs._exportResolution
+
+# converts a RGBA mode image into an RGB mode image
+def convertToJpg(image):
+    newImage = Image.new('RGB', size=image.size)
+    newImage.paste(image)
+    return newImage.copy()
+
+# saves all heatmaps in given dictionary
+def saveHeatmaps(heatmapDict, workerArgs):
+    # now save collected data
+    fileCounter = 0
+    for csvName in heatmapDict:
+        for wsiName in heatmapDict[csvName]:
+            wsiFileName = wsiName[: -4]
+            pathologistName = csvName[6 : -4] + ".png"
+
+            # just save as png
+            heatmapDict[csvName][wsiName]['base'].save(EXPORT_DIR + wsiFileName + "_base_" + pathologistName)
+            heatmapDict[csvName][wsiName]['color'].save(EXPORT_DIR + wsiFileName + "_colorHeatMap_" + pathologistName)
+            heatmapDict[csvName][wsiName]['roi'].save(EXPORT_DIR + wsiFileName + "_roiHeatmap_" + pathologistName)
+            fileCounter += 3
+
+            if (workerArgs._hatchedFlag):
+                heatmapDict[csvName][wsiName]['hatching'].save(EXPORT_DIR + wsiFileName + "_hatchingHeatmap_" + pathologistName)
+                fileCounter += 1
+
+            if (workerArgs._viewPathFlag):
+                heatmapDict[csvName][wsiName]['viewpath'].save(EXPORT_DIR + wsiFileName + "_viewPath_" + pathologistName)
+                fileCounter += 1
+
+            # first convert to rgb mode to be savable as jpg
+            '''baseImage = convertToJpg(heatmapDict[csvName][wsiName]['base'])
+            colorImage = convertToJpg(heatmapDict[csvName][wsiName]['color'])
+            roiImage = convertToJpg(heatmapDict[csvName][wsiName]['roi'])
+
+            baseImage.save(EXPORT_DIR + wsiFileName + "_base_" + pathologistName)
+            colorImage.save(EXPORT_DIR + wsiFileName + "_colorHeatMap_" + pathologistName)
+            roiImage.save(EXPORT_DIR + wsiFileName + "_roiHeatmap_" + pathologistName)
+            fileCounter += 3
+
+            if (workerArgs._hatchedFlag):
+                hatchingImage = convertToJpg(heatmapDict[csvName][wsiName]['hatching'])
+                hatchingImage.save(EXPORT_DIR + wsiFileName + "_hatchingHeatmap_" + pathologistName)
+                fileCounter += 1
+            
+            if (workerArgs._viewPathFlag):
+                viewPathImage = convertToJpg(heatmapDict[csvName][wsiName]['viewpath'])
+                viewPathImage.save(EXPORT_DIR + wsiFileName + "_viewPath_" + pathologistName)
+                fileCounter += 1'''
+    print(f'saved {fileCounter} files for {csvFile}.')
+
+# gets run in seperate processes. on process should only work on one csv file
+def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
+    print(f'working on CSV: {csvFile}...')
+    returnDict = { }
+    for wsiName in ImageSections:
+        if (wsiName == "None"):
+            continue
+
+        if (csvFile not in returnDict):
+            returnDict[csvFile] = { }
+        
+        if (wsiName not in returnDict):
+            returnDict[csvFile][wsiName] = { }
+
+        # get some data needed for heatmap utils
+        # and convert base image as greyscale for better readabillity
+        baseImageColor = wsiBaseDict[wsiName].copy()
+        baseImageGreyscale = ImageOps.grayscale(baseImageColor)
+
+        baseImage = baseImageGreyscale.convert('RGBA')
+        scanMagnification = rawWsiDict[wsiName].properties['openslide.objective-power']
+
+        exportPixelX, exportPixelY = getExportPixel(rawWsiDict[wsiName], workerArgs)
+        layer0X, layer0Y = rawWsiDict[wsiName].dimensions
+
+        heatMapUtils = object
+        if (workerArgs._cellSize != 0):
+            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, scanMagnification, workerArgs._cellSize)
+        else:
+            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, scanMagnification, DEFAUTL_CELL_SIZE)
+
+        if (workerArgs._edgeDetectionFlag):
+            baseImage = heatMapUtils.getCannyImage(
+                baseImageColor,
+                workerArgs._cannyThreashold1,
+                workerArgs._cannyThreashold2)
+
+        if (workerArgs._heatmapBackgroundAlpha):
+            alpha = baseImage.getchannel('A')
+            newAlpha = alpha.point(lambda x: workerArgs._heatmapBackgroundAlpha if x > 0 else 0)
+            baseImage.putalpha(newAlpha)
+
+        returnDict[csvFile][wsiName]['base'] = baseImageColor.copy()
+
+        returnDict[csvFile][wsiName]['roi'] = heatMapUtils.drawRoiOnImage(baseImage, ImageSections[wsiName])
+
+        if (workerArgs._roiLabelFlag):
+            returnDict[csvFile][wsiName]['roi'] = heatMapUtils.addRoiColorLegend(returnDict[csvFile][wsiName]['roi'])
+
+        returnDict[csvFile][wsiName]['color'] = heatMapUtils.getHeatmap(
+          baseImage,
+          ImageSections[wsiName])
+
+        if (workerArgs._cellLabelFlag):
+            returnDict[csvFile][wsiName]['color'] = heatMapUtils.addHeatmapColorLegend(returnDict[csvFile][wsiName]['color'], ImageSections[wsiName])
+        
+        if (workerArgs._hatchedFlag):
+            returnDict[csvFile][wsiName]['hatching'] = heatMapUtils.getHatchingHeatmap(
+                baseImage,
+                ImageSections[wsiName],
+                workerArgs._hatchingAlpha)
+
+        if (workerArgs._viewPathFlag):
+            returnDict[csvFile][wsiName]['viewpath'] = heatMapUtils.drawViewPath(
+                baseImage,
+                ImageSections[wsiName],
+                workerArgs
+            )
+
+            if (workerArgs._viewPathLabelFlag):
+                returnDict[csvFile][wsiName]['viewpath'] = heatMapUtils.addViewPathColorLegend(
+                    returnDict[csvFile][wsiName]['viewpath']
+                )
+
+    saveHeatmaps(returnDict, workerArgs)
+
 if __name__ == "__main__":
     initArgumentParser()
     arguments = parser.parse_args()
     verifyInput(arguments)
 
-    csvFileList = []
+    csvFileList = [ ]
 
     # check if export directory exists. if not create it
     if (not os.path.exists(EXPORT_DIR)):
@@ -375,147 +617,131 @@ if __name__ == "__main__":
 
     # check if user has specifyed file or a directory
     if (not os.path.isfile(arguments.c)):
-        print("No file specifyed, looking for a directory...")
+        sys.stderr.write("No file specifyed, looking for a directory...\n")
         if (not os.path.isdir(arguments.c)):
-            print("Need to specify at least input directory!")
-            terminate()        
+            sys.stderr.write("Need to specify at least input directory!\n")
+            terminate()
 
         # search for csv files inside given data directory
+        csvFoundCounter = 0
         for file in os.listdir(arguments.c):
             if (file.endswith(".csv")):
                 inputDirectoryFile = arguments.c + file
                 csvFileList.append(inputDirectoryFile)
-                print(f'found: {file}')
-        print(" ")
+                csvFoundCounter += 1
+        print(f'-> found {csvFoundCounter} csv files.')
     else:
-        csvFileList.append(arguments.c)        
+        csvFileList.append(arguments.c)
 
-    # now do this for every csv file
-    for file in csvFileList:
-        # read csv and svs files
-        print(f'parsing {file}...')
-        imageSectionsDict = readCSV(file)
+    # if input is okey, load it in an workerArg object
+    workerArgs = getWorkerArgs(arguments)
 
-        # check if meeting produced correct data
-        if (imageSectionsDict is None):
-            print("CSV File does not contain correct Image Section data!")
-            print("-------------")
+    # now sorting all data to be used in a seperate process
+    # the idea is to sort the data by csv file (or participant). so a worker can get its csv file name
+    # and gets shared memory to the csvImageSectionDict and wsiBaseImageDict
+
+    # first thing to do is to export thumbnails of all wsi files which are mentioned inside
+    # the given csv file(s). do this in seperate processes so it should be faster.
+    # but first get the csv file(s)!
+
+    # to get return values use shared memory
+    sharedMemoryManager = mp.Manager()
+
+    # this will hold all thumbnails and wsi name will be key
+    wsiBaseImages = sharedMemoryManager.dict()
+
+    # this will hold all image sections and the csv name will be key
+    csvImageSections = { } # dont need to be on shared memory
+
+    # this will hold raw wsi from drive and be given to 
+    # wsi name will be key for later use
+    rawWsiDict = { }
+    wsiFileList = [ ]
+
+    for csvFile in csvFileList:
+        csvFileDict = readCSV(csvFile)
+
+        # check if meeting produced correct data or if it was exported correctly
+        if (csvFileDict is None):
+            sys.stderr.write(f'* CSV File {csvFile} does not contain the right data!\n')
             continue
 
-        print("loading svs...")
-        wsiFilesDict = loadSVSFiles(imageSectionsDict)
-        
-        for fileName in wsiFilesDict:
-            layer0Width, layer0Height = wsiFilesDict[fileName].level_dimensions[0]
-            
-            # check if layer or resolution is given for export
-            exportPixelX = 0
-            exportPixelY = 0
-            heatmapUtils = object
+        # save for later use in different processes    
+        csvImageSections[csvFile] = csvFileDict.copy()
 
-            if (arguments.r):
-                exportPixelX, exportPixelY = getResolutionFromArgs(arguments)
-            
-            else:
-                exportPixelX, exportPixelY = wsiFilesDict[fileName].level_dimensions[int(arguments.l)]
+        # add wsi files to list to later sort out multiples
+        for wsiName in csvImageSections[csvFile].keys():
+            if (wsiName is None or wsiName == "None"):
+                continue
+            wsiFileList.append(wsiName)
 
-            if (arguments.t):
-                heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height, arguments.t)
+    # not needed anymore so free some ram
+    del csvFileList
+    del csvFileDict
 
-            else:
-                heatmapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0Width, layer0Height)
+    # remove multiples from wsiFilesList
+    # then load all the wsi's into rawWsiDict and use wsifileName as key
+    wsiFileList = sorted(set(wsiFileList))
+    print(f'sorted wsi list contains: {len(wsiFileList)} wsi files.')
+    for wsiFile in wsiFileList:
+        if (wsiFile == "None"):
+            continue
+        rawWsiDict[wsiFile] = readSVS(wsiFile)
 
-            # working with files and extract information
-            print(f'rendering thumbnail for {fileName}...')
-            baseImage = heatmapUtils.extractJPG(wsiFilesDict[fileName])
-            
-            print("drawing roi...")
-            roiImage = heatmapUtils.drawRoiOnImage(baseImage, imageSectionsDict[fileName])
+    # now start the parallised base image export
+    # holds rendered base images. keys are wsi names
+    wsiProcessList = [ ]
 
-            if (arguments.b):
-                roiImage = heatmapUtils.addRoiColorLegend(roiImage)
+    for wsiName in wsiFileList:
+        exportRes = rawWsiDict[wsiName].level_dimensions[workerArgs._exportLayer]
 
-            print("working on heatmap...")
-            heatmapImage = heatmapUtils.getHeatmap(roiImage, imageSectionsDict[fileName])
+        cellSize = DEFAUTL_CELL_SIZE
+        if (workerArgs._cellSize != 0):
+            cellSize = workerArgs._cellSize
 
-            if (arguments.a):
-                heatmapImage = heatmapUtils.addHeatmapColorLegend(heatmapImage)
+        heatMapUtils = HeatMapUtils(
+            exportRes[0],
+            exportRes[1],
+            rawWsiDict[wsiName].dimensions[0],
+            rawWsiDict[wsiName].dimensions[1],
+            0,
+            cellSize)
 
-            # draw hatched heatmap
-            if (arguments.s):
-                print("working on hatching...")
-                alpha = int(arguments.s)
-                hatchingImage = heatmapUtils.getHatchingHeatmap(baseImage, imageSectionsDict[fileName], alpha)
+        wsiProcessList.append(
+            Process(target=heatMapUtils.extractThumbnail, args=(rawWsiDict[wsiName], wsiBaseImages, wsiName))
+        )
+        wsiProcessList[-1].start()
+    
+    del wsiFileList
 
-            # draw view path
-            if (arguments.v):
-                print("drawing view path...")
+    for proc in wsiProcessList:
+        proc.join()
+    
+    del wsiProcessList
+    
+    # now got all base images in wsiBaseImages
+    # going further with doing the heatmap work
+    # one process per csv file
+    heatMapProcessList = [ ]
 
-                # get all optional parameters for viewpath drawing
-                pathStrength = heatmapUtils.PATH_STRENGTH
-                if (arguments.p):
-                    pathStrength = getINTFromArg(arguments.p)
+    # prepare dicts for rendered heatmaps
+    # csvWsiDict will be the nested dict inside returnHeatMapsDict
+    # we need to do it like this, othrewise the nested members are 
+    # not getting saved
+    for csvFile in csvImageSections:
+        heatMapProcessList.append(
+            Process(target=heatmapWorker, args=(
+                csvImageSections[csvFile],
+                csvFile,
+                rawWsiDict,
+                wsiBaseImages,
+                workerArgs
+            ))
+        )
+        heatMapProcessList[-1].start()
 
-                pathColor = heatmapUtils.PATH_COLOR
-                if (arguments.i):
-                    pathColor = getRGBFromArgs(arguments.i)
-
-                pointRadius = heatmapUtils.POINT_RADIUS
-                if (arguments.u):
-                    pointRadius = getINTFromArg(arguments.u)
-
-                pointColor = heatmapUtils.POINT_COLOR
-                if (arguments.o):
-                    pointColor = getRGBFromArgs(arguments.o)
-
-                viewPathImage = heatmapUtils.drawViewPath(
-                  baseImage,
-                  imageSectionsDict[fileName],
-                  pathStrength,
-                  pathColor,
-                  pointRadius,
-                  pointColor)
-
-            # update name and save
-            baseName = fileName[: len(fileName) - 4]
-            pathologistName = file[6 : len(file) - 4]
-
-            saveName = baseName
-            hatchingName = baseName
-            viewPathName = baseName
-            
-            baseName += "_base_"
-            baseName += pathologistName
-            
-            saveName += "_heatmap_"
-            saveName += pathologistName
-            saveName += ".jpg"
-
-            hatchingName += "_hatching_"
-            hatchingName += pathologistName
-            hatchingName += ".jpg"
-
-            viewPathName += "_viewpath_"
-            viewPathName += pathologistName
-            viewPathName += ".jpg"
-            
-            print(f'saving {baseName} for pathologist {pathologistName}')
-
-            # now save save image
-            baseImage.save(EXPORT_DIR + baseName + ".jpg")
-            heatmapImage.save(EXPORT_DIR + saveName)
-
-            if (arguments.s):
-                hatchingImage.save(EXPORT_DIR + hatchingName)
-
-            if (arguments.v):
-                viewPathImage.save(EXPORT_DIR + viewPathName)
-
-            # new line for every svs
-            print(" ")
-
-        # split off output for every csv file
-        print("-------------")
+    for proc in heatMapProcessList:
+        proc.join()
 
     print("done.")
     

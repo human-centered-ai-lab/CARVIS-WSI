@@ -7,6 +7,7 @@ This Project aims to render heatmap data onto an extracted WSI using eye trackin
 <br><img src="/images/sample_2.png"></br>
 <br><img src="/images/sample_3.png"></br>
 <br><img src="/images/sample_4.png"></br>
+<br><img src="/images/sample_5.png"></br>
 </details>
 
 ## Installation
@@ -29,12 +30,15 @@ For writing the exported files, there will be a user and user group with the sam
 
 -----
 
-If you want to run this program outside of docker you neede to install the following dependencies by pip, your package manager or by source:
+If you want to run this program outside of docker you neede to install the following dependencies by pip, your package manager or by source. Make sure to run at least the version listed below:
 - [pixman-0.40.0](https://www.linuxfromscratch.org/blfs/view/cvs/general/pixman.html)
 - [openslide-python 1.2.0](https://openslide.org/api/python/)
 - [OpenSlide 3.4.1](https://openslide.org/)
 - [Pillow 9.2.0](https://pillow.readthedocs.io/en/stable/)
 - [pyvips 2.21](https://pypi.org/project/pyvips/)
+- [numpy 1.21.5](https://numpy.org/)
+- [opencv 4.6.0](https://opencv.org/)
+
 
 ## Usage
 To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed in the iMotions meeting must be present inside `data` directory.
@@ -67,14 +71,18 @@ If you don't have a special need for this you can leave it like it is and don't 
 |   -l   | (Recommended) specify extraction layer. the extraction resolution will be read from WSI metadata. |
 |   -r   | render resolution for WSI (only needed of no -l is given). |
 |   -t   | specify cell size. default is 50. cells are always square. |
-|   -s   | output hatched heatmap and specify alpha value of pattern. it is recommended to use a bigger cell size (~100) in combination with this option. |
+|   -s   | output hatched heatmap and specify alpha value of pattern. it is recommended to use a bigger cell size (~100) in combination with this option. Alpha has no default value, so specifying is necessary. Best results have been observed at around 230. |
 |   -v   | enables viewpath drawing. the following parameters can be specifyed if -v is used. |
 |   -p   | specify path strength. default value is 2. |
-|   -i   | specify path RGB color. default is (3, 252, 102). |
+|   -i   | specify start path RGBA color. default is (127, 191, 15, 255). |
+|   -j   | specify end path RGBA color. default is (15, 109, 191, 255). |
 |   -u   | specify point radius. default value is 9. |
-|   -o   | specify point RGB color. default is (3, 252, 161). |
+|   -o   | specify point RGBA color. default is (3, 252, 161, 230). |
 |   -a   | enable cell labeling to be rendered onto exported image. |
 |   -b   | enable roi labeling to be rendered onto exported image. |
+|   -d   | specify heatmap background apha value in range [0-255]. |
+|   -e   | enable viewPath color legend to visualise start and end colors. |
+|   -f   | Specify use and threshold values for canny edge detection. Default is (100, 400). |
 
 ### Minmal native working example
 To get heatmap data rendered on all wsi files used in one specific iMotions meeting and export all JPG's with their layer 3 resolution, use following line.

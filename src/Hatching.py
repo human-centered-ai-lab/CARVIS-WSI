@@ -2,7 +2,8 @@
 
 ''' dataframe for hatching patterns '''
 
-from PIL import Image, ImageDraw, ImageFont
+import sys
+from PIL import Image
 
 class Hatching():
     def __init__(self, alpha=170):
@@ -19,7 +20,6 @@ class Hatching():
     
     # resizes all pattern at once for every wsi
     def resizePattern(self, cellSizeX, cellSizeY):
-        print(f'cell size: {cellSizeX, cellSizeY}')
         for key, image in self._hatchingDict.items():
             self._hatchingDict[key] = image.resize((cellSizeX, cellSizeY))
             
@@ -63,3 +63,14 @@ class Hatching():
             
             if (magnification >= 10.0):
                 return self._hatchingDict['sx_mx']
+
+    # returns hatching image for cell, based on the given key
+    def getHatching(self, key):
+        if (not key in self._hatchingDict.keys()):
+            sys.stderr.write("ERROR: given key is not valid!")
+            return False        
+        return self._hatchingDict[key]
+
+    # retuns standard hatching, minimal time, minimal magnification
+    def getDefautlHatching(self):
+        return self._hatchingDict['s1_m2']
