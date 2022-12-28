@@ -22,6 +22,7 @@ from openslide import open_slide
 EXPORT_DIR = "export/"
 ROI_LEGEND_FILE = "ROI_LEGEND.png"
 ROI_CHANGE_SIGNAL = "%7b%22"
+DEFAUTL_CELL_SIZE = 50
 
 wsiLevel = 0
 parser = None
@@ -554,9 +555,9 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
 
         heatMapUtils = object
         if (workerArgs._cellSize != 0):
-            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, workerArgs._cellSize, scanMagnification)
+            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, scanMagnification, workerArgs._cellSize)
         else:
-            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, scanMagnification)
+            heatMapUtils = HeatMapUtils(exportPixelX, exportPixelY, layer0X, layer0Y, scanMagnification, DEFAUTL_CELL_SIZE)
 
         if (workerArgs._edgeDetectionFlag):
             baseImage = heatMapUtils.getCannyImage(
@@ -694,12 +695,17 @@ if __name__ == "__main__":
     for wsiName in wsiFileList:
         exportRes = rawWsiDict[wsiName].level_dimensions[workerArgs._exportLayer]
 
+        cellSize = DEFAUTL_CELL_SIZE
+        if (workerArgs._cellSize != 0):
+            cellSize = workerArgs._cellSize
+
         heatMapUtils = HeatMapUtils(
             exportRes[0],
             exportRes[1],
             rawWsiDict[wsiName].dimensions[0],
             rawWsiDict[wsiName].dimensions[1],
-            workerArgs._cellSize)
+            0,
+            cellSize)
 
         wsiProcessList.append(
             Process(target=heatMapUtils.extractThumbnail, args=(rawWsiDict[wsiName], wsiBaseImages, wsiName))

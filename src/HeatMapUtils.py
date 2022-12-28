@@ -44,7 +44,7 @@ class HeatMapUtils():
     ROI_COLORS = [MAGNIFICATION_2_5, MAGNIFICATION_5, MAGNIFICATION_10, MAGNIFICATION_20, MAGNIFICATION_30, MAGNIFICATION_40]
     ROI_LABELS = ["x2.5", "x5", "x10", "x20", "x30", "x40"]
 
-    def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y, scanMagnification, cellSize=50):
+    def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y, scanMagnification, cellSize):
         self._grid = 0
         self._exportWidth = int(pixelCountX)
         self._exportHeight = int(pixelCountY)
@@ -53,6 +53,8 @@ class HeatMapUtils():
         self.CELL_SIZE_X = int(cellSize)
         self.CELL_SIZE_Y = int(cellSize)
         self.SCAN_MAG = int(scanMagnification)
+
+        print(f'cell size: {self.CELL_SIZE_X} or: {cellSize}')
 
         self._gridHeight, self._gridWidth = self.calculateGridSize()
 
