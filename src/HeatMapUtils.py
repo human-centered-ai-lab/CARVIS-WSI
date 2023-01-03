@@ -36,15 +36,16 @@ class HeatMapUtils():
     CANNY_PARAM1 = 100
     CANNY_PARAM2 = 400
 
-    MAGNIFICATION_2_5 = (102,51,255, 255)
-    MAGNIFICATION_5 = (51,204,255, 255)
-    MAGNIFICATION_10 = (51,255,204, 255)
-    MAGNIFICATION_20 = (51,255,102, 255)
-    MAGNIFICATION_30 = (102,255,51, 255)
-    MAGNIFICATION_40 = (204,255,51, 255)
+    MAGNIFICATION_MIN = (255, 94, 0, 255)
+    MAGNIFICATION_2_5 = (183, 255, 0, 255)
+    MAGNIFICATION_5 = (0, 255, 0, 255)
+    MAGNIFICATION_10 = (51, 255, 204, 255)
+    MAGNIFICATION_20 = (51, 204, 255, 255)
+    MAGNIFICATION_30 = (52, 72, 255, 255)
+    MAGNIFICATION_40 = (140, 0, 255, 255)
 
-    ROI_COLORS = [MAGNIFICATION_2_5, MAGNIFICATION_5, MAGNIFICATION_10, MAGNIFICATION_20, MAGNIFICATION_30, MAGNIFICATION_40]
-    ROI_LABELS = ["x2.5", "x5", "x10", "x20", "x30", "x40"]
+    ROI_COLORS = [MAGNIFICATION_MIN, MAGNIFICATION_2_5, MAGNIFICATION_5, MAGNIFICATION_10, MAGNIFICATION_20, MAGNIFICATION_30, MAGNIFICATION_40]
+    ROI_LABELS = ["<2.5x", "2.5x - 5x", "5x - 10x", "10x - 20x", "20x - 30x", "30x - 40x", ">=40x"]
 
     def __init__(self, pixelCountX, pixelCountY, layer0X, layer0Y, scanMagnification, cellSize):
         self._grid = 0
@@ -614,12 +615,17 @@ class HeatMapUtils():
 
         return normalizedGrid
 
+    # maps a given value to a specifyed range
+    def mapValue(self, value, minInput, maxInput, minOutput, maxOutput):
+        return (value - minInput)/(maxInput - minInput) * (maxOutput - minOutput) + minOutput
+
     # draws the Image Sections (ROI) on the extracted wsi layer
     # parts of this code is from Markus
     # returns wsi image with rectangle on it
     def drawRoiOnImage(self, baseImage, imageSections, filling=None, lineWidth=10):
         alphaImage = baseImage.copy()
         alphaImage.load() # needed for split()
+        minAlphaFactor = 0.05 # specifyes the minimal percent of how much the rectangles gets drawn
 
         image = Image.new('RGB', alphaImage.size, (255, 255, 255))
         image.paste(alphaImage, mask=alphaImage.split()[3]) # 3 is alpha
@@ -644,7 +650,10 @@ class HeatMapUtils():
             magnification = self.getMagnification(imageSection._downsampleFactor)
             outlineColor = (0, 0, 0)
 
-            if (magnification < 5):
+            if (magnification < 2.5):
+                outlineColor = self.MAGNIFICATION_MIN
+            
+            elif (magnification >= 2.5 and magnification < 5):
                 outlineColor = self.MAGNIFICATION_2_5
             
             elif (magnification >= 5 and magnification < 10):
@@ -662,11 +671,14 @@ class HeatMapUtils():
             elif (magnification > 40 and magnification >= 30):
                 outlineColor = self.MAGNIFICATION_40
 
+            rawAlpha = 100 * normalizedList[index]
+            scaledAlpha = self.mapValue(rawAlpha, 0.0, 100.0, (minAlphaFactor * 255), 255)
+
             outlineing=(
               outlineColor[0],
               outlineColor[1],
               outlineColor[2],
-              int(100 * normalizedList[index]))
+              int(scaledAlpha))
 
             draw.rectangle((
                 topLeftX,
