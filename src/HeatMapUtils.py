@@ -187,10 +187,10 @@ class HeatMapUtils():
         else:
             startColor = self.PATH_START_COLOR
 
-        if (workerArgs._viewPathColorStart != 0):
+        if (workerArgs._viewPathColorEnd != 0):
             endColor = workerArgs._viewPathColorEnd
         else:
-            startColor = self.PATH_END_COLOR
+            endColor = self.PATH_END_COLOR
 
         # TODO: cleanup and refactor (also in drawViewpathLegend)
         legendStep = 75

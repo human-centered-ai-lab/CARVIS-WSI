@@ -275,6 +275,10 @@ def verifyInput(arguments):
     if (len(sys.argv) < 1):
         terminate()
 
+    if (not arguments.c):
+        print("ERROR: no file or directory specifyed!")
+        terminate()
+
     #if (not os.path.isfile(arguments.c)):
     #    print("ERROR: CSV file not found!\n")
     #    print(arguments.c)
