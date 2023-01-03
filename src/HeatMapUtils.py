@@ -200,9 +200,9 @@ class HeatMapUtils():
             drawnPercentage = pixelX / endX
 
             # create color gradient
-            R = int(startColor[0] * drawnPercentage + endColor[0] * (1 - drawnPercentage))
-            G = int(startColor[1] * drawnPercentage + endColor[1] * (1 - drawnPercentage))
-            B = int(startColor[2] * drawnPercentage + endColor[2] * (1 - drawnPercentage))
+            R = int(endColor[0] * drawnPercentage + startColor[0] * (1 - drawnPercentage))
+            G = int(endColor[1] * drawnPercentage + startColor[1] * (1 - drawnPercentage))
+            B = int(endColor[2] * drawnPercentage + startColor[2] * (1 - drawnPercentage))
             A = 255
 
             draw.line(((pixelX, lineHeight), (stepEnd, lineHeight)), fill=(R, G, B, A), width=lineWidth)
@@ -255,12 +255,9 @@ class HeatMapUtils():
 
                 # count how many points are drawable
                 drawnPointsCount += 1
-                pointSize = 0
+                pointSize = int(pointRadius)
 
                 # draw point
-                if (lastPoint is None):
-                    pointSize = 9
-
                 imageDraw.ellipse(
                   [
                       (gazePointX - pointOffset,
@@ -271,7 +268,6 @@ class HeatMapUtils():
                   fill=pointColor,
                   outline=None,
                   width=pointSize)
-                #print(f'drawn size: {pointSize}')
 
             drawnPoints += drawnPointsCount
 
@@ -280,6 +276,7 @@ class HeatMapUtils():
         # so calculate number of image sections and get number of points per image section to claculate percentage
         # this is no tperfectly efficcient to iterate and check all points twice...
         colorGradientCounter = 0
+        newImage = True
         for imageSection in imageSections:
             for gazePoints in imageSection._eyeTracking:
                 # drop incomplete points
@@ -309,9 +306,9 @@ class HeatMapUtils():
                    print(f'drawnPercentage: {drawnPercentage}')
 
                 pathColor = (
-                   int(pathColorStart[0] * drawnPercentage + pathColorEnd[0] * (1 - drawnPercentage)),
-                   int(pathColorStart[1] * drawnPercentage + pathColorEnd[1] * (1 - drawnPercentage)),
-                   int(pathColorStart[2] * drawnPercentage + pathColorEnd[2] * (1 - drawnPercentage)),
+                   int(pathColorEnd[0] * drawnPercentage + pathColorStart[0] * (1 - drawnPercentage)),
+                   int(pathColorEnd[1] * drawnPercentage + pathColorStart[1] * (1 - drawnPercentage)),
+                   int(pathColorEnd[2] * drawnPercentage + pathColorStart[2] * (1 - drawnPercentage)),
                    int(pathColorEnd[3]))
 
                 # if it is the first one we can't draw a line yet
@@ -322,10 +319,37 @@ class HeatMapUtils():
                      width=pathStrength,
                      joint=None)
 
+                if (newImage):
+                    self.drawBiggerPoint(imageDraw, (gazePointX, gazePointY), pointSize, pathColorStart, 3)
+                    newImage = False
+                if (drawnPercentage == 1.0):
+                    self.drawBiggerPoint(imageDraw, (gazePointX, gazePointY), pointSize, pathColorEnd, 3)
+
                 lastPoint = (gazePointX, gazePointY)
         
         viewPath = Image.alpha_composite(image, viewPath)
         return viewPath
+
+    # used for start and end point to be drawn bigger and in start/end path color
+    def drawBiggerPoint(self, imageDraw, coordinates, pointRadius, pointColor, sizeFactor):
+        pointSize = sizeFactor * pointRadius
+        pointOffset = int(pointSize / 2)
+        gazePointX = coordinates[0]
+        gazePointY = coordinates[1]
+        
+        imageDraw.ellipse(
+            [
+                (gazePointX - pointOffset,
+                gazePointY - pointOffset),
+                (gazePointX + pointOffset,
+                gazePointY + pointOffset)
+            ],
+            fill=pointColor,
+            outline=None,
+            width=pointSize)
+        
+        pointSize = pointRadius
+        pointOffset = int(pointSize / 2)
 
     # returns roi legend drawn on bottom of roi image
     def addRoiColorLegend(self, image):
