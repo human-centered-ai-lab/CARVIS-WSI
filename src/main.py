@@ -501,6 +501,7 @@ def saveHeatmaps(heatmapDict, workerArgs):
             # just save as png
             heatmapDict[csvName][wsiName]['base'].save(EXPORT_DIR + wsiFileName + "_base_" + pathologistName)
             heatmapDict[csvName][wsiName]['color'].save(EXPORT_DIR + wsiFileName + "_colorHeatMap_" + pathologistName)
+            heatmapDict[csvName][wsiName]['colormap'].save(EXPORT_DIR + wsiFileName + "_colorMap_" + pathologistName)
             heatmapDict[csvName][wsiName]['roi'].save(EXPORT_DIR + wsiFileName + "_roiHeatmap_" + pathologistName)
             fileCounter += 3
 
@@ -582,9 +583,12 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
         if (workerArgs._roiLabelFlag):
             returnDict[csvFile][wsiName]['roi'] = heatMapUtils.addRoiColorLegend(returnDict[csvFile][wsiName]['roi'])
 
-        returnDict[csvFile][wsiName]['color'] = heatMapUtils.getHeatmap(
+        colorHeatmap = heatMapUtils.getHeatmap(
           baseImage,
           ImageSections[wsiName])
+        
+        returnDict[csvFile][wsiName]['color'] = colorHeatmap[0]
+        returnDict[csvFile][wsiName]['colormap'] = colorHeatmap[1]
 
         if (workerArgs._cellLabelFlag):
             returnDict[csvFile][wsiName]['color'] = heatMapUtils.addHeatmapColorLegend(returnDict[csvFile][wsiName]['color'], ImageSections[wsiName])

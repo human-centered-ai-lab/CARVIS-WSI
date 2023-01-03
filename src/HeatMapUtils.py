@@ -229,7 +229,7 @@ class HeatMapUtils():
         pathStrength = workerArgs._viewPathStrength
         pointColor = workerArgs._viewPathPointColor
 
-        if (pointRadius == (0,)):
+        if (pointRadius == 0):
             pointRadius = self.POINT_RADIUS
         pointOffset = int(pointRadius / 2)
 
@@ -255,18 +255,24 @@ class HeatMapUtils():
 
                 # count how many points are drawable
                 drawnPointsCount += 1
+                pointSize = pointRadius
 
                 # draw point
+                #if (lastPoint is None):
+                #    print("start point")
+                #    pointSize = 1
+
                 imageDraw.ellipse(
-                  [
+                [
                     (gazePointX - pointOffset,
                     gazePointY - pointOffset),
                     (gazePointX + pointOffset,
                     gazePointY + pointOffset)
-                  ], 
-                  fill=pointColor,
-                  outline=None, 
-                  width=pointRadius)
+                ], 
+                fill=pointColor,
+                outline=None, 
+                width=pointSize)
+                #print(f'drawn size: {pointSize}')
 
             drawnPoints += drawnPointsCount
 
@@ -700,7 +706,7 @@ class HeatMapUtils():
     # grid values need to be normalized first!
     # returns drawing on image
     def drawGridValues(self, image, gridValues):
-        image = Image.new('RGBA', image.size, color=0)
+        image = Image.new('RGBA', image.size, color=(0, 0, 0, 255))
         draw = ImageDraw.Draw(image, 'RGBA')
         # [width, height] (for all rows make the columns)
         gridColors = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
@@ -708,10 +714,18 @@ class HeatMapUtils():
         # first get through array of values to make array of colors
         for yCell in range(self._gridHeight):
             for xCell in range(self._gridWidth):
-                A = (int(255 * gridValues[yCell][xCell]))
-                B = 205
-                G = 244
-                R = 50
+                cellValue = gridValues[yCell][xCell]
+                A = 255
+                B = 0
+                G = 0
+                R = 0
+
+                if (cellValue != 0.0):
+                    A = (int(255 * cellValue))
+                    B = 205
+                    G = 244
+                    R = 50
+
                 gridColors[yCell][xCell] = (A, R, G, B)
 
         # go through all grid cells and get the center position (of the cell) on the image
@@ -854,4 +868,4 @@ class HeatMapUtils():
         
         # draw grid values on image and return
         heatmap = self.drawGridValues(image, normalizedGridData)
-        return Image.alpha_composite(baseImage, heatmap)
+        return (Image.alpha_composite(baseImage, heatmap), heatmap)
