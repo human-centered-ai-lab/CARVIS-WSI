@@ -267,9 +267,9 @@ class HeatMapUtils():
                       gazePointY - pointOffset),
                       (gazePointX + pointOffset,
                       gazePointY + pointOffset)
-                  ], 
+                  ],
                   fill=pointColor,
-                  outline=None, 
+                  outline=None,
                   width=pointSize)
                 #print(f'drawn size: {pointSize}')
 
