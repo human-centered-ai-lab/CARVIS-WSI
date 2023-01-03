@@ -255,23 +255,22 @@ class HeatMapUtils():
 
                 # count how many points are drawable
                 drawnPointsCount += 1
-                pointSize = pointRadius
+                pointSize = 0
 
                 # draw point
-                #if (lastPoint is None):
-                #    print("start point")
-                #    pointSize = 1
+                if (lastPoint is None):
+                    pointSize = 9
 
                 imageDraw.ellipse(
-                [
-                    (gazePointX - pointOffset,
-                    gazePointY - pointOffset),
-                    (gazePointX + pointOffset,
-                    gazePointY + pointOffset)
-                ], 
-                fill=pointColor,
-                outline=None, 
-                width=pointSize)
+                  [
+                      (gazePointX - pointOffset,
+                      gazePointY - pointOffset),
+                      (gazePointX + pointOffset,
+                      gazePointY + pointOffset)
+                  ], 
+                  fill=pointColor,
+                  outline=None, 
+                  width=pointSize)
                 #print(f'drawn size: {pointSize}')
 
             drawnPoints += drawnPointsCount
@@ -702,11 +701,22 @@ class HeatMapUtils():
     def extractThumbnail(self, slide, wsiDict, wsiName):
         wsiDict[wsiName] = slide.get_thumbnail((self._exportWidth, self._exportHeight))
 
+    # wrapper for drawGridValues.
+    # returns color map of given image
+    def getColorMap(self, image, gridValues):
+        colorMap = Image.new('RGBA', image.size, color=(0,0,0,255))
+        return self.drawGridValues(colorMap, gridValues, 255)
+    
+    # wrapper for drawGridValues
+    # returns color grid on given image
+    def drawColorHeatmap(self, image, gridValues):
+        return self.drawGridValues(image, gridValues, 0)
+
     # turns grid values into cell colors and draws them on given image
     # grid values need to be normalized first!
     # returns drawing on image
-    def drawGridValues(self, image, gridValues):
-        image = Image.new('RGBA', image.size, color=(0, 0, 0, 255))
+    def drawGridValues(self, image, gridValues, defaultAlpha):
+        image = Image.new('RGBA', image.size, color=(0, 0, 0, defaultAlpha))
         draw = ImageDraw.Draw(image, 'RGBA')
         # [width, height] (for all rows make the columns)
         gridColors = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
@@ -715,7 +725,7 @@ class HeatMapUtils():
         for yCell in range(self._gridHeight):
             for xCell in range(self._gridWidth):
                 cellValue = gridValues[yCell][xCell]
-                A = 255
+                A = defaultAlpha
                 B = 0
                 G = 0
                 R = 0
@@ -867,5 +877,6 @@ class HeatMapUtils():
         normalizedGridData = self.normalizeGridData(self._grid)
         
         # draw grid values on image and return
-        heatmap = self.drawGridValues(image, normalizedGridData)
-        return (Image.alpha_composite(baseImage, heatmap), heatmap)
+        heatmap = self.drawColorHeatmap(image, normalizedGridData)
+        colorMap = self.getColorMap(image, normalizedGridData)
+        return (Image.alpha_composite(baseImage, heatmap), colorMap)
