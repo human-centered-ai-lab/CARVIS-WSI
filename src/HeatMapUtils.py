@@ -273,10 +273,10 @@ class HeatMapUtils():
                 if (self.outsideImageSectionFrame(imageSection, gazePointX, gazePointY)):
                     continue
 
-                if (pathColorStart == (0,)):
+                if (pathColorStart == 0):
                     pathColorStart = self.PATH_START_COLOR
                 
-                if (pathColorEnd == (0,)):
+                if (pathColorEnd == 0):
                     pathColorEnd = self.PATH_END_COLOR
                 
                 if (pathStrength == 0):
@@ -288,7 +288,6 @@ class HeatMapUtils():
                 if (drawnPercentage > 1.0):
                    print(f'drawnPercentage: {drawnPercentage}')
 
-                # TODO: alpha value passthrough!
                 pathColor = (
                    int(pathColorStart[0] * drawnPercentage + pathColorEnd[0] * (1 - drawnPercentage)),
                    int(pathColorStart[1] * drawnPercentage + pathColorEnd[1] * (1 - drawnPercentage)),
