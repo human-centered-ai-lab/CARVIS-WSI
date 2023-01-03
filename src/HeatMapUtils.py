@@ -146,7 +146,7 @@ class HeatMapUtils():
         return counter
 
     # draws legend on bottom of the image to display start and end colors
-    def addViewPathColorLegend(self, image):
+    def addViewPathColorLegend(self, image, workerArgs):
         # draw legend, not high but as wide as image
         # merge both together. heatmap on top, legend on bottom
         heatmapWidth = image.size[0]
@@ -178,6 +178,18 @@ class HeatMapUtils():
         startX = (2 * offsetX) + zeroWidth
         endX = heatmapWidth - startX - int(textWidth / 2)
 
+        startColor = 0
+        endColor = 0
+        if (workerArgs._viewPathColorStart != 0):
+            startColor = workerArgs._viewPathColorStart
+        else:
+            startColor = self.PATH_START_COLOR
+
+        if (workerArgs._viewPathColorStart != 0):
+            endColor = workerArgs._viewPathColorEnd
+        else:
+            startColor = self.PATH_END_COLOR
+
         # TODO: cleanup and refactor (also in drawViewpathLegend)
         legendStep = 75
         for pixelX in range(startX, endX, legendStep):
@@ -185,9 +197,9 @@ class HeatMapUtils():
             drawnPercentage = pixelX / endX
 
             # create color gradient
-            R = int(self.PATH_START_COLOR[0] * drawnPercentage + self.PATH_END_COLOR[0] * (1 - drawnPercentage))
-            G = int(self.PATH_START_COLOR[1] * drawnPercentage + self.PATH_END_COLOR[1] * (1 - drawnPercentage))
-            B = int(self.PATH_START_COLOR[2] * drawnPercentage + self.PATH_END_COLOR[2] * (1 - drawnPercentage))
+            R = int(startColor[0] * drawnPercentage + endColor[0] * (1 - drawnPercentage))
+            G = int(startColor[1] * drawnPercentage + endColor[1] * (1 - drawnPercentage))
+            B = int(startColor[2] * drawnPercentage + endColor[2] * (1 - drawnPercentage))
             A = 255
 
             draw.line(((pixelX, lineHeight), (stepEnd, lineHeight)), fill=(R, G, B, A), width=lineWidth)

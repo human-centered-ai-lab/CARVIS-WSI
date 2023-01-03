@@ -600,7 +600,8 @@ def heatmapWorker(ImageSections, csvFile, rawWsiDict, wsiBaseDict, workerArgs):
 
             if (workerArgs._viewPathLabelFlag):
                 returnDict[csvFile][wsiName]['viewpath'] = heatMapUtils.addViewPathColorLegend(
-                    returnDict[csvFile][wsiName]['viewpath']
+                    returnDict[csvFile][wsiName]['viewpath'],
+                    workerArgs
                 )
 
     saveHeatmaps(returnDict, workerArgs)
