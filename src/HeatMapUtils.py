@@ -470,8 +470,8 @@ class HeatMapUtils():
 
             # create a grid for every image section
             imageSectionTimestamps = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
-            
-            # additionally grid to save highest sample factor on grid
+
+            # additional grid to save highest sample factor on grid
             gridMagnificationFactors = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
             for gazePoint in imageSection._eyeTracking:
