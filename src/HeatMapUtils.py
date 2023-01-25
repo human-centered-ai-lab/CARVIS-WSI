@@ -26,6 +26,8 @@ class HeatMapUtils():
     PATH_START_COLOR = (127, 191, 15, 255)
     PATH_END_COLOR = (15, 109, 191, 255)
 
+    MIN_ROI_ALPHA = 0.07 # specifyes the minimal percent of how much the rectangles gets drawn
+
     FONT_FILE = "templates/arial.ttf"
 
     MAG_40_SCAN_RES = 100000
@@ -128,7 +130,7 @@ class HeatMapUtils():
     # returns the magnification form the downsample factor
     def getMagnification(self, downsampleFactor):
         return self.SCAN_MAG / downsampleFactor
-
+#minAlphaFactor = 0.05 
     # filters out invalid points
     # returns number of usable points
     def getValidGazepointCount(self, imageSection):
@@ -603,7 +605,7 @@ class HeatMapUtils():
                 image.paste(hatchingPattern, (cellCenterX, cellCenterY), hatchingPattern)
 
         return image
-
+#minAlphaFactor = 0.05 
     # returns grid of time values relative to given imageSection
     # time values represent time spent looking onto cell
     def mapImageSectionTimesToGrid(self, grid, timeSpent):
@@ -652,7 +654,6 @@ class HeatMapUtils():
     def drawRoiOnImage(self, baseImage, imageSections, filling=None, lineWidth=10):
         alphaImage = baseImage.copy()
         alphaImage.load() # needed for split()
-        minAlphaFactor = 0.05 # specifyes the minimal percent of how much the rectangles gets drawn
 
         image = Image.new('RGB', alphaImage.size, (255, 255, 255))
         image.paste(alphaImage, mask=alphaImage.split()[3]) # 3 is alpha
@@ -699,7 +700,7 @@ class HeatMapUtils():
                 outlineColor = self.MAGNIFICATION_40
 
             rawAlpha = 100 * normalizedList[index]
-            scaledAlpha = self.mapValue(rawAlpha, 0.0, 100.0, (minAlphaFactor * 255), 255)
+            scaledAlpha = self.mapValue(rawAlpha, 0.0, 100.0, (self.MIN_ROI_ALPHA * 255), 255)
 
             outlineing=(
               outlineColor[0],
