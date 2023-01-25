@@ -514,6 +514,7 @@ def saveHeatmaps(heatmapDict, workerArgs):
                 fileCounter += 1
 
             # first convert to rgb mode to be savable as jpg
+            # this breaks some parts of alpha drawn parts like the lagend of color heatmap
             '''baseImage = convertToJpg(heatmapDict[csvName][wsiName]['base'])
             colorImage = convertToJpg(heatmapDict[csvName][wsiName]['color'])
             roiImage = convertToJpg(heatmapDict[csvName][wsiName]['roi'])
