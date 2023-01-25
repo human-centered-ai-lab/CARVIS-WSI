@@ -26,7 +26,7 @@ class HeatMapUtils():
     PATH_START_COLOR = (127, 191, 15, 255)
     PATH_END_COLOR = (15, 109, 191, 255)
 
-    MIN_ROI_ALPHA = 0.07 # specifyes the minimal percent of how much the rectangles gets drawn
+    MIN_ROI_ALPHA = 0.07
 
     FONT_FILE = "templates/arial.ttf"
 
@@ -716,10 +716,13 @@ class HeatMapUtils():
                 fill=filling,
                 outline=outlineing,
                 width=lineWidth)
+            
+            #draw.point((topLeftX, topLeftY), fill=255)
+            #draw.point((bottomRightX, bottomRightY), fill=255)
 
         return image
 
-    # extracts a "level" (only resolution) of the whole slide image and converts it to a jpg
+    # extracts a "level" (only resolution) of the whole slide image and converts it to a image
     # returns the level on success or None on failure
     def extractThumbnail(self, slide, wsiDict, wsiName):
         wsiDict[wsiName] = slide.get_thumbnail((self._exportWidth, self._exportHeight))
