@@ -869,7 +869,7 @@ class HeatMapUtils():
     # calculates heat of grid cells
     # uses GazePoints, which are mapped to export resolution
     # to draw a map on an image
-    # returns colored, mostly transparent, cells rendered onto a .jpg
+    # returns colored, mostly transparent, cells rendered onto a .png
     def getHeatmap(self, baseImage, imageSections):
         image = baseImage.copy()
         for imageSection in imageSections:
