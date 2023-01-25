@@ -130,7 +130,7 @@ class HeatMapUtils():
     # returns the magnification form the downsample factor
     def getMagnification(self, downsampleFactor):
         return self.SCAN_MAG / downsampleFactor
-#minAlphaFactor = 0.05 
+
     # filters out invalid points
     # returns number of usable points
     def getValidGazepointCount(self, imageSection):
@@ -605,7 +605,7 @@ class HeatMapUtils():
                 image.paste(hatchingPattern, (cellCenterX, cellCenterY), hatchingPattern)
 
         return image
-#minAlphaFactor = 0.05 
+
     # returns grid of time values relative to given imageSection
     # time values represent time spent looking onto cell
     def mapImageSectionTimesToGrid(self, grid, timeSpent):
