@@ -99,7 +99,7 @@ When the programm is has finished all renderings, `done.` will be printed.
 
 ## Output Interpretation
 
-### Region Of Interes
+### Region Of Interest
 Uses line strength (not width!) to visualize what areas of the WSI an Pathologist has viewed the most. The line strength resemples the time spent observing at the area, relative to the total time spent looking at this WSI. Stronger lines resemble longer time spent, weaker lines resemble less time spent on a particular area.
 
 The Color of outlineing resemples the downsample factor to which the area has been zoomed in. The more a Pathologist has zoomed in to an specific area, the smaller the downsample factor number gets. \
