@@ -575,11 +575,9 @@ class HeatMapUtils():
                 
                 for key in self._gridHatchingData[yCell][xCell].getKeys():
                     gotCurrentFlag = self._gridHatchingData[yCell][xCell].getHatchingFlag(key)
+                    hatchingPattern = hatching.getDefautlHatching()
                     if (gotCurrentFlag):
                         hatchingPattern = hatching.getHatching(key)
-                    if ((not gotCurrentFlag) and
-                      (self._gridHatchingData[yCell][xCell].getNumOfSetFlags() < 1)):
-                        hatchingPattern = hatching.getDefautlHatching()
                     image.paste(hatchingPattern, (cellCenterX, cellCenterY), hatchingPattern)
         return image
 
@@ -826,8 +824,8 @@ class HeatMapUtils():
 
     # returns mapped Cell on grid [x, y]
     def mapToCell(self, gazeX, gazeY):
-        xCell = math.ceil(gazeX / self.CELL_SIZE_X)
-        yCell = math.ceil(gazeY / self.CELL_SIZE_Y)
+        xCell = math.floor(gazeX / self.CELL_SIZE_X)
+        yCell = math.floor(gazeY / self.CELL_SIZE_Y)
 
         return (xCell, yCell)
 
