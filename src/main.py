@@ -212,11 +212,11 @@ def readCSV(file):
 
                     # first get all parameters
                     imageSection = getRoiParameters(row)
-                    
+
                     # then add collected lists
                     imageSection.addTimestamps(imageSectionTimestamps)
                     imageSection.addEyeTracking(gazePointList)
-                    
+
                     # append image section
                     ImageSectionList.append(imageSection)
 

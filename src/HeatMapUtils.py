@@ -294,18 +294,18 @@ class HeatMapUtils():
 
                 if (pathColorStart == 0):
                     pathColorStart = self.PATH_START_COLOR
-                
+
                 if (pathColorEnd == 0):
                     pathColorEnd = self.PATH_END_COLOR
-                
+
                 if (pathStrength == 0):
                     pathStrength = self.PATH_STRENGTH
 
                 colorGradientCounter += 1
 
                 drawnPercentage = colorGradientCounter / drawnPoints
-                if (drawnPercentage > 1.0):
-                   print(f'drawnPercentage: {drawnPercentage}')
+                if (drawnPercentage > 1.0): # thats an error
+                   print(f'drawnPercentage: {drawnPercentage}/1.0')
 
                 pathColor = (
                    int(pathColorEnd[0] * drawnPercentage + pathColorStart[0] * (1 - drawnPercentage)),
@@ -328,7 +328,7 @@ class HeatMapUtils():
                     self.drawBiggerPoint(imageDraw, (gazePointX, gazePointY), pointSize, pathColorEnd, 3)
 
                 lastPoint = (gazePointX, gazePointY)
-        
+
         viewPath = Image.alpha_composite(image, viewPath)
         return viewPath
 
@@ -398,6 +398,7 @@ class HeatMapUtils():
         return heatmapLegend
 
     # returns legend drawing on bottom of heatmap
+
     def addHeatmapColorLegend(self, image, ImageSections):
         legendStep = 75
 
@@ -462,7 +463,7 @@ class HeatMapUtils():
     def getHatchingHeatmap(self, baseImage, imageSections, alpha):
         image = baseImage.copy()
         hatching = Image.new('RGBA', image.size, color=0)
-        
+
         # see how much time someone has spent looking on one grid cell
         for imageSection in imageSections:
             # time is in ms
@@ -473,7 +474,7 @@ class HeatMapUtils():
             # create a grid for every image section
             imageSectionTimestamps = [[0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
-            # additional grid to save highest sample factor on grid
+            # additional grid to save magnification factors
             gridMagnificationFactors = [[0.0 for x in range(self._gridWidth)] for y in range(self._gridHeight)]
 
             for gazePoint in imageSection._eyeTracking:
@@ -509,7 +510,8 @@ class HeatMapUtils():
                     magnificationFactor)
 
                 # now save it as magnification
-                if (imageSection._downsampleFactor > gridMagnificationFactors[yCell][xCell]):
+                #if (imageSection._downsampleFactor > gridMagnificationFactors[yCell][xCell]):
+                if (magnificationFactor > gridMagnificationFactors[yCell][xCell]):
                     gridMagnificationFactors[yCell][xCell] = magnificationFactor
 
             # after all eye data inside a imageSection normalize hitmap grid
@@ -525,7 +527,6 @@ class HeatMapUtils():
 
         # draw patterns on grid based on watching time
         # also scale up or down templates based on cell size
-        #heatmap = self.drawHatching(hatching, self._gridTimestamps, gridMagnificationFactors, alpha)
         heatmap = self.drawHatchingData(hatching, alpha)
         smth = Image.alpha_composite(image, heatmap)
         return smth
@@ -680,22 +681,22 @@ class HeatMapUtils():
 
             if (magnification < 2.5):
                 outlineColor = self.MAGNIFICATION_MIN
-            
+
             elif (magnification >= 2.5 and magnification < 5):
                 outlineColor = self.MAGNIFICATION_2_5
             
             elif (magnification >= 5 and magnification < 10):
                 outlineColor = self.MAGNIFICATION_5
-            
+
             elif (magnification >= 10 and magnification < 20):
                 outlineColor = self.MAGNIFICATION_10
-            
+
             elif (magnification >= 20 and magnification < 30):
                 outlineColor = self.MAGNIFICATION_20
 
             elif (magnification >= 30 and magnification < 40):
                 outlineColor = self.MAGNIFICATION_30
-            
+
             elif (magnification > 40 and magnification >= 30):
                 outlineColor = self.MAGNIFICATION_40
 
@@ -716,10 +717,10 @@ class HeatMapUtils():
                 fill=filling,
                 outline=outlineing,
                 width=lineWidth)
-            
-            #draw.point((topLeftX, topLeftY), fill=255)
-            #draw.point((bottomRightX, bottomRightY), fill=255)
 
+            # for debug only
+            #draw.ellipse([(topLeftX, topLeftY), (topLeftX + 5, topLeftY + 5)], outline="black", fill="black")
+            #draw.ellipse([(bottomRightX - 5, bottomRightY - 5), (bottomRightX, bottomRightY)], outline="red", fill="red")
         return image
 
     # extracts a "level" (only resolution) of the whole slide image and converts it to a image
@@ -806,11 +807,11 @@ class HeatMapUtils():
 
         # current height, current width are relative to wsi
         # calculate gaze point relative to frame. image section is shown on monitor
-        # with iMotions window
+        # within iMotions window (just nearby dead window part)
         relativeGazePointX = gazeX - deadWidth
         relativeGazePointY = gazeY - deadHeight
 
-        # next step is to calculate gaze point relative to wsi
+        # next step is to calculate gaze point position relative to wsi
         # image section corner points (view roi) are relative to wsi so use them
         realGazeX = imageSection._topLeftX + relativeGazePointX
         realGazeY = imageSection._topLeftY + relativeGazePointY
@@ -824,13 +825,12 @@ class HeatMapUtils():
 
         # this should be it
 
-        return (exportGazeX, exportGazeY) # how got sometimes negative indexes?
+        return (exportGazeX, exportGazeY) # why are some indexes negative?
 
     # returns mapped Cell on grid [x, y]
     def mapToCell(self, gazeX, gazeY):
         xCell = math.floor(gazeX / self.CELL_SIZE_X)
         yCell = math.floor(gazeY / self.CELL_SIZE_Y)
-
         return (xCell, yCell)
 
     # protects cell mapping from edge cases
