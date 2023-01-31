@@ -195,15 +195,16 @@ def readCSV(file):
         # sort data by ImageSections
         readOK = False
 
+        gazePointCounter = 0
+
         for row in csvFile:
             if (row[0] == '1'): # line after "Row"
-                readOK = True
+                readOK = True   # when true it saves also eye data before the first image section (?)
                 continue
             
             # in first line where timestamps are
             if (readOK):
                 roiChangeColumn = row[11][:6].strip()
-
                 # drop lines where eye tracking data is empty
                 # when there is a new roi change signal save all currently
                 # collected data to existing image section and create a new one
@@ -212,6 +213,10 @@ def readCSV(file):
 
                     # first get all parameters
                     imageSection = getRoiParameters(row)
+
+                    if imageSection._fileName == "MUGGRZ-PATH-SCAN-SS7525-1021032.svs":
+                        print(f'reset counter. last value: {gazePointCounter}')
+                        gazePointcounter = 0
 
                     # then add collected lists
                     imageSection.addTimestamps(imageSectionTimestamps)
@@ -239,21 +244,22 @@ def readCSV(file):
                         imageSectionTimestamps.append(float(row[1]))
 
                         gazePoint = GazePoint(
-                            row[13],
-                            row[14],
-                            row[15],
-                            row[16],
-                            row[17],
-                            row[18],
-                            row[19],
-                            row[20],
-                            row[21],
-                            row[22],
-                            row[23],
-                            row[24],
-                            row[25]
+                            row[13],    # ET_GazeLeftx
+                            row[14],    # ET_GazeLefty
+                            row[15],    # ET_GazeRightx
+                            row[16],    # ET_GazeRighty
+                            row[17],    # ET_PupilLeft
+                            row[18],    # ET_PupilRight
+                            row[19],    # ET_TimeSignal
+                            row[20],    # ET_DistanceLeft
+                            row[21],    # ET_DistanceRight
+                            row[22],    # ET_CameraLeftX
+                            row[23],    # ET_CameraLeftY
+                            row[24],    # ET_CameraRightX
+                            row[25]     # ET_CameraRightY
                         )
                         gazePointList.append(gazePoint)
+                        gazePointCounter += 1
 
         # also don't forget to save all pending eye tracking data to last fileName in ImageSectionsDict
         if (len(ImageSectionList) >= 1):

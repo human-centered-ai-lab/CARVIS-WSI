@@ -236,6 +236,9 @@ class HeatMapUtils():
         pointOffset = int(pointRadius / 2)
 
         drawnPoints = 0
+        notDrawnPoints = 0
+        incompletePonts = 0
+        outsideFramePoints = 0
         for imageSection in imageSections:
             # just get point count and interpolate color over points
             drawnPointsCount = 0
@@ -243,6 +246,8 @@ class HeatMapUtils():
 
                 # drop incomplete points
                 if (self.incompleteGazeData(gazePoints)):
+                    notDrawnPoints += 1
+                    incompletePonts += 1
                     continue
 
                 # map eye data to gaze point on output resolution image
@@ -250,6 +255,8 @@ class HeatMapUtils():
 
                 # check if mapped point is inside image section frame
                 if (self.outsideImageSectionFrame(imageSection, gazePointX, gazePointY)):
+                    notDrawnPoints += 1
+                    outsideFramePoints += 1
                     continue
 
                 if (pointColor == 0):
@@ -272,6 +279,8 @@ class HeatMapUtils():
                   width=pointSize)
 
             drawnPoints += drawnPointsCount
+            #if imageSection._fileName == "MUGGRZ-PATH-SCAN-SS7525-1021032.svs":
+            #    print(f'draw {drawnPointsCount} points | not drawn {notDrawnPoints} points | incomplete: {incompletePonts} | outside frame: {outsideFramePoints}')
 
         # now draw lines with clor gradient
         # need to draw start to end over all image sections
@@ -803,23 +812,38 @@ class HeatMapUtils():
         # need to turn monitor related position into wsi (layer 0) related position
 
         # calculate dead part on recording monitor, which is the iMotions window
+        # falsch!
         deadWidth = self.DISPLAY_X - imageSection._width
         deadHeight = self.DISPLAY_Y - imageSection._height
+
+        #if deadHeight < 0 or deadWidth < 0:
+        #    print("dead height/width is negative")
 
         # current height, current width are relative to wsi
         # calculate gaze point relative to frame. image section is shown on monitor
         # within iMotions window (just nearby dead window part)
+        # falsch!
+        print(f'{gazeX} - {deadWidth} = {gazeX - deadWidth}')
         relativeGazePointX = gazeX - deadWidth
         relativeGazePointY = gazeY - deadHeight
+
+        #if relativeGazePointX < 0 or relativeGazePointY < 0:
+        #    print("relative gaze point is negative")
 
         # next step is to calculate gaze point position relative to wsi
         # image section corner points (view roi) are relative to wsi so use them
         realGazeX = imageSection._topLeftX + relativeGazePointX
         realGazeY = imageSection._topLeftY + relativeGazePointY
 
+        #if realGazeX < 0 or realGazeY < 0:
+        #    print("real gaze is negative")
+
         # now map gaze points to export resolution
         resolutionFactorX = self._exportWidth / self._layer0X
         resolutionFactorY = self._exportHeight / self._layer0Y
+
+        #if resolutionFactorX < 0 or relativeGazePointY < 0:
+        #    print("negative resolution factor")
 
         exportGazeX = int(realGazeX * resolutionFactorX)
         exportGazeY = int(realGazeY * resolutionFactorY)
@@ -827,6 +851,14 @@ class HeatMapUtils():
         # this should be it
 
         return (exportGazeX, exportGazeY) # why are some indexes negative?
+
+    # try to rewrite mapGazePoint but in a more correct manner
+    def mapGazePointCorrect(self, imageSection, gazePoints):
+        gazeX = int((gazePoints._leftX + gazePoints._rightX) / 2)
+        gazeY = int((gazePoints._leftY + gazePoints._rightY) / 2)
+
+
+        pass
 
     # returns mapped Cell on grid [x, y]
     def mapToCell(self, gazeX, gazeY):

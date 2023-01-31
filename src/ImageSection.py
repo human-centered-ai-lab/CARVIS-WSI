@@ -39,6 +39,7 @@ class ImageSection():
         self._bottomRightY = float(bottomRightY)
         self._timestamps = [ ]
         self._eyeTracking = [ ]
+        self._gazePointsCount = 0
     
     # appends timestamps to empty _timestamps list
     # for inheritance reasons
