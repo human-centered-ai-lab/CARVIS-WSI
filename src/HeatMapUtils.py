@@ -578,10 +578,11 @@ class HeatMapUtils():
                 
                 for key in self._gridHatchingData[yCell][xCell].getKeys():
                     gotCurrentFlag = self._gridHatchingData[yCell][xCell].getHatchingFlag(key)
-                    hatchingPattern = hatching.getDefautlHatching()
+
+                    #hatchingPattern = hatching.getDefautlHatching()
                     if (gotCurrentFlag):
                         hatchingPattern = hatching.getHatching(key)
-                    image.paste(hatchingPattern, (cellCenterX, cellCenterY), hatchingPattern)
+                        image.paste(hatchingPattern, (cellCenterX, cellCenterY), hatchingPattern)
         return image
 
     # returns image with drawn on hatching
