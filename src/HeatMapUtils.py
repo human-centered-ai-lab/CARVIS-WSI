@@ -20,6 +20,7 @@ class HeatMapUtils():
     MAX_ROI_LEGEND_SIZE = 75
     DISPLAY_X = 1920
     DISPLAY_Y = 1080
+    WIN_TASKBAR_HEIGHT = 40
     PATH_STRENGTH = 2
     POINT_RADIUS = 9
     POINT_COLOR = (3, 252, 161, 255)
@@ -279,8 +280,8 @@ class HeatMapUtils():
                   width=pointSize)
 
             drawnPoints += drawnPointsCount
-            #if imageSection._fileName == "MUGGRZ-PATH-SCAN-SS7525-1021032.svs":
-            #    print(f'draw {drawnPointsCount} points | not drawn {notDrawnPoints} points | incomplete: {incompletePonts} | outside frame: {outsideFramePoints}')
+            if imageSection._fileName == "MUGGRZ-PATH-SCAN-SS7525-1021032.svs":
+                print(f'draw {drawnPointsCount} points | not drawn {notDrawnPoints} points | incomplete: {incompletePonts} | outside frame: {outsideFramePoints}')
 
         # now draw lines with clor gradient
         # need to draw start to end over all image sections
@@ -407,7 +408,6 @@ class HeatMapUtils():
         return heatmapLegend
 
     # returns legend drawing on bottom of heatmap
-
     def addHeatmapColorLegend(self, image, ImageSections):
         legendStep = 75
 
@@ -499,7 +499,7 @@ class HeatMapUtils():
                     continue
 
                 # map gazepoints to export resolution
-                gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoint)
+                #gazePointX, gazePointY = self.mapGazePoint(imageSection, gazePoint)
 
                 # map to grid
                 xCell, yCell = self.mapToCell(gazePointX, gazePointY)
@@ -802,7 +802,7 @@ class HeatMapUtils():
         return image
 
     # returns gaze point mapped to the export resolution [x, y]
-    def mapGazePoint(self, imageSection, gazePoints):
+    def mapGazePointOld(self, imageSection, gazePoints):
         # center gaze point
         # relative to monitor upper left corner
         gazeX = int((gazePoints._leftX + gazePoints._rightX) / 2)
@@ -811,8 +811,7 @@ class HeatMapUtils():
         # eye data (or "gaze point") is relative to upper left corner of monitor
         # need to turn monitor related position into wsi (layer 0) related position
 
-        # calculate dead part on recording monitor, which is the iMotions window
-        # falsch!
+        # calculate dead part on recording monitor, which is the QuPath window
         deadWidth = self.DISPLAY_X - imageSection._width
         deadHeight = self.DISPLAY_Y - imageSection._height
 
@@ -822,8 +821,7 @@ class HeatMapUtils():
         # current height, current width are relative to wsi
         # calculate gaze point relative to frame. image section is shown on monitor
         # within iMotions window (just nearby dead window part)
-        # falsch!
-        print(f'{gazeX} - {deadWidth} = {gazeX - deadWidth}')
+        #print(f'{gazeX} - {deadWidth} = {gazeX - deadWidth}')
         relativeGazePointX = gazeX - deadWidth
         relativeGazePointY = gazeY - deadHeight
 
@@ -853,12 +851,29 @@ class HeatMapUtils():
         return (exportGazeX, exportGazeY) # why are some indexes negative?
 
     # try to rewrite mapGazePoint but in a more correct manner
-    def mapGazePointCorrect(self, imageSection, gazePoints):
+    # returns gaze point as tuple (x, y)
+    def mapGazePoint(self, imageSection, gazePoints):
         gazeX = int((gazePoints._leftX + gazePoints._rightX) / 2)
         gazeY = int((gazePoints._leftY + gazePoints._rightY) / 2)
 
+        deadWidth = self.DISPLAY_X - imageSection._width
+        deadHeight = self.DISPLAY_Y - self.WIN_TASKBAR_HEIGHT - imageSection._height
 
-        pass
+        # sometimes these values go negative -> shouls always be > 0
+        gazeOnDisplayX = gazeX - deadWidth
+        gazeOnDisplayY = gazeY - deadHeight
+
+        heightScaleFactor = self._exportWidth / self._layer0X 
+        widthScaleFactor = self._exportHeight / self._layer0Y
+        #print(f'heigt: {heightScaleFactor}, widht: {widthScaleFactor}')
+
+        gazeOnExportX = int(gazeOnDisplayX / widthScaleFactor)
+        gazeOnExportY = int(gazeOnDisplayY / heightScaleFactor)
+
+        if gazeOnExportX < 0:
+            print(f'gazeExportX: {gazeOnExportX}, gazeOnDisplayX: {gazeOnDisplayX}, widhtScaleFactor: {widthScaleFactor}, gazeX: {gazeX}')
+
+        return (gazeOnExportX, gazeOnExportY)
 
     # returns mapped Cell on grid [x, y]
     def mapToCell(self, gazeX, gazeY):
@@ -900,7 +915,6 @@ class HeatMapUtils():
             or gazePoint._leftY < 0
             or gazePoint._rightY < 0):
             return True
-        
         return False
 
     # calculates heat of grid cells
