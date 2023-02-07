@@ -215,7 +215,7 @@ def readCSV(file):
                     imageSection = getRoiParameters(row)
 
                     if imageSection._fileName == "MUGGRZ-PATH-SCAN-SS7525-1021032.svs":
-                        print(f'reset counter. last value: {gazePointCounter}')
+                        #print(f'reset counter. last value: {gazePointCounter}')
                         gazePointcounter = 0
 
                     # then add collected lists
