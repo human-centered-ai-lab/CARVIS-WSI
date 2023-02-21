@@ -30,7 +30,7 @@ Then build the docker container.
 docker build -t slide-heatmap .
 ```
 
-This command may take some time to run, depending on the system. It downloads the latest Docker Python image and installs all depenecies so this does not have to be done manually. \
+This command may take some time to run, depending on the system. It downloads the latest Docker Python image and installs all dependencies so this does not have to be done manually. \
 For writing the exported files, there will be a user and user group with the same parameters added as your current user to avoid permission errors.
 
 -----
