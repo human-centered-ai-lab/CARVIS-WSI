@@ -4,7 +4,7 @@
 <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/human-centered-ai-lab/SlideHeatmap">
 
 # SlideHeatmap
-This Project aims to render heatmap data onto an extracted histopathology whole slide image (WSI) using eye tracking data collected with [iMotions](https://imotions.com).
+This software aims to render heatmap data onto an extracted histopathology whole slide image (WSI) using eye tracking data collected with [iMotions](https://imotions.com).
 
 <details>
 <summary>Here are some up to date output sample files:</summary>
