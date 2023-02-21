@@ -105,17 +105,17 @@ When the program has finished all renderings, `done.` will be printed.
 ## Output Interpretation
 
 ### Region Of Interest
-Uses line strength (not width!) to visualize what areas of the WSI a participant of the eye tracking session has viewed the most. The line strength resembles the time spent observing the area, relative to the total time spent looking at this WSI. Stronger lines resemble longer time spent, weaker lines resemble less time spent on a particular area.
+Uses line opacity to visualize what areas of the WSI a participant of the eye tracking session has viewed the most. The line opacity resembles the time spent observing the area, relative to the total time spent looking at this WSI. More opaque lines resemble longer time spent, more transparent lines resemble less time spent on a particular area.
 
-The Color of outlineing resemples the downsample factor to which the area has been zoomed in. The more a Pathologist has zoomed in to an specific area, the smaller the downsample factor number gets. \
-A rule of thumb is that, bigger areas result in higher downsample factors and smaller image sections result in smaller downsample factors.
+The color of outlining resembles the downsample factor to which the area has been zoomed in. The more a participant of the eye tracking session has zoomed in to a specific area, the smaller the downsample factor gets. \
+A rule of thumb is that bigger areas result in higher downsample factors and smaller image sections result in smaller downsample factors.
 
 ### Color Heatmap
-The Color Heatmap only draws one color, but in different strenghts. \
-The drawn color strength on each cell is relative to the total time spent observing at this WSI. Stronger cells have been observed longer than weaker colored ones.
+The color heatmap draws only one color, but in different opacities. \
+The opacity on each square is relative to the total time spent observing that part of the WSI. More opaque squares have been observed longer than more transparent ones.
 
 ### Hatching Heatmap
-The Hatching Heatmap uses different pattern to visualize the observation duration and magnification of cells. \
+The hatching heatmap uses different hatch patterns to visualize the observation duration and magnification of areas. \
 The following pattern is being used.
 
 <br><img src="images/Hatching_Pattern.png"></br>
