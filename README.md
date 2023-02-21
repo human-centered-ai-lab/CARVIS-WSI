@@ -16,7 +16,7 @@ This software aims to render heatmap data onto an extracted histopathology whole
 </details>
 
 ## Installation
-To setup this programm you need to clone the master branch of this repository.
+To setup this program you need to clone the master branch of this repository.
 
 `git clone git@github.com:human-centered-ai-lab/SlideHeatmap.git`
 
