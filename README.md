@@ -13,14 +13,6 @@ For a more detailed description of the concepts used by SlideHeatmap, please see
 
 Please cite the above article, if you use SlideHeatmap in your research.
 
-<details>
-<summary>Here are some up to date output sample files:</summary>
-<br><img src="images/sample_1.png"></br>
-<br><img src="images/sample_2.png"></br>
-<br><img src="images/sample_3.png"></br>
-<br><img src="images/sample_4.png"></br>
-<br><img src="images/sample_5.png"></br>
-</details>
 
 ## Installation
 To setup this program you need to clone the master branch of this repository.
@@ -109,6 +101,11 @@ Important to know is that a resolution with the same width/height ratio as the o
 
 When the program has finished all renderings, `done.` will be printed.
 
+## Input Example
+Example of an input slides that will be processed by SlideHeatmap.
+
+<br><img src="images/sample_1.png"></br>
+
 ## Output Interpretation
 
 ### Region Of Interest
@@ -121,11 +118,29 @@ A rule of thumb is that bigger areas result in higher downsample factors and sma
 The color heatmap draws only one color, but in different opacities. \
 The opacity on each square is relative to the total time spent observing that part of the WSI. More opaque squares have been observed longer than more transparent ones.
 
-### Hatching Heatmap
-The hatching heatmap uses different hatch patterns to visualize the observation duration and magnification of areas. \
-The following pattern is being used.
+<br><img src="images/sample_2.png"></br>
 
-<br><img src="images/Hatching_Pattern.png"></br>
+
+### Hatching Heatmap
+<img src="images/Hatching_Pattern.png" align="right" width="200" height="200" >
+The hatching heatmap uses different hatch patterns to visualize the observation duration and magnification of areas. The following pattern is being used.
+
+
+<br><img src="images/sample_3.png"></br>
+
+
+### Observation Path
+The observation path illustrates the centers of the observed areas from start to end.
+
+
+<br><img src="images/sample_4.png"></br>
+
+
+### Examined Areas
+
+The examined araes are illustrated by framed image sections with the corresponding magnifictaion.
+
+<br><img src="images/sample_5.png"></br>
 
 
 ## Folder Structure
