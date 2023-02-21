@@ -1,13 +1,18 @@
+[![Build Status Docker](https://github.com/human-centered-ai-lab/SlideHeatmap/actions/workflows/docker-image.yml/badge.svg)](https://github.com/human-centered-ai-lab/SlideHeatmap/actions)
+<img alt="GitHub top language" src="https://img.shields.io/github/languages/top/human-centered-ai-lab/SlideHeatmap">
+<img alt="GitHub language count" src="https://img.shields.io/github/languages/count/human-centered-ai-lab/SlideHeatmap">
+<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/human-centered-ai-lab/SlideHeatmap">
+
 # SlideHeatmap
 This Project aims to render heatmap data onto an extracted WSI using eye tracking data collected with iMotions.
 
 <details>
 <summary>Here are some up to date output sample files:</summary>
-<br><img src="/images/sample_1.png"></br>
-<br><img src="/images/sample_2.png"></br>
-<br><img src="/images/sample_3.png"></br>
-<br><img src="/images/sample_4.png"></br>
-<br><img src="/images/sample_5.png"></br>
+<br><img src="images/sample_1.png"></br>
+<br><img src="images/sample_2.png"></br>
+<br><img src="images/sample_3.png"></br>
+<br><img src="images/sample_4.png"></br>
+<br><img src="images/sample_5.png"></br>
 </details>
 
 ## Installation
@@ -113,7 +118,7 @@ The drawn color strength on each cell is relative to the total time spent observ
 The Hatching Heatmap uses different pattern to visualize the observation duration and magnification of cells. \
 The following pattern is being used.
 
-<br><img src="/images/Hatching_Pattern.png"></br>
+<br><img src="images/Hatching_Pattern.png"></br>
 
 
 ## Folder Structure
@@ -142,6 +147,18 @@ The following pattern is being used.
 | ET_DistanceLeft/Right | Distance between Left/Right eye and eye tracker. | - | - |
 | ET_CameraLeft/RightX/Y | X/Y coordinate of Left/Right eye gaze Point.  | - | Absolute pixels on display's left upper corner. |
 
-
-
 > **_NOTE:_** This Project is currently WIP! When features are implemented they get merged into master branch.
+
+## Citation
+
+For more information about the motivation of the SlideHeatmap, please see the following article:
+
+> [Understanding and Explaining Diagnostic Paths: Toward Augmented Decision Making](https://ieeexplore.ieee.org/abstract/document/9861384) <br>
+> M Plass, M Kargl, P Nitsche, E Jungwirth, A Holzinger, H Müller <br>
+> *IEEE Computer Graphics and Applications*, 42 (6), 47-57
+
+If you use SlideHeatmap in your research, please cite the above article.
+
+
+
+
