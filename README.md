@@ -35,7 +35,7 @@ For writing the exported files, there will be a user and user group with the sam
 
 -----
 
-If you want to run this program outside of docker you neede to install the following dependencies by pip, your package manager or by source. Make sure to run at least the version listed below:
+If you want to run this program outside of docker, you need to install the following dependencies by pip, your package manager or by source. Make sure to run at least the version listed below:
 - [pixman-0.40.0](https://www.linuxfromscratch.org/blfs/view/cvs/general/pixman.html)
 - [openslide-python 1.2.0](https://openslide.org/api/python/)
 - [OpenSlide 3.4.1](https://openslide.org/)
@@ -46,7 +46,7 @@ If you want to run this program outside of docker you neede to install the follo
 
 
 ## Usage
-To draw heatmap data, a csv file from iMotions is needed. All WSI files viewed in the iMotions meeting must be present inside `data` directory.
+To draw heatmap data, a csv file with eye tracking data exported from iMotions is needed. All WSI files, on which eye tracking data have been recorded in the iMotions session, must be present inside `data` directory.
 
 Run a new container with following parameters:
 
@@ -60,16 +60,16 @@ docker run --rm \
     -l [EXPORT_LAYER]
 ```
 
-The `-v` parameter bind mounts a local directory to a directory inside the container. It uses following convention: `local_dir : container_dir`. It is important to use abolute paths for this parameter! \
+The `-v` parameter mounts a local directory to a directory inside the container. It uses the following convention: `local_dir : container_dir`. It is important to use abolute paths for this parameter! \
 Also make sure to have write permissions to the export directory!
 
-The `-c` parameter can be left away if no specific CSV file is desired. The container will take automatically the mounted `/data/` directory as input. If you want to specify one file, assume you are already in the mounted directory. \
-All the other parameters are working like described in the table down below.
+The `-c` parameter can be skipped if no specific CSV file is desired. The container will take automatically the mounted `/data/` directory as input. If you want to specify one file, assume you are already in the mounted directory. \
+All the other parameters are working like described in the table below.
 
-With the `-u` flag a user or user and group id can be specifyed [`id -u` is for user, `id -u` is for group]. This solves permission issues with the exported files by running the process inside the container with this specifyed user. \
-If you don't have a special need for this you can leave it like it is and don't have to worry about it.
+With the `-u` flag a user or user and group id can be specified [`id -u` is for user, `id -u` is for group]. This solves permission issues with the exported files by running the process inside the container with this specified user. \
+If you don't have a special need for this, you can leave it like it is and don't have to worry about it.
 
-### Input parameters and their usage:
+### Input parameters for SlideHeatmap and their usage:
 | Option | Description |
 | ------ | ----------- |
 |   -c   | input CSV file or input file directory (CSV and SVS files need to be inside here). |
@@ -89,23 +89,23 @@ If you don't have a special need for this you can leave it like it is and don't 
 |   -e   | enable viewPath color legend to visualise start and end colors. |
 |   -f   | Specify use and threshold values for canny edge detection. Default is (100, 400). |
 
-### Minmal native working example
-To get heatmap data rendered on all wsi files used in one specific iMotions meeting and export all JPG's with their layer 3 resolution, use following line.
+### Minimal native working example
+To get heatmap data rendered on all WSI files used in one specific iMotions session and export all JPG's with their layer 3 resolution, use following line.
 
 `
 python3 src/main.py -c data/testMeeting.csv -l 3
 `
 
-Important to know is that a resolution with the same width/height ratio as the original wsi files has to be chosen if you specify a fixed resolution. Otherwise it is possible that only a part of the original wsi is being extracted.
+Important to know is that a resolution with the same width/height ratio as the original WSI files has to be chosen if you specify a fixed resolution. Otherwise it is possible that only a part of the original WSI is being extracted.
 
-> Note: Inside `data` directory must be all .csv and .svs files stored which where used by this iMotions meeting!
+> Note: Inside `data` directory must be all .csv files exported from a specific iMotions session, and all .svs files of WSIs used during this iMotions session!
 
-When the programm is has finished all renderings, `done.` will be printed.
+When the program has finished all renderings, `done.` will be printed.
 
 ## Output Interpretation
 
-### Region Of Interes
-Uses line strength (not width!) to visualize what areas of the WSI an Pathologist has viewed the most. The line strength resemples the time spent observing at the area, relative to the total time spent looking at this WSI. Stronger lines resemble longer time spent, weaker lines resemble less time spent on a particular area.
+### Region Of Interest
+Uses line strength (not width!) to visualize what areas of the WSI a participant of the eye tracking session has viewed the most. The line strength resembles the time spent observing the area, relative to the total time spent looking at this WSI. Stronger lines resemble longer time spent, weaker lines resemble less time spent on a particular area.
 
 The Color of outlineing resemples the downsample factor to which the area has been zoomed in. The more a Pathologist has zoomed in to an specific area, the smaller the downsample factor number gets. \
 A rule of thumb is that, bigger areas result in higher downsample factors and smaller image sections result in smaller downsample factors.
