@@ -133,13 +133,13 @@ The following pattern is being used.
 
 <br />
 
-## iMotions Data
+## iMotions .csv export
 
-| Parameter | Description | Used For | Relative To |
+| Column name | Description | Used For | Relative To |
 |-----------|-------------|----------|-------------|
 | CurrentCenterX/Y | Center of displayed image section. | - | Relative to WSI on Layer 0. |
 | CurrentDownsampleFactor | Basically a inverted zoom factor. | Draw image sectoins. | Lower numbers means more "zoomed in" the displayed image section is. |
-| width/heght | Width/Height of displayed image section. | Calculate dead part on recording monitor, which is the iMotions window. | Absolute pixels on display's left upper corner. |
+| width/height | Width/Height of displayed image section. | Calculate dead part on recording monitor, which is the iMotions window. | Absolute pixels on display's left upper corner. |
 | Top/BottomLeft/RightX/Y | Corner point coordinates of displayed image section. | Draw image sectoins. | Coordinates are on Layer 0 of WSI. |
 | CenterX/Y | Center of displayed image section. | - | Coordinates are on Layer 0 of WSI. |
 | ET_GazeLeft/RightX/Y | Pixel on wich eye is looking. | Drawing heatmaps and viewpath. | Coordinates on record Display. |
