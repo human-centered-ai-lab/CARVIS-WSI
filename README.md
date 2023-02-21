@@ -5,6 +5,13 @@
 
 # SlideHeatmap
 This software aims to render heatmap data onto an extracted histopathology whole slide image (WSI) using eye tracking data collected with [iMotions](https://imotions.com).
+For a more detailed description of the concepts used by SlideHeatmap, please see the following article:
+
+> [Understanding and Explaining Diagnostic Paths: Toward Augmented Decision Making](https://ieeexplore.ieee.org/abstract/document/9861384) <br>
+> M Plass, M Kargl, P Nitsche, E Jungwirth, A Holzinger, H Müller <br>
+> *IEEE Computer Graphics and Applications*, 42 (6), 47-57
+
+Please cite the above article, if you use SlideHeatmap in your research.
 
 <details>
 <summary>Here are some up to date output sample files:</summary>
