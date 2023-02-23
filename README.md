@@ -1,23 +1,23 @@
-[![Build Status Docker](https://github.com/human-centered-ai-lab/SlideHeatmap/actions/workflows/docker-image.yml/badge.svg)](https://github.com/human-centered-ai-lab/SlideHeatmap/actions)
-<img alt="GitHub top language" src="https://img.shields.io/github/languages/top/human-centered-ai-lab/SlideHeatmap">
-<img alt="GitHub language count" src="https://img.shields.io/github/languages/count/human-centered-ai-lab/SlideHeatmap">
-<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/human-centered-ai-lab/SlideHeatmap">
+[![Build Status Docker](https://github.com/human-centered-ai-lab/CARVIS-WSI/actions/workflows/docker-image.yml/badge.svg)](https://github.com/human-centered-ai-lab/CARVIS-WSI/actions)
+<img alt="GitHub top language" src="https://img.shields.io/github/languages/top/human-centered-ai-lab/CARVIS-WSI">
+<img alt="GitHub language count" src="https://img.shields.io/github/languages/count/human-centered-ai-lab/CARVIS-WSI">
+<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/human-centered-ai-lab/CARVIS-WSI">
 
-# SlideHeatmap
-This software aims to render heatmap data onto an extracted histopathology whole slide image (WSI) using eye tracking data collected with [iMotions](https://imotions.com).
-For a more detailed description of the concepts used by SlideHeatmap, please see the following article:
+# CARVIS-WSI
+CARVIS-WSI is an open source tool for **CAR**tographic **VIS**ualization of the Diagnostic Path on **W**hole **S**lide **I**mages that aims to render heatmap data onto an extracted histopathology whole slide image (WSI) using eye tracking data collected with [iMotions](https://imotions.com).
+For a more detailed description of the concepts used by CARVIS-WSI, please see the following article:
 
 > [Understanding and Explaining Diagnostic Paths: Toward Augmented Decision Making](https://ieeexplore.ieee.org/abstract/document/9861384) <br>
 > M Plass, M Kargl, P Nitsche, E Jungwirth, A Holzinger, H Müller <br>
 > *IEEE Computer Graphics and Applications*, 42 (6), 47-57
 
-Please cite the above article, if you use SlideHeatmap in your research.
+Please cite the above article, if you use CARVIS-WSI in your research.
 
 
 ## Installation
 To setup this program you need to clone the master branch of this repository.
 
-`git clone git@github.com:human-centered-ai-lab/SlideHeatmap.git`
+`git clone git@github.com:human-centered-ai-lab/CARVIS-WSI.git`
 
 Now create both a directory for input data and one for export data inside the repository.
 
@@ -26,7 +26,7 @@ Now create both a directory for input data and one for export data inside the re
 Then build the docker container.
 
 ```
-docker build -t slide-heatmap .
+docker build -t carvis-wsi .
 ```
 
 This command may take some time to run, depending on the system. It downloads the latest Docker Python image and installs all dependencies so this does not have to be done manually. \
@@ -43,7 +43,6 @@ If you want to run this program outside of docker, you need to install the follo
 - [numpy 1.21.5](https://numpy.org/)
 - [opencv 4.6.0](https://opencv.org/)
 
-
 ## Usage
 To draw heatmap data, a csv file with eye tracking data exported from iMotions is needed. All WSI files, on which eye tracking data have been recorded in the iMotions session, must be present inside `data` directory.
 
@@ -52,10 +51,10 @@ Run a new container with following parameters:
 ```
 docker run --rm \
     -u $(id -u):$(id -g) \
-    --name slide-heatmap \
+    --name carvis-wsi \
     -v /absolute/path/to/data/:/data/ \
     -v /absolute/path/to/export/:/export/ \
-    slide-heatmap \
+    carvis-wsi \
     -l [EXPORT_LAYER]
 ```
 
@@ -68,7 +67,7 @@ All the other parameters are working like described in the table below.
 With the `-u` flag a user or user and group id can be specified [`id -u` is for user, `id -u` is for group]. This solves permission issues with the exported files by running the process inside the container with this specified user. \
 If you don't have a special need for this, you can leave it like it is and don't have to worry about it.
 
-### Input parameters for SlideHeatmap and their usage:
+### Input parameters for CARVIS-WSI and their usage:
 | Option | Description |
 | ------ | ----------- |
 |   -c   | input CSV file or input file directory (CSV and SVS files need to be inside here). |
@@ -102,9 +101,14 @@ Important to know is that a resolution with the same width/height ratio as the o
 When the program has finished all renderings, `done.` will be printed.
 
 ## Input Example
-Example of an input slides that will be processed by SlideHeatmap.
+Example of an input slides that will be processed by CARVIS-WSI.
 
 <br><img src="images/sample_1.png"></br>
+
+### Input csv
+
+To get the input csv file containing the eye-tracking data please import the [ViewerCoordinates](scripts/ViewerCoordinates.groovy) script into QuPath by placing it in the scripts directory (Documents/quPath/scripts or check the location of the scipts directory with Automate->Shared Scripts->Open Scripts Directory). When erverything is set up and you are ready to start recording you can start the ViewerCoordinates script (Automate->Shared Scripts->ViewerCoordinates->Run [Ctrl+R]). Importnat to Note iMostions must be running before the ViewerCoordinates script is started.
+
 
 ## Output Interpretation
 
@@ -173,13 +177,13 @@ The examined araes are illustrated by framed image sections with the correspondi
 
 ## Citation
 
-For more information about the motivation of the SlideHeatmap, please see the following article:
+For more information about the motivation of the CARVIS-WSI, please see the following article:
 
 > [Understanding and Explaining Diagnostic Paths: Toward Augmented Decision Making](https://ieeexplore.ieee.org/abstract/document/9861384) <br>
 > M Plass, M Kargl, P Nitsche, E Jungwirth, A Holzinger, H Müller <br>
 > *IEEE Computer Graphics and Applications*, 42 (6), 47-57
 
-If you use SlideHeatmap in your research, please cite the above article.
+If you use CARVIS-WSI in your research, please cite the above article.
 
 
 
