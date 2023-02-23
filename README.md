@@ -107,7 +107,7 @@ Example of an input slides that will be processed by CARVIS-WSI.
 
 ### Input csv
 
-To get the input csv file containing the eye-tracking data please import the [ViewerCoordinates](scripts/ViewerCoordinates.groovy) script into QuPath by placing it in the scripts directory (Documents/quPath/scripts or check the location of the scipts directory with Automate->Shared Scripts->Open Scripts Directory). When erverything is set up and you are ready to start recording you can start the ViewerCoordinates script (Automate->Shared Scripts->ViewerCoordinates->Run [`Ctrl+R`]). **Important** to note iMostions must be running before the ViewerCoordinates script is started.
+To get the input csv file containing the eye tracking data please import the [scripts/ViewerCoordinates](scripts/ViewerCoordinates.groovy) script into QuPath by placing it in the scripts directory (Documents/quPath/scripts/ or check the location of the scipts directory with Automate->Shared Scripts->Open Scripts Directory). When everything is set up and you are ready to start recording you can start the ViewerCoordinates script (Automate->Shared Scripts->ViewerCoordinates->Run [`Ctrl+R`]). **Important** to note iMotions must be running before the ViewerCoordinates script is started.
 
 
 ## Output Interpretation
@@ -159,7 +159,7 @@ The examined araes are illustrated by framed image sections with the correspondi
 
 <br />
 
-## iMotions .csv export
+## Eye tracking .csv export
 
 | Column name | Description | Used for | Relative to |
 |-----------|-------------|----------|-------------|
