@@ -4,7 +4,7 @@
 <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/human-centered-ai-lab/CARVIS-WSI">
 
 # CARVIS-WSI
-CARVIS-WSI is an open source tool for **CAR**tographic **VIS**ualization of the Diagnostic Path on **W**hole **S**lide **I**mages that aims to render heatmap data onto an extracted histopathology whole slide image (WSI) using eye tracking data collected with [iMotions](https://imotions.com).
+CARVIS-WSI is an open source tool for **CAR**tographic **VIS**ualization of the Diagnostic Path on **W**hole **S**lide **I**mages that aims to render heatmap data onto an extracted histopathology whole slide image (WSI) using eye tracking data collected with [iMotions](https://imotions.com) and [QuPath](https://qupath.github.io/). 
 For a more detailed description of the concepts used by CARVIS-WSI, please see the following article:
 
 > [Understanding and Explaining Diagnostic Paths: Toward Augmented Decision Making](https://ieeexplore.ieee.org/abstract/document/9861384) <br>
@@ -42,6 +42,11 @@ If you want to run this program outside of docker, you need to install the follo
 - [pyvips 2.21](https://pypi.org/project/pyvips/)
 - [numpy 1.21.5](https://numpy.org/)
 - [opencv 4.6.0](https://opencv.org/)
+
+
+## Recorindg setup
+
+To record the eyetracking data use [iMotions](https://imotions.com) and [QuPath](https://qupath.github.io/). Import the [scripts/ViewerCoordinates](scripts/ViewerCoordinates.groovy) script into QuPath by placing it in the scripts directory (´Documents/quPath/scripts/´ or check the location of the scipts directory with Automate->Shared Scripts->Open Scripts Directory). Once everything is set up and you are ready to start recording you can start the ViewerCoordinates script (Automate->Shared Scripts->ViewerCoordinates->Run [`Ctrl+R`]). **Important** to note iMotions must be running before the ViewerCoordinates script is started. The [ViewerCoordinates](scripts/ViewerCoordinates.groovy) script generate a csv eye tracking and the coordinates of currently viewed WSI region in relation to layer 0.
 
 ## Usage
 To draw heatmap data, a csv file with eye tracking data exported from iMotions is needed. All WSI files, on which eye tracking data have been recorded in the iMotions session, must be present inside `data` directory.
@@ -107,8 +112,7 @@ Example of an input slides that will be processed by CARVIS-WSI.
 
 ### Input csv
 
-To get the input csv file containing the eye tracking data please import the [scripts/ViewerCoordinates](scripts/ViewerCoordinates.groovy) script into QuPath by placing it in the scripts directory (Documents/quPath/scripts/ or check the location of the scipts directory with Automate->Shared Scripts->Open Scripts Directory). When everything is set up and you are ready to start recording you can start the ViewerCoordinates script (Automate->Shared Scripts->ViewerCoordinates->Run [`Ctrl+R`]). **Important** to note iMotions must be running before the ViewerCoordinates script is started.
-
+To get the input csv file containing the eye tracking data please import the [scripts/ViewerCoordinates](scripts/ViewerCoordinates.groovy) script into QuPath and run it during the eye tracking study.
 
 ## Output Interpretation
 
