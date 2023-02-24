@@ -133,7 +133,7 @@ The opacity on each square is relative to the total time spent observing that pa
 
 ### Hatching Heatmap
 <img src="images/Hatching_Pattern.png" align="right" width="200" height="200" >
-The hatching heatmap uses different hatch patterns to visualize the observation duration and magnification of areas. The following pattern is being used.
+The hatching heatmap uses different hatch patterns to visualize the observation duration and magnification of areas. Giving an comprehensive overview on which regions were observed in which magnifictaion and how long. The following pattern is being used.
 
 
 <br><img src="images/sample_3.png"></br>
