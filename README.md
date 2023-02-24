@@ -46,7 +46,9 @@ If you want to run this program outside of docker, you need to install the follo
 
 ## Recorindg setup
 
-To record the eyetracking data use [iMotions](https://imotions.com) and [QuPath](https://qupath.github.io/). Import the [scripts/ViewerCoordinates](scripts/ViewerCoordinates.groovy) script into QuPath by placing it in the scripts directory (´Documents/quPath/scripts/´ or check the location of the scipts directory with Automate->Shared Scripts->Open Scripts Directory). Once everything is set up and you are ready to start recording you can start the ViewerCoordinates script (Automate->Shared Scripts->ViewerCoordinates->Run [`Ctrl+R`]). **Important** to note iMotions must be running before the ViewerCoordinates script is started. The [ViewerCoordinates](scripts/ViewerCoordinates.groovy) script generate a csv eye tracking and the coordinates of currently viewed WSI region in relation to layer 0.
+To record the eyetracking data use [iMotions](https://imotions.com) and [QuPath](https://qupath.github.io/). Import the [scripts/ViewerCoordinates](scripts/ViewerCoordinates.groovy) script into QuPath by placing it in the scripts directory (´Documents/quPath/scripts/´ or check the location of the scipts directory with Automate->Shared Scripts->Open Scripts Directory). Once everything is set up and you are ready to start recording you can start the ViewerCoordinates script (Automate->Shared Scripts->ViewerCoordinates->Run [`Ctrl+R`]). **Important** to note iMotions must be running before the ViewerCoordinates script is started. 
+
+The [ViewerCoordinates](scripts/ViewerCoordinates.groovy) script generate a csv eye tracking and the coordinates of currently viewed WSI region in relation to layer 0.
 
 ## Usage
 To draw heatmap data, a csv file with eye tracking data exported from iMotions is needed. All WSI files, on which eye tracking data have been recorded in the iMotions session, must be present inside `data` directory.
